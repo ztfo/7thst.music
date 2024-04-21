@@ -1,2 +1,2 @@
-# foreign.symbols
-A place for genre-blending music.
+# foreign.symbols landing page
+A place for genre-blending music. Coming Soon.
