@@ -21,6 +21,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
         }
         section {
             text-align: center;
@@ -68,7 +69,14 @@
         }
         .dot1 { animation: dot 1s infinite; }
         .dot2 { animation: dot 1s 0.33s infinite; }
-        .dot3 { animation: dot 1s 0.66s infinite; }        
+        .dot3 { animation: dot 1s 0.66s infinite; }
+        .copyright {
+            margin-top: 4em;
+            text-transform: uppercase;
+            font-size: .8em;
+            letter-spacing: 1px;
+            opacity: .6;
+        }
     </style>
 </head>
 <body>
@@ -107,6 +115,11 @@
                     </a>
                 </li>
             </ul>
+        </section>
+        <section class="copyright">
+            <small>
+                &copy; 2024 - Foreign Symbols Music - All rights reserved.
+            </small>
         </section>
     </main>
 </body>
