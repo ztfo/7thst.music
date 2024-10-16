@@ -97,6 +97,26 @@
         .link-footer a {
             text-decoration: underline;
         }
+        @media only screen and (max-width: 767px) {
+            body {
+                height: auto;
+                padding-top: 3rem;
+            }
+            .grid {
+                display: block;
+            }
+            .grid>div {
+                width: auto;
+                height: auto;
+                border: none;
+                margin-bottom: 2rem;
+                padding-bottom: 2rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .grid>div:last-child {
+                border-bottom: 0;
+            }
+        }
     </style>
 </head>
 <body>
