@@ -471,7 +471,7 @@
         }
 
         .dot.wave {
-            animation: gentleWave 2.5s ease-out forwards;  /* Back to previous animation */
+            animation: gentleWave 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;  /* Smoother easing */
         }
 
         @keyframes electricPulse {
@@ -491,9 +491,14 @@
 
         @keyframes gentleWave {
             0% {
-                transform: scale(2);  /* Larger scale */
+                transform: scale(2);
                 background: rgba(231, 212, 148, 0.8);
-                box-shadow: 0 0 25px rgba(231, 212, 148, 0.5);  /* Stronger glow */
+                box-shadow: 0 0 25px rgba(231, 212, 148, 0.5);
+            }
+            50% {
+                transform: scale(1.5);
+                background: rgba(231, 212, 148, 0.4);
+                box-shadow: 0 0 15px rgba(231, 212, 148, 0.3);
             }
             100% {
                 transform: scale(1);
@@ -648,7 +653,9 @@
                 this.container = document.createElement('div');
                 this.container.className = 'dot-grid';
                 this.dots = [];
-                this.spacing = 25;  // Increased spacing for lower density
+                this.spacing = 25;
+                this.frameInterval = 1000 / 60;  // Increased to 60fps for smoother animation
+                this.waveSpeed = 3;  // Reduced speed for smoother motion
                 // Calculate visible area including below the fold
                 this.maxRadius = Math.sqrt(
                     Math.max(window.innerWidth, document.documentElement.scrollWidth) ** 2 + 
@@ -660,7 +667,6 @@
                 this.maxWaves = 1;  // Limit to one wave at a time
                 this.activeWaveCount = 0;
                 this.lastFrame = 0;
-                this.frameInterval = 1000 / 30; // Reduced to 30fps
                 
                 this.init();
                 this.startWaveAnimation();
@@ -696,8 +702,8 @@
             createWave() {
                 return {
                     radius: 0,
-                    speed: 5,
-                    maxRadius: this.maxRadius  // Use the pre-calculated max radius
+                    speed: this.waveSpeed,
+                    maxRadius: this.maxRadius
                 };
             }
 
@@ -716,10 +722,10 @@
                 const activeDots = new Set();
                 
                 this.waves = this.waves.filter(wave => {
-                    wave.radius += wave.speed;
-                    const waveThickness = this.spacing * 2;
+                    // Smoother wave expansion
+                    wave.radius += wave.speed * (this.frameInterval / 16.67);  // Normalize speed across framerates
+                    const waveThickness = this.spacing * 1.5;  // Slightly thinner wave
 
-                    // Process all dots within the circular wave area
                     for (let dot of this.dots) {
                         const x = parseFloat(dot.style.left);
                         const y = parseFloat(dot.style.top);
@@ -728,15 +734,16 @@
                         const dy = y - this.centerY;
                         const distance = Math.sqrt(dx * dx + dy * dy);
                         
-                        // Check if dot is within the wave's ring
-                        if (Math.abs(distance - wave.radius) <= waveThickness) {
+                        // Smoother wave detection with gradual falloff
+                        const distanceFromWave = Math.abs(distance - wave.radius);
+                        if (distanceFromWave <= waveThickness) {
                             if (!activeDots.has(dot)) {
                                 activeDots.add(dot);
                                 if (!dot.classList.contains('wave')) {
                                     dot.classList.add('wave');
                                     setTimeout(() => {
                                         dot.classList.remove('wave');
-                                    }, 1500);
+                                    }, 2000);  // Slightly longer animation duration
                                 }
                             }
                         }
@@ -745,9 +752,9 @@
                     return wave.radius < wave.maxRadius;
                 });
 
-                // Fixed timing between waves
+                // More gradual wave timing
                 if (this.waves.length > 0 && 
-                    this.waves[this.waves.length - 1].radius > this.spacing * 15) {
+                    this.waves[this.waves.length - 1].radius > this.spacing * 20) {  // Increased spacing between waves
                     this.waves.push(this.createWave());
                 }
 
