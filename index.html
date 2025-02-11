@@ -121,59 +121,50 @@
         }
 
         main {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            position: relative;
+            z-index: 1;
         }
 
         .header {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             position: relative;
-            z-index: 1;
-            padding-top: 20px;
+            width: 100%;
+            z-index: 2;
+            background: linear-gradient(to bottom, 
+                rgba(0, 0, 0, 0.8) 0%,
+                rgba(0, 0, 0, 0.6) 50%,
+                rgba(0, 0, 0, 0.4) 100%
+            );
         }
 
-        /* Add gradient overlay */
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(
-                circle at center,
-                rgba(0, 0, 0, 0.8) 0%,
-                rgba(0, 0, 0, 0.6) 30%,
-                rgba(0, 0, 0, 0.3) 60%,
-                transparent 100%
-            );
-            z-index: -1;
-            pointer-events: none;
+        .header * {
+            pointer-events: auto;  /* Re-enable clicking on header elements */
         }
 
         .logo {
             width: 150px;
             height: auto;
             margin-bottom: 2rem;
-            position: relative; /* Ensure logo stays above gradient */
+            position: relative;
+            filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
         }
 
         .grid {
             position: relative;
             z-index: 1;
-            padding: 2rem 1rem;  /* Reduced padding for mobile */
+            padding: 2rem 1rem;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
-            box-sizing: border-box;  /* Ensure padding is included in width */
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.8);
         }
 
         .grid > div {
@@ -188,41 +179,18 @@
         .player-container {
             position: relative;
             width: 100%;
-            min-height: 300px;
+            height: 300px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 8px;
             overflow: hidden;
-            box-sizing: border-box;
-        }
-
-        .player-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(231, 212, 148, 0.05),
-                transparent
-            );
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% {
-                transform: translateX(-100%);
-            }
-            100% {
-                transform: translateX(100%);
-            }
         }
 
         .player-container iframe {
             position: relative;
-            z-index: 1;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
         }
 
         h3 {
@@ -481,16 +449,16 @@
             height: 100vh;
             z-index: 0;
             pointer-events: none;
-            background: transparent;
         }
 
         .dot {
             position: absolute;
-            width: 4px;  /* Slightly larger dots */
+            width: 4px;
             height: 4px;
             background: rgba(231, 212, 148, 0.06);
             border-radius: 50%;
             transition: all 0.3s ease-out;
+            will-change: transform, opacity;
         }
 
         .dot.active {
@@ -591,9 +559,8 @@
                         height="300" 
                         scrolling="no" 
                         frameborder="no" 
-                        loading="lazy"
                         allow="autoplay" 
-                        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1874619647&color=%23E7D494&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
+                        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1874619647&color=%23E7D494&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
                     </iframe>
                 </div>
                 <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/llu-official" title="llü" target="_blank" style="color: #cccccc; text-decoration: none;">llü</a> · <a href="https://soundcloud.com/llu-official/sets/latebloomer-ep" title="Latebloomer EP" target="_blank" style="color: #cccccc; text-decoration: none;">Latebloomer EP</a></div>
@@ -606,7 +573,6 @@
                         height="300" 
                         scrolling="no" 
                         frameborder="no" 
-                        loading="lazy"
                         allow="autoplay" 
                         src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1966906052&color=%23E7D494&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
                     </iframe>
@@ -621,7 +587,6 @@
                         height="300" 
                         scrolling="no" 
                         frameborder="no" 
-                        loading="lazy"
                         allow="autoplay" 
                         src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1859234718&color=%23E7D494&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
                     </iframe>
@@ -636,7 +601,6 @@
                         height="300" 
                         scrolling="no" 
                         frameborder="no" 
-                        loading="lazy"
                         allow="autoplay" 
                         src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1866428391&color=%23E7D494&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
                     </iframe>
@@ -684,21 +648,31 @@
                 this.container = document.createElement('div');
                 this.container.className = 'dot-grid';
                 this.dots = [];
-                this.spacing = 14;  // Slightly larger spacing
+                this.spacing = 25;  // Increased spacing for lower density
+                // Calculate visible area including below the fold
+                this.maxRadius = Math.sqrt(
+                    Math.max(window.innerWidth, document.documentElement.scrollWidth) ** 2 + 
+                    Math.max(window.innerHeight, document.documentElement.scrollHeight) ** 2
+                ) * 1.2;
                 this.centerX = window.innerWidth / 2;
                 this.centerY = window.innerHeight / 2;
                 this.waves = [];
-                this.maxWaves = 2;  // Fewer concurrent waves for performance
+                this.maxWaves = 1;  // Limit to one wave at a time
                 this.activeWaveCount = 0;
+                this.lastFrame = 0;
+                this.frameInterval = 1000 / 30; // Reduced to 30fps
                 
                 this.init();
                 this.startWaveAnimation();
             }
 
             init() {
-                const cols = Math.floor(window.innerWidth / this.spacing);
-                const rows = Math.floor(window.innerHeight / this.spacing);
+                // Calculate grid size to cover entire document
+                const cols = Math.ceil(Math.max(window.innerWidth, document.documentElement.scrollWidth) / this.spacing);
+                const rows = Math.ceil(Math.max(window.innerHeight, document.documentElement.scrollHeight) / this.spacing);
 
+                const fragment = document.createDocumentFragment();
+                
                 for (let i = 0; i < rows; i++) {
                     for (let j = 0; j < cols; j++) {
                         const dot = document.createElement('div');
@@ -711,80 +685,77 @@
                         dot.style.top = y + 'px';
                         
                         this.dots.push(dot);
-                        this.container.appendChild(dot);
+                        fragment.appendChild(dot);
                     }
                 }
                 
+                this.container.appendChild(fragment);
                 document.body.insertBefore(this.container, document.body.firstChild);
             }
 
             createWave() {
                 return {
                     radius: 0,
-                    speed: 4 + Math.random() * 2,  // Random speed variation
-                    maxRadius: Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 1.2
+                    speed: 5,
+                    maxRadius: this.maxRadius  // Use the pre-calculated max radius
                 };
             }
 
             animateWaves() {
+                const now = performance.now();
+                if (now - this.lastFrame < this.frameInterval) {
+                    requestAnimationFrame(() => this.animateWaves());
+                    return;
+                }
+                this.lastFrame = now;
+
                 if (this.waves.length === 0) {
                     this.waves.push(this.createWave());
                 }
 
-                // Use a single loop for performance
                 const activeDots = new Set();
                 
                 this.waves = this.waves.filter(wave => {
                     wave.radius += wave.speed;
-                    const waveThickness = this.spacing * 3;  // Thicker wave
+                    const waveThickness = this.spacing * 2;
 
-                    // Only process visible dots
-                    const minX = Math.max(0, this.centerX - wave.radius - waveThickness);
-                    const maxX = Math.min(window.innerWidth, this.centerX + wave.radius + waveThickness);
-                    const minY = Math.max(0, this.centerY - wave.radius - waveThickness);
-                    const maxY = Math.min(window.innerHeight, this.centerY + wave.radius + waveThickness);
-
-                    this.dots.forEach(dot => {
+                    // Process all dots within the circular wave area
+                    for (let dot of this.dots) {
                         const x = parseFloat(dot.style.left);
                         const y = parseFloat(dot.style.top);
                         
-                        // Skip dots outside the active area
-                        if (x < minX || x > maxX || y < minY || y > maxY) return;
-
                         const dx = x - this.centerX;
                         const dy = y - this.centerY;
                         const distance = Math.sqrt(dx * dx + dy * dy);
-                        const distanceFromWave = Math.abs(distance - wave.radius);
-
-                        if (distanceFromWave < waveThickness) {
+                        
+                        // Check if dot is within the wave's ring
+                        if (Math.abs(distance - wave.radius) <= waveThickness) {
                             if (!activeDots.has(dot)) {
                                 activeDots.add(dot);
                                 if (!dot.classList.contains('wave')) {
                                     dot.classList.add('wave');
                                     setTimeout(() => {
                                         dot.classList.remove('wave');
-                                    }, 2000);
+                                    }, 1500);
                                 }
                             }
                         }
-                    });
+                    }
 
                     return wave.radius < wave.maxRadius;
                 });
 
-                // Add new wave with some randomness
+                // Fixed timing between waves
                 if (this.waves.length > 0 && 
-                    this.waves[this.waves.length - 1].radius > this.spacing * (10 + Math.random() * 10)) {
+                    this.waves[this.waves.length - 1].radius > this.spacing * 15) {
                     this.waves.push(this.createWave());
                 }
+
+                requestAnimationFrame(() => this.animateWaves());
             }
 
             startWaveAnimation() {
-                const animate = () => {
-                    this.animateWaves();
-                    requestAnimationFrame(animate);
-                };
-                animate();
+                this.animateWaves();
             }
         }
 
@@ -793,7 +764,7 @@
             // Delay dot grid initialization slightly to prioritize content loading
             setTimeout(() => {
                 new DotGrid();
-            }, 100);
+            }, 500);
             
             const scrollIndicator = document.createElement('div');
             scrollIndicator.className = 'scroll-indicator';
