@@ -664,9 +664,8 @@
                 this.container.className = 'dot-grid';
                 this.dots = [];
                 this.spacing = 25;
-                this.frameInterval = 1000 / 60;  // Increased to 60fps for smoother animation
-                this.waveSpeed = 3;  // Reduced speed for smoother motion
-                // Calculate visible area including below the fold
+                this.frameInterval = 1000 / 70;
+                this.waveSpeed = 3; 
                 this.maxRadius = Math.sqrt(
                     Math.max(window.innerWidth, document.documentElement.scrollWidth) ** 2 + 
                     Math.max(window.innerHeight, document.documentElement.scrollHeight) ** 2
@@ -674,7 +673,7 @@
                 this.centerX = window.innerWidth / 2;
                 this.centerY = window.innerHeight / 2;
                 this.waves = [];
-                this.maxWaves = 1;  // Limit to one wave at a time
+                this.maxWaves = 1; 
                 this.activeWaveCount = 0;
                 this.lastFrame = 0;
                 
@@ -733,8 +732,8 @@
                 
                 this.waves = this.waves.filter(wave => {
                     // Smoother wave expansion
-                    wave.radius += wave.speed * (this.frameInterval / 16.67);  // Normalize speed across framerates
-                    const waveThickness = this.spacing * 1.5;  // Slightly thinner wave
+                    wave.radius += wave.speed * (this.frameInterval / 16.67); 
+                    const waveThickness = this.spacing * 2; 
 
                     for (let dot of this.dots) {
                         const x = parseFloat(dot.style.left);
@@ -753,7 +752,7 @@
                                     dot.classList.add('wave');
                                     setTimeout(() => {
                                         dot.classList.remove('wave');
-                                    }, 2000);  // Slightly longer animation duration
+                                    }, 2000);  
                                 }
                             }
                         }
