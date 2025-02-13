@@ -466,9 +466,7 @@
             width: 4px;
             height: 4px;
             background: rgba(231, 212, 148, 0.06);
-            border-radius: 50%;
-            transition: all 0.3s ease-out;
-            will-change: transform, opacity;
+            border-radius: 50%;  /* Keep dots circular */
         }
 
         .dot.active {
@@ -481,7 +479,7 @@
         }
 
         .dot.wave {
-            animation: gentleWave 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;  /* Smoother easing */
+            animation: gentleWave 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
         @keyframes electricPulse {
@@ -501,17 +499,17 @@
 
         @keyframes gentleWave {
             0% {
-                transform: scale(2);
+                transform: scale(2);  /* Remove rotation */
                 background: rgba(231, 212, 148, 0.8);
                 box-shadow: 0 0 25px rgba(231, 212, 148, 0.5);
             }
             50% {
-                transform: scale(1.5);
+                transform: scale(1.5);  /* Remove rotation */
                 background: rgba(231, 212, 148, 0.4);
                 box-shadow: 0 0 15px rgba(231, 212, 148, 0.3);
             }
             100% {
-                transform: scale(1);
+                transform: scale(1);  /* Remove rotation */
                 background: rgba(231, 212, 148, 0);
                 box-shadow: none;
             }
@@ -665,7 +663,8 @@
                 this.dots = [];
                 this.spacing = 25;
                 this.frameInterval = 1000 / 70;
-                this.waveSpeed = 3; 
+                this.waveSpeed = 3;
+                this.rotationSpeed = 0.5;  // Keep this for square wave rotation only
                 this.maxRadius = Math.sqrt(
                     Math.max(window.innerWidth, document.documentElement.scrollWidth) ** 2 + 
                     Math.max(window.innerHeight, document.documentElement.scrollHeight) ** 2
@@ -712,7 +711,8 @@
                 return {
                     radius: 0,
                     speed: this.waveSpeed,
-                    maxRadius: this.maxRadius
+                    maxRadius: this.maxRadius,
+                    rotation: 0 // Initial rotation angle
                 };
             }
 
@@ -731,9 +731,9 @@
                 const activeDots = new Set();
                 
                 this.waves = this.waves.filter(wave => {
-                    // Smoother wave expansion
-                    wave.radius += wave.speed * (this.frameInterval / 16.67); 
-                    const waveThickness = this.spacing * 2; 
+                    wave.radius += wave.speed * (this.frameInterval / 16.67);
+                    wave.rotation += this.rotationSpeed * (this.frameInterval / 16.67);
+                    const waveThickness = this.spacing * 2;
 
                     for (let dot of this.dots) {
                         const x = parseFloat(dot.style.left);
@@ -741,18 +741,25 @@
                         
                         const dx = x - this.centerX;
                         const dy = y - this.centerY;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
                         
-                        // Smoother wave detection with gradual falloff
-                        const distanceFromWave = Math.abs(distance - wave.radius);
-                        if (distanceFromWave <= waveThickness) {
+                        // Rotate the square wave pattern, not the dots
+                        const rotationRad = wave.rotation * (Math.PI / 180);
+                        const rotatedX = dx * Math.cos(rotationRad) - dy * Math.sin(rotationRad);
+                        const rotatedY = dx * Math.sin(rotationRad) + dy * Math.cos(rotationRad);
+                        
+                        const distanceFromSquare = Math.max(
+                            Math.abs(rotatedX) - wave.radius,
+                            Math.abs(rotatedY) - wave.radius
+                        );
+
+                        if (Math.abs(distanceFromSquare) <= waveThickness) {
                             if (!activeDots.has(dot)) {
                                 activeDots.add(dot);
                                 if (!dot.classList.contains('wave')) {
                                     dot.classList.add('wave');
                                     setTimeout(() => {
                                         dot.classList.remove('wave');
-                                    }, 2000);  
+                                    }, 2000);
                                 }
                             }
                         }
