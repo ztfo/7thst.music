@@ -1,9 +1,5 @@
 # 7thSt.music
 
-A minimalist music showcase website for llü, featuring SoundCloud embeds and links to music profiles.
-
-## Music Profiles
-
 Find llü's music on these platforms:
 
 - [SoundCloud](https://soundcloud.com/llu-official)
