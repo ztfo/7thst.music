@@ -11,8 +11,7 @@ Find llü's music on these platforms:
 ### Music
 
 - **Latebloomer EP** - A collection to dance to 
-- **explorations 001** - Experimental sound design and ambient textures
-- **experiments** - Sound design explorations and audio sketches
+- **works in progress** - Sound design explorations and audio sketches
 
 ### Music Plug-ins
 
