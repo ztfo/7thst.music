@@ -27,9 +27,6 @@ Looking for musical inspiration? Check out these curated playlists:
 - [Dark](https://open.spotify.com/playlist/1cdTAxPUXieR9ZkcGKCleO)
 - [Smooth](https://open.spotify.com/playlist/5KuWQUO3X0dGalovbeC6aX)
 
-## Contact
-
-For inquiries: [llu@foreignsymbols.com](mailto:llu@foreignsymbols.com)
 
 ## About the Website
 
