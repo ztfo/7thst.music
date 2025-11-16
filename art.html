@@ -14,6 +14,15 @@
     <meta name="msapplication-TileColor" content="#000000">
     <meta name="theme-color" content="#000000">
     
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G9DRK12SZE"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-G9DRK12SZE');
+    </script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
@@ -613,6 +622,13 @@
             button.addEventListener('click', () => {
                 const targetTab = button.getAttribute('data-tab');
 
+                // Track tab click
+                gtag('event', 'click', {
+                    'event_category': 'Art Gallery Tab',
+                    'event_label': targetTab.charAt(0).toUpperCase() + targetTab.slice(1),
+                    'transport_type': 'beacon'
+                });
+
                 // Update active tab
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
@@ -715,6 +731,12 @@
                 item.setAttribute('data-category', category);
                 item.setAttribute('data-index', index);
                 item.addEventListener('click', () => {
+                    // Track image click
+                    gtag('event', 'click', {
+                        'event_category': 'Art Gallery Image',
+                        'event_label': `${category.charAt(0).toUpperCase() + category.slice(1)} - Image ${index + 1}`,
+                        'transport_type': 'beacon'
+                    });
                     openLightbox(category, index, shuffledImages);
                 });
                 
@@ -854,6 +876,13 @@
         function navigateLightbox(direction) {
             if (currentImages.length === 0) return;
             
+            // Track lightbox navigation
+            gtag('event', 'click', {
+                'event_category': 'Lightbox Navigation',
+                'event_label': direction === 'next' ? 'Next Image' : 'Previous Image',
+                'transport_type': 'beacon'
+            });
+            
             const newIndex = direction === 'next' 
                 ? currentIndex + 1 
                 : currentIndex - 1;
@@ -965,6 +994,18 @@
                 return false;
             }
         });
+
+        // Track back link click
+        const backLink = document.querySelector('.back-link a');
+        if (backLink) {
+            backLink.addEventListener('click', function() {
+                gtag('event', 'click', {
+                    'event_category': 'Navigation',
+                    'event_label': 'Back to Music',
+                    'transport_type': 'beacon'
+                });
+            });
+        }
 
         // Initialize on page load
         window.addEventListener('DOMContentLoaded', () => {

@@ -15,6 +15,15 @@
     <meta name="msapplication-TileColor" content="#000000">
     <meta name="theme-color" content="#000000">
     
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G9DRK12SZE"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-G9DRK12SZE');
+    </script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
@@ -818,6 +827,37 @@
                     scrollIndicator.style.opacity = '0';
                 } else {
                     scrollIndicator.style.opacity = '1';
+                }
+            });
+        });
+
+        // Google Analytics event tracking
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track music profile link clicks
+            const musicLinks = document.querySelectorAll('.top-social-links a');
+            musicLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const linkText = this.textContent.trim();
+                    gtag('event', 'click', {
+                        'event_category': 'Music Profile',
+                        'event_label': linkText,
+                        'transport_type': 'beacon'
+                    });
+                });
+            });
+
+            // Track external link clicks (playlists, etc.)
+            const externalLinks = document.querySelectorAll('a[target="_blank"]');
+            externalLinks.forEach(link => {
+                if (!link.closest('.top-social-links')) {
+                    link.addEventListener('click', function(e) {
+                        const linkText = this.textContent.trim() || this.href;
+                        gtag('event', 'click', {
+                            'event_category': 'External Link',
+                            'event_label': linkText,
+                            'transport_type': 'beacon'
+                        });
+                    });
                 }
             });
         });
