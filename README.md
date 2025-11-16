@@ -5,12 +5,7 @@ Find llü's music on these platforms:
 - [SoundCloud](https://soundcloud.com/llu-official)
 - [Spotify](https://open.spotify.com/artist/1t00W56dAWaTPJ7YcRwY91)
 - [Apple Music](https://music.apple.com/us/artist/llü/1770530866)
-
-## Art Gallery
-
-View llü's illustrations and artwork:
-
-- [Art Gallery](art.html) - Browse illustrations across Dreams, Mandalas, Voices, Animals, and Song Art
+- [Illustration Art Gallery](https://7thst.music/art.html) 
 
 ## Featured Projects
 
