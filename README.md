@@ -5,7 +5,6 @@ Find llü's music on these platforms:
 - [SoundCloud](https://soundcloud.com/llu-official)
 - [Spotify](https://open.spotify.com/artist/1t00W56dAWaTPJ7YcRwY91)
 - [Apple Music](https://music.apple.com/us/artist/llü/1770530866)
-- [Illustration Art Gallery](https://7thst.music/art.html) 
 
 ## Featured Projects
 
@@ -17,6 +16,10 @@ Find llü's music on these platforms:
 ### Music Plug-ins
 
 - **[Arreglo](https://arreglo.ai)** - An AI-powered music arrangement generator for Figma. Transform your track ideas into complete arrangements in minutes.
+
+## Illustration Art
+
+- [Illustration Art Gallery](https://7thst.music/art.html) 
 
 ## Inspiration Playlists
 
