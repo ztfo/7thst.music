@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>Art - 7thSt.music</title>
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <!-- <link rel="manifest" href="site.webmanifest"> -->
+    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#000000">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#000000">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: #000;
+            color: #FFF;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 2rem 1rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
+        }
+
+        .back-link {
+            color: rgba(231, 212, 148, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin: 0 auto;
+            margin-top: 2rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .back-link:hover {
+            color: #E7D494;
+            text-shadow: 0 0 10px rgba(231, 212, 148, 0.3);
+        }
+
+        .art-gallery {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: transparent;
+            border: 1px solid rgba(231, 212, 148, 0.15);
+            color: rgba(231, 212, 148, 0.6);
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: lowercase;
+        }
+
+        .tab-button:hover {
+            border-color: rgba(231, 212, 148, 0.3);
+            color: rgba(231, 212, 148, 0.9);
+        }
+
+        .tab-button.active {
+            background: rgba(231, 212, 148, 0.1);
+            border-color: rgba(231, 212, 148, 0.4);
+            color: #E7D494;
+        }
+
+        .tab-description {
+            text-align: center;
+            color: rgba(231, 212, 148, 0.6);
+            font-size: 0.9rem;
+            font-style: italic;
+            margin: -1.5rem 0 2rem;
+            padding: 0 1rem;
+            min-height: 1.5rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-section {
+            display: none;
+        }
+
+        .gallery-section.active {
+            display: block;
+        }
+
+        /* 2-column portrait grid for Animals */
+        .gallery-grid.portrait {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            padding: 1rem 0;
+        }
+
+        /* Square grid for Mandalas and Dreams */
+        .gallery-grid.square {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem 0;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Skeleton loader */
+        .skeleton-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(231, 212, 148, 0.05) 0%,
+                rgba(231, 212, 148, 0.1) 50%,
+                rgba(231, 212, 148, 0.05) 100%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        .gallery-item img.loaded {
+            opacity: 1;
+        }
+
+        .gallery-item img {
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            pointer-events: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+        }
+
+        /* Copyright watermark on images */
+        .gallery-item::before {
+            content: '© 2025 Luis Palomares - 7thSt.Music';
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.65rem;
+            font-family: 'Inter', sans-serif;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .gallery-item:hover::before {
+            opacity: 1;
+        }
+
+        /* Watermark on lightbox image - only show when image is loaded */
+        .lightbox-content::after {
+            content: '© 2025 Luis Palomares - 7thSt.Music';
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            pointer-events: none;
+            z-index: 1002;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        .lightbox-content.has-loaded-image::after {
+            opacity: 1;
+        }
+
+        .gallery-item .skeleton-loader.hidden {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .gallery-item.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-item.portrait {
+            aspect-ratio: auto;
+        }
+
+        .gallery-item.square {
+            aspect-ratio: 1;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(231, 212, 148, 0);
+            transition: background 0.3s ease;
+            pointer-events: none;
+        }
+
+        .gallery-item:hover::after {
+            background: rgba(231, 212, 148, 0.05);
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        .lightbox.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            cursor: default;
+        }
+
+        .lightbox-skeleton {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            background: linear-gradient(
+                90deg,
+                rgba(231, 212, 148, 0.05) 0%,
+                rgba(231, 212, 148, 0.1) 50%,
+                rgba(231, 212, 148, 0.05) 100%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .lightbox-skeleton.hidden {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            display: block;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            pointer-events: none;
+        }
+
+        .lightbox-content img.loaded {
+            opacity: 1;
+        }
+
+        .lightbox-close {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: transparent;
+            border: 1px solid rgba(231, 212, 148, 0.3);
+            color: rgba(231, 212, 148, 0.8);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            z-index: 1001;
+        }
+
+        .lightbox-close:hover {
+            background: rgba(231, 212, 148, 0.1);
+            border-color: rgba(231, 212, 148, 0.5);
+            color: #E7D494;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .gallery-grid.portrait {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-grid.square {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+
+            .tab-nav {
+                gap: 1rem;
+            }
+
+            .tab-button {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.85rem;
+            }
+
+            .art-gallery {
+                padding: 1rem;
+            }
+
+            .lightbox-close {
+                top: 1rem;
+                right: 1rem;
+                width: 36px;
+                height: 36px;
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid.square {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="back-link">
+        <a href="index.html" class="back-link">&larr; Back to Music</a>
+    </div>
+    <div class="header">
+        <img src="squaresnake.svg" alt="logo" class="logo">
+    </div>
+
+    <div class="art-gallery">
+        <div class="tab-nav">
+            <button class="tab-button active" data-tab="dreams">Dreams</button>
+            <button class="tab-button" data-tab="mandalas">Mandalas</button>
+            <button class="tab-button" data-tab="voices">Voices</button>
+            <button class="tab-button" data-tab="animals">Animals</button>
+            <button class="tab-button" data-tab="songart">Song Art</button>
+        </div>
+
+        <div class="tab-description" id="tab-description">random illustrations of emotions, dreams, or just random play</div>
+
+        <!-- Dreams Gallery (Square) -->
+        <div class="gallery-section active" id="dreams-gallery">
+            <div class="gallery-grid square" id="dreams-grid">
+                <!-- Images will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Mandalas Gallery (Square) -->
+        <div class="gallery-section" id="mandalas-gallery">
+            <div class="gallery-grid square" id="mandalas-grid">
+                <!-- Images will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Voices Gallery (Portrait) -->
+        <div class="gallery-section" id="voices-gallery">
+            <div class="gallery-grid portrait" id="voices-grid">
+                <!-- Images will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Animals Gallery (Portrait) -->
+        <div class="gallery-section" id="animals-gallery">
+            <div class="gallery-grid portrait" id="animals-grid">
+                <!-- Images will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Song Art Gallery (Square) -->
+        <div class="gallery-section" id="songart-gallery">
+            <div class="gallery-grid square" id="songart-grid">
+                <!-- Images will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightbox-close">&times;</button>
+        <div class="lightbox-content">
+            <div class="lightbox-skeleton" id="lightbox-skeleton"></div>
+            <img id="lightbox-image" src="" alt="">
+        </div>
+    </div>
+
+    <!-- Copyright Footer -->
+    <section class="copyright" style="text-align: center; padding: 3rem 1rem 2rem; color: rgba(231, 212, 148, 0.4); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;">
+        <small>
+            &copy; 2025 - Luis Palomares - 7thSt.Music - All rights reserved.
+        </small>
+    </section>
+
+    <!-- Load Cloudinary images data (generated by fetch-cloudinary-images.js) -->
+    <script src="images-data.js"></script>
+    
+    <script>
+        // Image data will be loaded from images-data.js
+        // If images-data.js doesn't exist or fails to load, use empty structure
+        if (typeof window.images === 'undefined') {
+            window.images = {
+                dreams: [],
+                mandalas: [],
+                voices: [],
+                animals: [],
+                songart: []
+            };
+        }
+        
+        // Create a local reference for easier access
+        const images = window.images;
+
+        // Tab descriptions
+        const tabDescriptions = {
+            dreams: 'random illustrations of emotions, dreams, or just random play',
+            mandalas: 'patterns I doodle to decompress, while making or listening to music',
+            voices: 'words that stick to me',
+            animals: 'my favorite pieces to draw',
+            songart: 'illustrations for my music'
+        };
+
+        // Tab navigation
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const gallerySections = document.querySelectorAll('.gallery-section');
+        const tabDescription = document.getElementById('tab-description');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+
+                // Update active tab
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Update description
+                if (tabDescriptions[targetTab]) {
+                    tabDescription.textContent = tabDescriptions[targetTab];
+                }
+
+                // Show/hide galleries
+                gallerySections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(`${targetTab}-gallery`).classList.add('active');
+
+                // Trigger scroll animations for newly visible gallery
+                setTimeout(() => {
+                    observeGallery(`${targetTab}-grid`);
+                }, 100);
+            });
+        });
+
+        // Layout configuration (portrait = 2 columns, square = square grid)
+        const layouts = {
+            dreams: 'square',
+            mandalas: 'square',
+            voices: 'portrait',
+            animals: 'portrait',
+            songart: 'square'
+        };
+
+        // Shuffle array function (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            const shuffled = [...array]; // Create a copy to avoid mutating original
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Render gallery images
+        function renderGallery(category, gridId) {
+            const grid = document.getElementById(gridId);
+            const categoryImages = images[category];
+            
+            if (!categoryImages || categoryImages.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: rgba(231, 212, 148, 0.5); padding: 3rem;">No images found. Run: node fetch-cloudinary-images.js</p>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            const isPortrait = layouts[category] === 'portrait';
+
+            // Shuffle images for random order each time
+            const shuffledImages = shuffleArray(categoryImages);
+
+            shuffledImages.forEach((imageData, index) => {
+                const item = document.createElement('div');
+                item.className = `gallery-item ${isPortrait ? 'portrait' : 'square'}`;
+                
+                // Create skeleton loader
+                const skeleton = document.createElement('div');
+                skeleton.className = 'skeleton-loader';
+                item.appendChild(skeleton);
+                
+                const img = document.createElement('img');
+                img.alt = imageData.alt || `Image ${index + 1}`;
+                img.loading = 'lazy';
+                
+                // Add staggered delay for loading
+                const loadDelay = index * 50; // 50ms delay between each image
+                
+                setTimeout(() => {
+                    img.src = imageData.url;
+                }, loadDelay);
+                
+                // Handle image load
+                img.addEventListener('load', () => {
+                    img.classList.add('loaded');
+                    skeleton.classList.add('hidden');
+                    // Remove skeleton after fade out
+                    setTimeout(() => {
+                        if (skeleton.parentNode) {
+                            skeleton.remove();
+                        }
+                    }, 300);
+                });
+                
+                img.addEventListener('error', () => {
+                    skeleton.classList.add('hidden');
+                    img.style.display = 'none';
+                    item.innerHTML = '<div style="padding: 2rem; text-align: center; color: rgba(231, 212, 148, 0.3);">Image failed to load</div>';
+                });
+
+                item.appendChild(img);
+                // Use lightboxUrl if available, otherwise fall back to url
+                const lightboxUrl = imageData.lightboxUrl || imageData.url;
+                item.addEventListener('click', () => openLightbox(lightboxUrl, imageData.alt));
+                
+                grid.appendChild(item);
+            });
+
+            // Observe for scroll animations
+            observeGallery(gridId);
+        }
+
+        // Intersection Observer for scroll animations
+        function observeGallery(gridId) {
+            const grid = document.getElementById(gridId);
+            if (!grid) return;
+
+            const items = grid.querySelectorAll('.gallery-item:not(.fade-in)');
+            
+            if (items.length === 0) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('fade-in');
+                            observer.unobserve(entry.target);
+                        }, index * 50); // Staggered delay
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '50px'
+            });
+
+            items.forEach(item => observer.observe(item));
+        }
+
+        // Lightbox functionality
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxContent = document.querySelector('.lightbox-content');
+        const lightboxSkeleton = document.getElementById('lightbox-skeleton');
+        const lightboxClose = document.getElementById('lightbox-close');
+
+        function openLightbox(imageUrl, imageAlt) {
+            // Reset state
+            lightboxImage.classList.remove('loaded');
+            lightboxImage.src = '';
+            lightboxImage.alt = imageAlt || '';
+            lightboxSkeleton.classList.remove('hidden');
+            lightboxContent.classList.remove('has-loaded-image'); // Hide watermark initially
+            
+            // Show lightbox
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Load image
+            lightboxImage.src = imageUrl;
+            
+            // Handle image load
+            lightboxImage.addEventListener('load', function onLoad() {
+                lightboxImage.classList.add('loaded');
+                lightboxSkeleton.classList.add('hidden');
+                // Show watermark when image is loaded
+                lightboxContent.classList.add('has-loaded-image');
+                // Remove listener after first load
+                lightboxImage.removeEventListener('load', onLoad);
+            }, { once: true });
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+            setTimeout(() => {
+                lightboxImage.src = '';
+                lightboxImage.classList.remove('loaded');
+                lightboxSkeleton.classList.remove('hidden');
+                lightboxContent.classList.remove('has-loaded-image');
+            }, 300);
+        }
+
+        lightboxClose.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeLightbox();
+        });
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        // Close lightbox on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+                closeLightbox();
+            }
+        });
+
+        // Initialize galleries
+        function initGalleries() {
+            renderGallery('dreams', 'dreams-grid');
+            renderGallery('mandalas', 'mandalas-grid');
+            renderGallery('voices', 'voices-grid');
+            renderGallery('animals', 'animals-grid');
+            renderGallery('songart', 'songart-grid');
+        }
+
+        // Prevent right-click and image saving
+        document.addEventListener('contextmenu', (e) => {
+            // Allow right-click on non-image elements
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Prevent drag and drop
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Prevent common keyboard shortcuts for saving
+        document.addEventListener('keydown', (e) => {
+            // Disable Save Image (Ctrl+S / Cmd+S on images)
+            if ((e.ctrlKey || e.metaKey) && e.key === 's' && e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+            // Disable Save Image As (Ctrl+Shift+S / Cmd+Shift+S)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Prevent image selection
+        document.addEventListener('selectstart', (e) => {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            initGalleries();
+        });
+    </script>
+</body>
+</html>
+

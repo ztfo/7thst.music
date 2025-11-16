@@ -1,0 +1,14 @@
+{
+  "name": "7thst-music",
+  "version": "1.0.0",
+  "description": "7thSt.music portfolio site",
+  "scripts": {
+    "fetch-images": "node fetch-cloudinary-images.js"
+  },
+  "dependencies": {
+    "cloudinary": "^1.41.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {}
+}
+
