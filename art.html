@@ -211,7 +211,8 @@
             content: '© 2025 Luis Palomares - 7thSt.Music';
             position: absolute;
             bottom: 15px;
-            right: 15px;
+            left: 50%;
+            transform: translateX(-50%);
             color: rgba(0, 0, 0, 0.6);
             font-size: 0.75rem;
             font-family: 'Inter', sans-serif;
@@ -378,6 +379,46 @@
             z-index: 1001;
         }
 
+        .lightbox-nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: 1px solid rgba(231, 212, 148, 0.3);
+            color: rgba(231, 212, 148, 0.8);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            z-index: 1001;
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(231, 212, 148, 0.1);
+            border-color: rgba(231, 212, 148, 0.5);
+            color: #E7D494;
+        }
+
+        .lightbox-nav.prev {
+            left: 2rem;
+        }
+
+        .lightbox-nav.next {
+            right: 2rem;
+        }
+
+        .lightbox-nav:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .lightbox-close:hover {
             background: rgba(231, 212, 148, 0.1);
             border-color: rgba(231, 212, 148, 0.5);
@@ -414,6 +455,20 @@
                 width: 36px;
                 height: 36px;
                 font-size: 1.3rem;
+            }
+
+            .lightbox-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+
+            .lightbox-nav.prev {
+                left: 1rem;
+            }
+
+            .lightbox-nav.next {
+                right: 1rem;
             }
         }
 
@@ -477,6 +532,8 @@
     <!-- Lightbox Modal -->
     <div class="lightbox" id="lightbox">
         <button class="lightbox-close" id="lightbox-close">&times;</button>
+        <button class="lightbox-nav prev" id="lightbox-prev" aria-label="Previous image">‹</button>
+        <button class="lightbox-nav next" id="lightbox-next" aria-label="Next image">›</button>
         <div class="lightbox-content">
             <div class="lightbox-skeleton" id="lightbox-skeleton"></div>
             <img id="lightbox-image" src="" alt="">
@@ -625,7 +682,12 @@
                 item.appendChild(img);
                 // Use lightboxUrl if available, otherwise fall back to url
                 const lightboxUrl = imageData.lightboxUrl || imageData.url;
-                item.addEventListener('click', () => openLightbox(lightboxUrl, imageData.alt));
+                // Store category and index for navigation
+                item.setAttribute('data-category', category);
+                item.setAttribute('data-index', index);
+                item.addEventListener('click', () => {
+                    openLightbox(category, index, shuffledImages);
+                });
                 
                 grid.appendChild(item);
             });
@@ -666,20 +728,24 @@
         const lightboxContent = document.querySelector('.lightbox-content');
         const lightboxSkeleton = document.getElementById('lightbox-skeleton');
         const lightboxClose = document.getElementById('lightbox-close');
+        const lightboxPrev = document.getElementById('lightbox-prev');
+        const lightboxNext = document.getElementById('lightbox-next');
 
-        function openLightbox(imageUrl, imageAlt) {
+        // Track current lightbox state
+        let currentCategory = null;
+        let currentIndex = -1;
+        let currentImages = [];
+
+        function loadLightboxImage(imageData) {
             // Reset state
             lightboxImage.classList.remove('loaded');
             lightboxImage.src = '';
-            lightboxImage.alt = imageAlt || '';
+            lightboxImage.alt = imageData.alt || '';
             lightboxSkeleton.classList.remove('hidden');
             lightboxContent.classList.remove('has-loaded-image'); // Hide watermark initially
             
-            // Show lightbox
-            lightbox.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
             // Load image
+            const imageUrl = imageData.lightboxUrl || imageData.url;
             lightboxImage.src = imageUrl;
             
             // Handle image load
@@ -693,6 +759,45 @@
             }, { once: true });
         }
 
+        function updateNavigationButtons() {
+            if (currentImages.length === 0) {
+                lightboxPrev.disabled = true;
+                lightboxNext.disabled = true;
+                return;
+            }
+
+            lightboxPrev.disabled = currentIndex === 0;
+            lightboxNext.disabled = currentIndex === currentImages.length - 1;
+        }
+
+        function openLightbox(category, index, images) {
+            currentCategory = category;
+            currentIndex = index;
+            currentImages = images;
+            
+            // Show lightbox
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Load first image
+            loadLightboxImage(currentImages[currentIndex]);
+            updateNavigationButtons();
+        }
+
+        function navigateLightbox(direction) {
+            if (currentImages.length === 0) return;
+            
+            const newIndex = direction === 'next' 
+                ? currentIndex + 1 
+                : currentIndex - 1;
+            
+            if (newIndex < 0 || newIndex >= currentImages.length) return;
+            
+            currentIndex = newIndex;
+            loadLightboxImage(currentImages[currentIndex]);
+            updateNavigationButtons();
+        }
+
         function closeLightbox() {
             lightbox.classList.remove('active');
             document.body.style.overflow = '';
@@ -701,6 +806,10 @@
                 lightboxImage.classList.remove('loaded');
                 lightboxSkeleton.classList.remove('hidden');
                 lightboxContent.classList.remove('has-loaded-image');
+                // Reset navigation state
+                currentCategory = null;
+                currentIndex = -1;
+                currentImages = [];
             }, 300);
         }
 
@@ -715,10 +824,27 @@
             }
         });
 
-        // Close lightbox on Escape key
+        // Navigation button handlers
+        lightboxPrev.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigateLightbox('prev');
+        });
+
+        lightboxNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigateLightbox('next');
+        });
+
+        // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+            if (!lightbox.classList.contains('active')) return;
+            
+            if (e.key === 'Escape') {
                 closeLightbox();
+            } else if (e.key === 'ArrowLeft') {
+                navigateLightbox('prev');
+            } else if (e.key === 'ArrowRight') {
+                navigateLightbox('next');
             }
         });
 
