@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>Upload Images - 7thSt.music</title>
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#000000">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#000000">
+    
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: #000;
+            color: #FFF;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
+        }
+
+        h1 {
+            color: #E7D494;
+            font-size: 2rem;
+            margin: 1rem 0;
+            letter-spacing: 1px;
+            text-transform: lowercase;
+        }
+
+        .back-link {
+            color: rgba(231, 212, 148, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .back-link:hover {
+            color: #E7D494;
+            text-shadow: 0 0 10px rgba(231, 212, 148, 0.3);
+        }
+
+        .upload-section {
+            background: rgba(231, 212, 148, 0.02);
+            border: 1px solid rgba(231, 212, 148, 0.15);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            color: rgba(231, 212, 148, 0.8);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: lowercase;
+            letter-spacing: 0.5px;
+        }
+
+        select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(231, 212, 148, 0.3);
+            color: #E7D494;
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            border-color: rgba(231, 212, 148, 0.5);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #E7D494;
+            box-shadow: 0 0 10px rgba(231, 212, 148, 0.2);
+        }
+
+        .upload-button {
+            width: 100%;
+            background: transparent;
+            border: 2px solid rgba(231, 212, 148, 0.4);
+            color: #E7D494;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: lowercase;
+        }
+
+        .upload-button:hover {
+            background: rgba(231, 212, 148, 0.1);
+            border-color: #E7D494;
+            box-shadow: 0 0 20px rgba(231, 212, 148, 0.3);
+        }
+
+        .upload-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-section {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .progress-section.active {
+            display: block;
+        }
+
+        .progress-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(231, 212, 148, 0.15);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .progress-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-item-name {
+            color: rgba(231, 212, 148, 0.9);
+            font-size: 0.9rem;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 1rem;
+        }
+
+        .progress-item-status {
+            color: rgba(231, 212, 148, 0.6);
+            font-size: 0.8rem;
+            text-transform: lowercase;
+        }
+
+        .progress-item-status.success {
+            color: #E7D494;
+        }
+
+        .progress-item-status.error {
+            color: #ff6b6b;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(231, 212, 148, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #E7D494;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .success-section {
+            display: none;
+            background: rgba(231, 212, 148, 0.05);
+            border: 1px solid rgba(231, 212, 148, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .success-section.active {
+            display: block;
+        }
+
+        .success-message {
+            color: #E7D494;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(231, 212, 148, 0.15);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .instructions h3 {
+            color: #E7D494;
+            font-size: 1rem;
+            margin: 0 0 1rem 0;
+            text-transform: lowercase;
+            letter-spacing: 1px;
+        }
+
+        .instructions ol {
+            color: rgba(231, 212, 148, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .instructions code {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(231, 212, 148, 0.2);
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #E7D494;
+        }
+
+        .config-note {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: rgba(255, 193, 7, 0.9);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .config-note strong {
+            color: #ffc107;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .upload-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="squaresnake.svg" alt="logo" class="logo">
+            <h1>Upload Images</h1>
+            <a href="index.html" class="back-link">&larr; Back to Home</a>
+        </div>
+
+        <div class="config-note" style="display: none;">
+            <strong>Setup Complete:</strong> Upload preset "illustration-upload" is configured and ready to use.
+        </div>
+
+        <div class="upload-section">
+            <div class="form-group">
+                <label for="category">Select Category</label>
+                <select id="category">
+                    <option value="Dreams">Dreams</option>
+                    <option value="Mandala">Mandalas</option>
+                    <option value="Voices">Voices</option>
+                    <option value="Animals">Animals</option>
+                    <option value="Song Art">Song Art</option>
+                </select>
+            </div>
+
+            <button class="upload-button" id="upload-button">Select Images to Upload</button>
+
+            <div class="progress-section" id="progress-section">
+                <h3 style="color: #E7D494; margin-bottom: 1rem; text-transform: lowercase; letter-spacing: 1px;">Upload Progress</h3>
+                <div id="progress-list"></div>
+            </div>
+
+            <div class="success-section" id="success-section">
+                <div class="success-message" id="success-message"></div>
+                
+                <div class="instructions">
+                    <h3>Next Steps</h3>
+                    <ol>
+                        <li>Open your terminal in the project directory</li>
+                        <li>Run: <code>npm run fetch-images</code></li>
+                        <li>This will regenerate <code>images-data.js</code> with your new images</li>
+                        <li>Commit and push the updated <code>images-data.js</code> to GitHub</li>
+                        <li>Your gallery will automatically update on GitHub Pages</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CLOUDINARY_CLOUD_NAME = 'dhjy8pfsa'; // Your Cloudinary cloud name
+        const CLOUDINARY_UPLOAD_PRESET = 'illustration-upload'; // Your unsigned upload preset name
+
+        // Category to tag mapping (matching fetch-cloudinary-images.js)
+        const categoryToTag = {
+            'Dreams': 'Dreams',
+            'Mandalas': 'Mandala',
+            'Voices': 'Voices',
+            'Animals': 'Animals',
+            'Song Art': 'Song Art'
+        };
+
+        const uploadButton = document.getElementById('upload-button');
+        const categorySelect = document.getElementById('category');
+        const progressSection = document.getElementById('progress-section');
+        const progressList = document.getElementById('progress-list');
+        const successSection = document.getElementById('success-section');
+        const successMessage = document.getElementById('success-message');
+
+        let uploadQueue = [];
+        let completedUploads = 0;
+        let totalUploads = 0;
+
+        // Configuration is set and ready to use
+
+        uploadButton.addEventListener('click', () => {
+            const selectedCategory = categorySelect.value;
+            const tag = categoryToTag[selectedCategory] || selectedCategory;
+
+            // Reset state
+            uploadQueue = [];
+            completedUploads = 0;
+            totalUploads = 0;
+            progressList.innerHTML = '';
+            progressSection.classList.add('active');
+            successSection.classList.remove('active');
+
+            // Open Cloudinary Upload Widget
+            cloudinary.openUploadWidget(
+                {
+                    cloudName: CLOUDINARY_CLOUD_NAME,
+                    uploadPreset: CLOUDINARY_UPLOAD_PRESET,
+                    sources: ['local'],
+                    multiple: true,
+                    tags: [tag],
+                    folder: selectedCategory.toLowerCase().replace(' ', '-'),
+                    maxFileSize: 10000000, // 10MB
+                    clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                    showAdvancedOptions: false,
+                    cropping: false,
+                    resourceType: 'image'
+                },
+                (error, result) => {
+                    if (error) {
+                        console.error('Upload error:', error);
+                        showError('Upload failed: ' + (error.message || 'Unknown error'));
+                        return;
+                    }
+
+                    if (result && result.event === 'success') {
+                        handleUploadSuccess(result.info);
+                    } else if (result && result.event === 'queues-end') {
+                        // All uploads in queue are complete
+                        checkAllComplete();
+                    } else if (result && result.event === 'close') {
+                        // Widget was closed
+                        if (totalUploads === 0) {
+                            progressSection.classList.remove('active');
+                        } else {
+                            // Check if all uploads completed before widget closed
+                            checkAllComplete();
+                        }
+                    }
+                }
+            );
+        });
+
+        function handleUploadSuccess(info) {
+            totalUploads++;
+            const fileName = info.original_filename || info.public_id.split('/').pop();
+            
+            // Create progress item
+            const progressItem = document.createElement('div');
+            progressItem.className = 'progress-item';
+            progressItem.id = `progress-${totalUploads}`;
+            progressItem.innerHTML = `
+                <div class="progress-item-header">
+                    <span class="progress-item-name">${fileName}</span>
+                    <span class="progress-item-status" id="status-${totalUploads}">Uploading...</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" id="bar-${totalUploads}" style="width: 0%"></div>
+                </div>
+            `;
+            progressList.appendChild(progressItem);
+
+            // Animate progress bar
+            setTimeout(() => {
+                const barEl = document.getElementById(`bar-${totalUploads}`);
+                if (barEl) {
+                    barEl.style.width = '100%';
+                }
+            }, 100);
+
+            // Mark as complete
+            setTimeout(() => {
+                const statusEl = document.getElementById(`status-${totalUploads}`);
+                const barEl = document.getElementById(`bar-${totalUploads}`);
+                if (statusEl && barEl) {
+                    statusEl.textContent = 'Uploaded';
+                    statusEl.classList.add('success');
+                    completedUploads++;
+                    checkAllComplete();
+                }
+            }, 800);
+        }
+
+        function checkAllComplete() {
+            if (completedUploads === totalUploads && totalUploads > 0) {
+                const category = categorySelect.value;
+                successMessage.textContent = `✅ Successfully uploaded ${totalUploads} image${totalUploads > 1 ? 's' : ''} to ${category}`;
+                successSection.classList.add('active');
+                
+                // Track upload event
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'upload', {
+                        'event_category': 'Image Upload',
+                        'event_label': category,
+                        'value': totalUploads
+                    });
+                }
+            }
+        }
+
+        function showError(message) {
+            const errorItem = document.createElement('div');
+            errorItem.className = 'progress-item';
+            errorItem.style.borderColor = 'rgba(255, 107, 107, 0.5)';
+            errorItem.innerHTML = `
+                <div class="progress-item-header">
+                    <span class="progress-item-name" style="color: #ff6b6b;">Error</span>
+                    <span class="progress-item-status error">Failed</span>
+                </div>
+                <div style="color: rgba(255, 107, 107, 0.8); font-size: 0.85rem; margin-top: 0.5rem;">
+                    ${message}
+                </div>
+            `;
+            progressList.appendChild(errorItem);
+        }
+    </script>
+</body>
+</html>
+
