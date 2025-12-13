@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "7thSt.music portfolio site",
   "scripts": {
-    "fetch-images": "node fetch-cloudinary-images.js"
+    "fetch-images": "node scripts/fetch-cloudinary-images.js",
+    "serve": "npx http-server -p 8000 -o",
+    "upload-server": "node upload-server.js"
   },
   "dependencies": {
     "cloudinary": "^1.41.0",

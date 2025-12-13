@@ -1,25 +1,20 @@
-# Environment variables
+# Environment variables (contains API secrets)
 .env
 .env.local
 .env.*.local
 
 # Node modules
 node_modules/
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-
-# Package manager files
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# Build outputs
-dist/
-build/
-*.tsbuildinfo
+*.log
+logs/
+*.log.*
 
 # OS files
 .DS_Store
@@ -43,10 +38,10 @@ Desktop.ini
 *.sublime-project
 *.sublime-workspace
 
-# Logs
-*.log
-logs/
-*.log.*
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
 
 # Runtime data
 pids/
@@ -54,7 +49,7 @@ pids/
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
+# Coverage directory
 coverage/
 *.lcov
 .nyc_output/
@@ -64,6 +59,22 @@ tmp/
 temp/
 *.tmp
 
-# Generated files (but we DO want to commit images-data.js)
-# images-data.js should be committed for GitHub Pages
+# Admin/Private Tools (keep private - contains upload functionality)
+upload.html
+upload-server.js
+generate-upload-signature.js
+
+# Utility/Debug Scripts (not needed for site functionality)
+list-cloudinary-tags.js
+
+# Backup files
+*-backup.js
+*.backup
+*.bak
+
+# Note: The following files ARE committed (needed for GitHub Pages):
+# - images-data.js (generated, but needed for gallery)
+# - scripts/fetch-cloudinary-images.js (utility script, part of workflow)
+# - package-lock.json (ensures consistent dependencies)
+# - assets/ (all images, icons, and static assets)
 
