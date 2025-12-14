@@ -789,26 +789,84 @@
         let currentIndex = -1;
         let currentImages = [];
 
-        // Extract mandala name from filename
+        // Extract mandala name from displayName, filename, or alt text
         function extractMandalaName(imageData) {
             if (currentCategory !== 'mandalas') return null;
             
-            // Get the filename from the URL (last part after the last slash)
-            const url = imageData.lightboxUrl || imageData.url;
-            const filename = url.split('/').pop();
+            let name = null;
             
-            // Extract name before the last underscore (which contains the hash)
-            // Handle cases with single or double underscores
-            const parts = filename.split('_');
-            if (parts.length < 2) return null;
+            // First priority: use displayName if available (what user sees when hovering in Cloudinary)
+            if (imageData.displayName) {
+                // displayName might be "Earthly_Resonance_hash" or "Earthly Resonance"
+                // Extract name before the last underscore if it contains underscores
+                const displayParts = imageData.displayName.split('_');
+                if (displayParts.length >= 2) {
+                    // Take all parts except the last one (the hash)
+                    const nameParts = displayParts.slice(0, -1);
+                    name = nameParts.join(' ');
+                } else {
+                    // No underscores, might already be formatted
+                    name = imageData.displayName;
+                }
+            }
             
-            // Take all parts except the last one (the hash)
-            const nameParts = parts.slice(0, -1);
-            let name = nameParts.join(' ');
+            // Second priority: extract from filename/publicId
+            if (!name) {
+                const publicId = imageData.publicId || '';
+                const url = imageData.lightboxUrl || imageData.url;
+                
+                // Extract filename from publicId (last part after slash) or from URL
+                let filename = '';
+                if (publicId) {
+                    filename = publicId.split('/').pop();
+                } else {
+                    // Fallback: extract from URL (last part before query params)
+                    const urlPath = url.split('?')[0].split('/');
+                    filename = urlPath[urlPath.length - 1];
+                }
+                
+                // Extract name before the last underscore (which contains the hash)
+                // Pattern: "Earthly_Resonance_hash" -> "Earthly Resonance"
+                const parts = filename.split('_');
+                
+                if (parts.length >= 2) {
+                    // Take all parts except the last one (the hash)
+                    const nameParts = parts.slice(0, -1);
+                    name = nameParts.join(' ');
+                }
+            }
+            
+            // Third priority: check if alt text has a meaningful name
+            if (!name) {
+                const altText = imageData.alt || '';
+                
+                // Check if alt text looks like a name (has capital letters, spaces, etc.)
+                // and is not just a hash (long alphanumeric string without spaces)
+                if (altText && altText.length < 50) {
+                    // If it has capital letters and spaces, it might be a name
+                    if (/[A-Z]/.test(altText) && /\s/.test(altText)) {
+                        // Remove hash-like suffix if present (alphanumeric at the end after space)
+                        name = altText.replace(/\s+[a-z0-9]{6,}$/i, '').trim();
+                        // If what's left is too short or looks like a hash, use full alt
+                        if (name.length < 3 || /^[a-z0-9]+$/i.test(name)) {
+                            name = altText.trim();
+                        }
+                    } else if (altText.length > 3 && altText.length < 20 && /[A-Z]/.test(altText)) {
+                        // Single word with capital letter might be a name
+                        name = altText.trim();
+                    }
+                }
+            }
             
             // Clean up: remove any weird characters, multiple spaces, etc.
-            name = name.replace(/[^a-zA-Z0-9\s]/g, ''); // Remove special characters
-            name = name.replace(/\s+/g, ' ').trim(); // Normalize spaces
+            if (name) {
+                name = name.replace(/[^a-zA-Z0-9\s]/g, ''); // Remove special characters
+                name = name.replace(/\s+/g, ' ').trim(); // Normalize spaces
+                // Don't show if it's just a hash (long alphanumeric without spaces)
+                if (/^[a-z0-9]{15,}$/i.test(name)) {
+                    name = null;
+                }
+            }
             
             return name || null;
         }

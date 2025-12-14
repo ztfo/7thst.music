@@ -54,11 +54,13 @@ async function fetchImagesByTag(tag) {
     console.log(`Fetching images with tag: ${tag}...`);
     
     // Use Admin API to get all resources with tags, then filter
+    // Include context to get custom metadata (like title/name)
     const result = await cloudinary.api.resources({
       type: 'upload',
       resource_type: 'image',
       max_results: 500,
-      tags: true
+      tags: true,
+      context: true
     });
 
     if (!result || !result.resources) {
@@ -102,10 +104,36 @@ async function fetchImagesByTag(tag) {
         ]
       });
 
+      // Try to get name from multiple sources (in priority order):
+      // 1. Context metadata (custom title/name)
+      // 2. display_name (what user sees when hovering in Cloudinary UI)
+      // 3. public_id filename (extracted from path)
+      let altText = null;
+      if (img.context && img.context.custom) {
+        // Check for title or name in context
+        altText = img.context.custom.title || img.context.custom.name || img.context.custom.alt;
+      }
+      
+      // If no context metadata, try display_name (this is what shows when hovering!)
+      if (!altText && img.display_name) {
+        altText = img.display_name;
+      }
+      
+      // Fall back to extracting from public_id
+      if (!altText) {
+        const sourceFilename = img.public_id.split('/').pop();
+        altText = sourceFilename.replace(/_/g, ' ').replace(/-/g, ' ') || `Image ${img.public_id}`;
+      }
+
+
       return {
         url: thumbnailUrl,
         lightboxUrl: lightboxUrl,
-        alt: img.public_id.split('/').pop().replace(/_/g, ' ').replace(/-/g, ' ') || `Image ${img.public_id}`
+        alt: altText,
+        // Store the original public_id for name extraction
+        publicId: img.public_id,
+        // Store display_name if available (what user sees when hovering)
+        displayName: img.display_name || null
       };
     });
   } catch (error) {
