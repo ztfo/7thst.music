@@ -78,3 +78,5 @@ list-cloudinary-tags.js
 # - package-lock.json (ensures consistent dependencies)
 # - assets/ (all images, icons, and static assets)
 
+# Claude Code
+.claude/sessions/
