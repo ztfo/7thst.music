@@ -38,107 +38,6 @@
             overflow-x: hidden;
         }
 
-        body::before {
-            display: none;
-        }
-
-        .background-pattern {
-            display: none;
-        }
-
-        .cursor-gradient {
-            display: none;
-        }
-
-        .background-symbols {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-            color: rgba(231, 212, 148, 0.15);
-            font-size: 12px;
-            line-height: 1;
-            pointer-events: none;
-            display: grid;
-            grid-template-columns: repeat(100, 1fr);
-            grid-template-rows: repeat(60, 1fr);
-            overflow: hidden;
-        }
-
-        .symbol {
-            opacity: 0.15;
-            transition: opacity 0.2s ease;
-            transform: rotate(var(--rotation));
-            animation: fadeInOut var(--duration) ease-in-out infinite;
-            animation-delay: var(--delay);
-        }
-
-        @keyframes pulseGradient {
-            0%, 100% { 
-                transform: scale(1);
-                opacity: 0.25;
-            }
-            50% { 
-                transform: scale(1.1);
-                opacity: 0.3;
-            }
-        }
-
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0.15; }
-            50% { opacity: 0.2; }
-        }
-
-        .spiral-block {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            border: 2px solid rgba(231, 212, 148, 0.3);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .spiral-block::before {
-            content: '';
-            position: absolute;
-            inset: 15%;
-            border: 2px solid rgba(231, 212, 148, 0.2);
-            border-radius: 2px;
-            animation: rotateSpiral 20s linear infinite;
-        }
-
-        .spiral-block::after {
-            content: '';
-            position: absolute;
-            inset: 30%;
-            border: 2px solid rgba(231, 212, 148, 0.1);
-            border-radius: 1px;
-            animation: rotateSpiral 15s linear infinite reverse;
-        }
-
-        @keyframes rotateSpiral {
-            0% {
-                transform: rotate(0deg) scale(0.8);
-                border-radius: 2px;
-            }
-            50% {
-                transform: rotate(180deg) scale(1);
-                border-radius: 30%;
-            }
-            100% {
-                transform: rotate(360deg) scale(0.8);
-                border-radius: 2px;
-            }
-        }
-
-        .spiral-block:hover::before,
-        .spiral-block:hover::after {
-            animation-duration: 5s;
-            border-color: rgba(231, 212, 148, 0.3);
-        }
-
         main {
             position: relative;
             z-index: 1;
@@ -432,57 +331,6 @@
             }
         }
 
-        .background-symbols, .cursor-gradient {
-            display: none;
-        }
-
-        .particle-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-            pointer-events: none;
-            background: transparent;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(231, 212, 148, 0.05);  /* Dimmer base state */
-            border-radius: 50%;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .particle.active {
-            background: rgba(231, 212, 148, 0.8);
-            transform: scale(2);
-            box-shadow: 0 0 20px rgba(231, 212, 148, 0.4);
-            z-index: 1;
-        }
-
-        .particle.trail {
-            background: rgba(231, 212, 148, 0.2);
-            transform: scale(1.5);
-            transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        @keyframes fadeTrail {
-            0% { 
-                opacity: 0.3;
-                transform: scale(1.5);
-            }
-            100% { 
-                opacity: 0.05;
-                transform: scale(1);
-            }
-        }
-
-        .particle-grid, .cursor-gradient, .background-symbols {
-            display: none;
-        }
 
         .dot-grid {
             position: fixed;
@@ -492,60 +340,14 @@
             height: 100vh;
             z-index: 0;
             pointer-events: none;
+            display: block;
         }
 
-        .dot {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(231, 212, 148, 0.06);
-            border-radius: 50%;  
-        }
-
-        .dot.active {
-            animation: electricPulse 0.4s ease-out;
-            background: rgba(231, 212, 148, 0.8);
-            box-shadow: 
-                0 0 10px rgba(231, 212, 148, 0.4),
-                0 0 20px rgba(231, 212, 148, 0.2);
-            z-index: 1;
-        }
-
-        .dot.wave {
-            animation: gentleWave 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        @keyframes electricPulse {
-            0% {
-                transform: scale(1);
-                background: rgba(231, 212, 148, 0.9);
-            }
-            50% {
-                transform: scale(1.5);
-                background: rgba(231, 212, 148, 0.7);
-            }
-            100% {
-                transform: scale(1);
-                background: rgba(231, 212, 148, 0);
-            }
-        }
-
-        @keyframes gentleWave {
-            0% {
-                transform: scale(2); 
-                background: rgba(231, 212, 148, 0.8);
-                box-shadow: 0 0 25px rgba(231, 212, 148, 0.5);
-            }
-            50% {
-                transform: scale(1.5); 
-                background: rgba(231, 212, 148, 0.4);
-                box-shadow: 0 0 15px rgba(231, 212, 148, 0.3);
-            }
-            100% {
-                transform: scale(1);  
-                background: rgba(231, 212, 148, 0);
-                box-shadow: none;
-            }
+        /* Shown instead of the canvas when WebGL is unavailable or lost. */
+        .dot-grid--static {
+            background-image: radial-gradient(
+                rgba(231, 212, 148, 0.06) 1.5px, transparent 1.5px);
+            background-size: 25px 25px;
         }
 
         .scroll-indicator {
@@ -580,9 +382,6 @@
     </style>
 </head>
 <body>
-    <div class="cursor-gradient"></div>
-    <div class="background-symbols">
-    </div>
     <main>
         <section class="header">
             <img src="assets/squaresnake.svg" alt="logo" class="logo">
@@ -684,139 +483,8 @@
     </main>
     <div class="scroll-indicator"></div>
     <script>
-        class DotGrid {
-            constructor() {
-                this.container = document.createElement('div');
-                this.container.className = 'dot-grid';
-                this.dots = [];
-                this.spacing = 25;
-                this.frameInterval = 1000 / 70;
-                this.waveSpeed = 3;
-                this.rotationSpeed = 0.5;  // Keep this for square wave rotation only
-                this.maxRadius = Math.sqrt(
-                    Math.max(window.innerWidth, document.documentElement.scrollWidth) ** 2 + 
-                    Math.max(window.innerHeight, document.documentElement.scrollHeight) ** 2
-                ) * 1.2;
-                this.centerX = window.innerWidth / 2;
-                this.centerY = window.innerHeight / 2;
-                this.waves = [];
-                this.maxWaves = 1; 
-                this.activeWaveCount = 0;
-                this.lastFrame = 0;
-                
-                this.init();
-                this.startWaveAnimation();
-            }
-
-            init() {
-                // Calculate grid size to cover entire document
-                const cols = Math.ceil(Math.max(window.innerWidth, document.documentElement.scrollWidth) / this.spacing);
-                const rows = Math.ceil(Math.max(window.innerHeight, document.documentElement.scrollHeight) / this.spacing);
-
-                const fragment = document.createDocumentFragment();
-                
-                for (let i = 0; i < rows; i++) {
-                    for (let j = 0; j < cols; j++) {
-                        const dot = document.createElement('div');
-                        dot.className = 'dot';
-                        
-                        const x = j * this.spacing;
-                        const y = i * this.spacing;
-                        
-                        dot.style.left = x + 'px';
-                        dot.style.top = y + 'px';
-                        
-                        this.dots.push(dot);
-                        fragment.appendChild(dot);
-                    }
-                }
-                
-                this.container.appendChild(fragment);
-                document.body.insertBefore(this.container, document.body.firstChild);
-            }
-
-            createWave() {
-                return {
-                    radius: 0,
-                    speed: this.waveSpeed,
-                    maxRadius: this.maxRadius,
-                    rotation: 0 // Initial rotation angle
-                };
-            }
-
-            animateWaves() {
-                const now = performance.now();
-                if (now - this.lastFrame < this.frameInterval) {
-                    requestAnimationFrame(() => this.animateWaves());
-                    return;
-                }
-                this.lastFrame = now;
-
-                if (this.waves.length === 0) {
-                    this.waves.push(this.createWave());
-                }
-
-                const activeDots = new Set();
-                
-                this.waves = this.waves.filter(wave => {
-                    wave.radius += wave.speed * (this.frameInterval / 16.67);
-                    wave.rotation += this.rotationSpeed * (this.frameInterval / 16.67);
-                    const waveThickness = this.spacing * 2;
-
-                    for (let dot of this.dots) {
-                        const x = parseFloat(dot.style.left);
-                        const y = parseFloat(dot.style.top);
-                        
-                        const dx = x - this.centerX;
-                        const dy = y - this.centerY;
-                        
-                        // Rotate the square wave pattern, not the dots
-                        const rotationRad = wave.rotation * (Math.PI / 180);
-                        const rotatedX = dx * Math.cos(rotationRad) - dy * Math.sin(rotationRad);
-                        const rotatedY = dx * Math.sin(rotationRad) + dy * Math.cos(rotationRad);
-                        
-                        const distanceFromSquare = Math.max(
-                            Math.abs(rotatedX) - wave.radius,
-                            Math.abs(rotatedY) - wave.radius
-                        );
-
-                        if (Math.abs(distanceFromSquare) <= waveThickness) {
-                            if (!activeDots.has(dot)) {
-                                activeDots.add(dot);
-                                if (!dot.classList.contains('wave')) {
-                                    dot.classList.add('wave');
-                                    setTimeout(() => {
-                                        dot.classList.remove('wave');
-                                    }, 2000);
-                                }
-                            }
-                        }
-                    }
-
-                    return wave.radius < wave.maxRadius;
-                });
-
-                // More gradual wave timing
-                if (this.waves.length > 0 && 
-                    this.waves[this.waves.length - 1].radius > this.spacing * 20) {  // Increased spacing between waves
-                    this.waves.push(this.createWave());
-                }
-
-                requestAnimationFrame(() => this.animateWaves());
-            }
-
-            startWaveAnimation() {
-                this.animateWaves();
-            }
-        }
-
         // Update scroll indicator behavior
         window.addEventListener('DOMContentLoaded', () => {
-            // Delay dot grid initialization slightly to prioritize content loading
-            setTimeout(() => {
-                new DotGrid();
-            }, 500);
-            
             const scrollIndicator = document.createElement('div');
             scrollIndicator.className = 'scroll-indicator';
             scrollIndicator.innerHTML = '⌄';
@@ -863,5 +531,6 @@
             });
         });
     </script>
+    <script src="dot-grid.js"></script>
 </body>
 </html>
