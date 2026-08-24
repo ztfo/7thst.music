@@ -1,15 +1,29 @@
 // Square wave rippling out of the logo, as a single fragment shader.
-// Constants match the DOM version this replaces: dots every 25px, wave travels
-// 180px/s, a new wave every 500px, each dot lit for 2s as the wave passes.
+// Grid geometry matches the DOM version this replaces: dots every 25px, a new
+// wave every 500px. The wave travels at a fifth of the original 180px/s, with a
+// wider, flatter lit band so the slower ring still reads as a moving border.
 
 const SPACING = 25;
-const WAVE_SPEED = 180;
+const WAVE_SPEED = 36;
 const SPAWN_GAP = 500;
 const BAND = SPACING * 2;
-const TRAIL = WAVE_SPEED * 2;
+// Thickness of the lit band, in rows of dots. Raising this widens the border;
+// it also lengthens how long the glow takes to sweep past a point, which is
+// what stops a slow wave reading as motion — so it trades against WAVE_SPEED.
+const RING_ROWS = 8;
+const TRAIL = SPACING * RING_ROWS;
+
+// Falloff across the band. Linear, so every row carries real light — a squared
+// curve dumps most brightness into the leading edge and the back rows read as
+// unlit however wide the band is.
+const FALLOFF = 1.0;
 const DOT_RADIUS = 0.08;
 const MAX_WAVES = 12;
-const STATIC_TIME = 7.5;
+
+// Frame held under reduced motion, expressed as how far the wave has travelled
+// so it stays the same picture regardless of WAVE_SPEED.
+const STATIC_RADIUS = 1350;
+const STATIC_TIME = STATIC_RADIUS / WAVE_SPEED;
 
 // The DOM version advanced radius by 3 and rotation by 0.5 on the same tick,
 // so a wave's angle is purely a function of how far it has travelled.
@@ -53,7 +67,7 @@ const FRAG = `
     if (edge > band) return 0.0;
 
     float age = (band - edge) / trail;
-    return pow(max(0.0, 1.0 - age), 3.0);
+    return pow(max(0.0, 1.0 - age), ${FALLOFF.toFixed(1)});
   }
 
   void main() {
@@ -62,7 +76,10 @@ const FRAG = `
     float lit = 0.0;
     for (int i = 0; i < ${MAX_WAVES}; i++) {
       if (float(i) >= waveCount) break;
-      lit = max(lit, waveAt(p, mod(time * speed - float(i) * spawnGap, cycle)));
+      // Negative travel means this wave has not spawned yet. Without the guard
+      // mod() wraps it to a large radius and the page opens mid-cycle.
+      float travel = time * speed - float(i) * spawnGap;
+      if (travel >= 0.0) lit = max(lit, waveAt(p, mod(travel, cycle)));
     }
 
     // Grid stays screen-aligned while the wave rotates through it.
