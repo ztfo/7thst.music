@@ -64,6 +64,11 @@
             height: auto;
             margin-bottom: 2rem;
             position: relative;
+            /* The mark's counters are transparent and the dot grid sits behind
+               it, so without this the wave shows through the middle of the
+               logo. The SVG's outer border meets the edge of its own box, so a
+               background on the element stops exactly at the mark's edges. */
+            background: #000;
             filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
         }
 
