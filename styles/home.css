@@ -94,13 +94,17 @@
 .pile__label b { font: 500 15px/1 var(--serif); color: var(--paper-2); font-variant-numeric: lining-nums tabular-nums; }
 
 /* ---------- the drawn card ---------- */
-.stage { grid-column: 2; grid-row: 2; align-self: stretch; justify-self: center; min-height: 0; display: grid; place-items: center; perspective: 2000px; transition: opacity 500ms var(--ease); }
+/* The stage is as wide as the card, and the card is centred in it absolutely. Its width comes
+   from its height, which Safari can't know while sizing the column, so nothing here waits on it. */
+.stage { grid-column: 2; grid-row: 2; align-self: stretch; justify-self: center; position: relative; width: calc(var(--card-h) * 516 / 884); min-height: 0; perspective: 2000px; touch-action: pan-y; transition: opacity 500ms var(--ease); }
 .card {
   appearance: none; border: 0; padding: 0; background: none; cursor: pointer;
-  position: relative; display: block; height: min(var(--card-h), 100%); aspect-ratio: var(--ar);
-  transform-style: preserve-3d; transform: rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg));
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: block; height: min(var(--card-h), 100%); aspect-ratio: var(--ar);
+  transform-style: preserve-3d; transform: translateX(var(--dx, 0px)) rotate(var(--rz, 0deg)) rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg));
   transition: transform 800ms var(--ease);
+  touch-action: pan-y;
 }
+.card.is-dragging { transition: none; }
 .card__inner { position: absolute; inset: 0; transform-style: preserve-3d; }
 .card__side { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 3px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 40px 70px -30px rgba(0, 0, 0, 0.9); }
 .card__side--back { transform: rotateY(180deg); }
@@ -299,7 +303,7 @@
   .table { min-height: 600px; }
   .pile, .idx { display: none; }
   .table__inner { grid-template-columns: minmax(0, 1fr); }
-  .stage { grid-column: 1; }
+  .stage { grid-column: 1; justify-self: stretch; width: auto; }
   .top { grid-template-columns: auto 1fr; }
   .brand { grid-column: 1; }
   .brand .label { display: none; }

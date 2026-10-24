@@ -288,7 +288,8 @@ function swapMeta(t, instant) {
   swap.classList.add('is-swapping');
   setTimeout(() => { bind(t); swap.classList.remove('is-swapping'); }, 220);
 }
-function flyToSung(k) {
+// dir: 1 or -1 when the card was swiped, so it leaves the way the finger sent it
+function flyToSung(k, dir = 0) {
   const from = cardBtn.getBoundingClientRect();
   const to = sungEl.getBoundingClientRect();
   const fly = document.createElement('div');
@@ -296,18 +297,18 @@ function flyToSung(k) {
   fly.innerHTML = faceHTML(TRACKS[k]);
   document.body.appendChild(fly);
   const visible = to.width > 0;
-  const dx = visible ? to.left + to.width / 2 - (from.left + from.width / 2) : window.innerWidth * 0.6;
+  const dx = visible ? to.left + to.width / 2 - (from.left + from.width / 2) : (dir ? -dir * window.innerWidth * 0.8 : window.innerWidth * 0.6);
   const dy = visible ? to.top + to.height / 2 - (from.top + from.height / 2) : 0;
-  const s = visible ? to.height / from.height : 0.6;
+  const s = visible ? to.height / from.height : (dir ? 0.9 : 0.6);
   fly.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(${s})`, opacity: visible ? 1 : 0 }], { duration: 820, easing: 'cubic-bezier(.5,0,.2,1)' }).onfinish = () => { fly.remove(); renderSung(); };
 }
-function deal(i, { instant = false, autoplay = false } = {}) {
+function deal(i, { instant = false, autoplay = false, dir = 0 } = {}) {
   const t = TRACKS[i];
   const prev = state.i;
   if (prev === i) return;
   if (prev !== null) {
     if (!state.sung.includes(prev)) state.sung.push(prev);
-    if (!instant && !reduce) flyToSung(prev); else renderSung();
+    if (!instant && !reduce) flyToSung(prev, dir); else renderSung();
   }
   state.i = i;
   state.drawn.add(i);
@@ -321,9 +322,9 @@ function deal(i, { instant = false, autoplay = false } = {}) {
     const d = deckBtn.getBoundingClientRect();
     const c = cardBtn.getBoundingClientRect();
     const fromDeck = d.width > 0;
-    const dx = fromDeck ? d.left + d.width / 2 - (c.left + c.width / 2) : 0;
-    const dy = fromDeck ? d.top + d.height / 2 - (c.top + c.height / 2) : 60;
-    const s = fromDeck ? d.height / c.height : 0.85;
+    const dx = fromDeck ? d.left + d.width / 2 - (c.left + c.width / 2) : dir * window.innerWidth * 0.7;
+    const dy = fromDeck ? d.top + d.height / 2 - (c.top + c.height / 2) : (dir ? 0 : 60);
+    const s = fromDeck ? d.height / c.height : (dir ? 0.96 : 0.85);
     // sealed cards land face down, so they travel without turning over
     const turn = t.sealed ? 0 : 180;
     table.classList.add('is-dealing');
@@ -653,7 +654,49 @@ new IntersectionObserver(([e]) => { if (e.isIntersecting && !sk.frame) scLoadSet
 const toggleActive = () => (miniSketch() ? toggleSketch() : toggle());
 
 // ---------- input ----------
-cardBtn.addEventListener('click', () => { if (arrival.running) finishArrival(); toggle(); });
+// On touch screens the card swipes: left for the next song, right for the one before.
+// It follows the finger a little; a short drag springs back, and vertical scrolling is left alone.
+const SWIPE = 56;
+const swipe = { id: null, x: 0, y: 0, dx: 0, used: false };
+const stageEl = $('#stage');
+stageEl.addEventListener('pointerdown', (e) => {
+  swipe.used = false;
+  if (e.pointerType === 'mouse' || arrival.running || state.i === null) return;
+  Object.assign(swipe, { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0 });
+});
+stageEl.addEventListener('pointermove', (e) => {
+  if (e.pointerId !== swipe.id) return;
+  const dx = e.clientX - swipe.x;
+  if (!swipe.dx && (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - swipe.y))) return;
+  swipe.dx = dx;
+  cardBtn.classList.add('is-dragging');
+  cardBtn.style.setProperty('--dx', `${(dx * 0.6).toFixed(1)}px`);
+  cardBtn.style.setProperty('--rz', `${(dx * 0.02).toFixed(2)}deg`);
+});
+function endSwipe(e) {
+  if (e.pointerId !== swipe.id) return;
+  swipe.id = null;
+  const released = () => { cardBtn.style.removeProperty('--dx'); cardBtn.style.removeProperty('--rz'); };
+  if (Math.abs(swipe.dx) < SWIPE || e.type === 'pointercancel') {
+    cardBtn.classList.remove('is-dragging');
+    released();
+    return;
+  }
+  // deal while the card is still where the finger left it, so it flies off from there
+  swipe.used = true;
+  const dir = swipe.dx < 0 ? 1 : -1;
+  deal((state.i + dir + TRACKS.length) % TRACKS.length, { autoplay: state.playing, dir });
+  released();
+  requestAnimationFrame(() => cardBtn.classList.remove('is-dragging'));
+}
+stageEl.addEventListener('pointerup', endSwipe);
+stageEl.addEventListener('pointercancel', endSwipe);
+// a swipe that ends on the card isn't also a tap on it
+cardBtn.addEventListener('click', () => {
+  if (swipe.used) { swipe.used = false; return; }
+  if (arrival.running) finishArrival();
+  toggle();
+});
 table.addEventListener('pointerdown', (e) => { if (arrival.running && !e.target.closest('#card')) finishArrival(); });
 deckBtn.addEventListener('click', () => drawRandom(true));
 document.addEventListener('click', (e) => {
