@@ -1,41 +1,58 @@
 # 7thSt.music
 
-Find llü's music on these platforms:
+The site for llü: **Buena Suerte**, a deck of nine songs, each one a card, plus the works in progress and the art.
 
-- [SoundCloud](https://soundcloud.com/llu-official)
-- [Spotify](https://open.spotify.com/artist/1t00W56dAWaTPJ7YcRwY91)
-- [Apple Music](https://music.apple.com/us/artist/llü/1770530866)
+- `index.html`: the table (the deck, the drawn card, the player, the tracklist), en proceso (works in progress from SoundCloud), and seguir (follow).
+- `art.html`: Mis dibujos / My art, the drawings by series with a viewer.
 
-## Featured Projects
+Plain HTML, CSS and ES modules on GitHub Pages. There is no build step: edit, commit, push to `main`.
 
-### Music
+## Where things live
 
-- **Latebloomer EP** - A collection to dance to 
-- **works in progress** - Sound design explorations and audio sketches
+| Path | What |
+| --- | --- |
+| `styles/site.css` | tokens, base, the microtext frame, language switch, footer (both pages) |
+| `styles/home.css`, `styles/art.css` | each page's own styles |
+| `js/i18n.js` | every string, in English and Mexican Spanish, and the remembered language |
+| `js/home.js`, `js/art.js` | each page's behavior |
+| `js/microtext.js` | the "BUENA SUERTE · LLÜ · 7TH ST" line used for frames and rules |
+| `data/tracks.js` | the nine cards, the SoundCloud sketches, follow links |
+| `data/envelopes.js` | generated: each song's low-end energy, which makes the room breathe |
+| `images-data.js` | generated: the art, from Cloudinary (`pnpm run fetch-images`) |
+| `fonts/` | Gambetta (Fontshare), self-hosted; Archivo loads from Google Fonts |
 
-### Music Plug-ins
+Audio and art are on Cloudinary, never in this repo. The repo is public.
 
-- **[Arreglo](https://arreglo.ai)** - An AI-powered music arrangement generator for Figma. Transform your track ideas into complete arrangements in minutes.
+## Audio
 
-## Illustration Art
+Released cards play the full song. Sealed cards play only a 30-second preview, cut from a third of the way in with fades. A full unreleased song is never uploaded.
 
-- [Illustration Art Gallery](https://7thst.music/art.html) 
+```sh
+pnpm run audio --src "<file>" --id el-fuego --kind preview   # a sealed card
+pnpm run audio --src "<file>" --id la-luna --kind full       # a card that's out
+```
 
-## Inspiration Playlists
+This needs ffmpeg and the Cloudinary credentials in `.env`. Each run uploads to `buena-suerte/<id>` (with `-preview` added for previews) and rewrites that song's entry in `data/envelopes.js`, so commit the envelope change. The same `--id` replaces the file at the same address. To drop in a remaster, re-run it. `--start <seconds>` picks a preview's start, and `--dry` cuts without uploading.
 
-Looking for musical inspiration? Check out these curated playlists:
+**When a card comes out:**
+1. Upload it in full with `--kind full`.
+2. In `data/tracks.js`, remove `sealed: true` and the field and tint colors, then add its card art (`img`) and its own `ground`.
+3. Point `src` at the full file.
 
-- [Emotional](https://soundcloud.com/emotionalmusic)
-- [Borderless](https://open.spotify.com/playlist/37i9dQZF1DWZJmo7mlltU6)
-- [Honest](https://open.spotify.com/playlist/29jL3I7s8q3GABpw359UIo)
-- [Dark](https://open.spotify.com/playlist/1cdTAxPUXieR9ZkcGKCleO)
-- [Smooth](https://open.spotify.com/playlist/5KuWQUO3X0dGalovbeC6aX)
+## Works in progress
 
+The list shows the newest 12 from the SoundCloud set "works in progress." and plays them through SoundCloud's own player, so plays count there. On each visit the page reads the set again and adds anything newer, so a new upload shows up without touching the site. The list in `data/tracks.js` is only what shows when SoundCloud can't be reached. Refresh it now and then.
 
-## About the Website
+## Art
 
-This website features a minimalist design with a focus on music content. The interactive background uses a dot grid animation system that creates visual waves as you interact with the page.
+Upload through the existing tool (`upload.html` with `pnpm run upload-server`, kept out of git), then run `pnpm run fetch-images` and commit `images-data.js`. Titles come from the Cloudinary display names, and untitled pieces are numbered.
 
-## License
+## Local preview
 
-© 2025 - 7thSt.music - All rights reserved.
+```sh
+python3 -m http.server 8000
+```
+
+Then open http://localhost:8000.
+
+© Luis Palomares · 7th St. Music. All rights reserved.
