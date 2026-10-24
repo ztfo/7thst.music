@@ -239,6 +239,15 @@
 
 <main>
   <section class="table" id="table" aria-label="Buena Suerte">
+    <script>
+      // A first visit opens dark on the caller's line, so the table is hidden here, before it
+      // can paint. If the page's script never starts the arrival, the table comes back anyway.
+      (function (el) {
+        try { if (sessionStorage.getItem('bs-arrived') || matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { return; }
+        el.classList.add('arriving');
+        setTimeout(function () { if (!el.dataset.arrival) el.classList.remove('arriving'); }, 10000);
+      })(document.currentScript.parentElement);
+    </script>
     <div class="world" id="world" aria-hidden="true"></div>
     <div class="vignette" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>

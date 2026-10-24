@@ -62,7 +62,7 @@ const miniBar = $('#mini [data-bar]');
 $('#card-reverse').innerHTML = backHTML();
 
 // src: what the mini player and the space bar follow, the card or a sketch
-const state = { i: null, drawn: new Set(), sung: [], playing: false, breath: 0, kick: 0, lastFrame: -1, previewEnded: false, ready: false, src: 'card' };
+const state = { i: null, drawn: new Set(), sung: [], playing: false, breath: 0, kick: 0, lastFrame: -1, previewEnded: false, ready: false, src: 'card', via: 'first' };
 
 // ---------- worlds ----------
 const worldEl = $('#world');
@@ -242,7 +242,8 @@ function flyToSung(k, dir = 0) {
   const s = visible ? to.height / from.height : (dir ? 0.9 : 0.6);
   fly.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(${s})`, opacity: visible ? 1 : 0 }], { duration: 820, easing: 'cubic-bezier(.5,0,.2,1)' }).onfinish = () => { fly.remove(); renderSung(); };
 }
-function deal(i, { instant = false, autoplay = false, dir = 0 } = {}) {
+// via says how the card got here (for analytics): first, draw, tracklist, swipe, next, prev, keys, auto
+function deal(i, { instant = false, autoplay = false, dir = 0, via = 'first' } = {}) {
   const t = TRACKS[i];
   const prev = state.i;
   if (prev === i) return;
@@ -251,6 +252,7 @@ function deal(i, { instant = false, autoplay = false, dir = 0 } = {}) {
     if (!instant && !reduce) flyToSung(prev, dir); else renderSung();
   }
   state.i = i;
+  state.via = via;
   state.drawn.add(i);
   status.hidden = true;
   setFollow(false);
@@ -279,10 +281,10 @@ function deal(i, { instant = false, autoplay = false, dir = 0 } = {}) {
   }
   load(t, autoplay);
 }
-function drawRandom(autoplay) {
+function drawRandom(autoplay, via = 'draw') {
   const left = TRACKS.map((_, k) => k).filter((k) => k !== state.i && !state.drawn.has(k));
   const pool = left.length ? left : TRACKS.map((_, k) => k).filter((k) => k !== state.i);
-  deal(pool[Math.floor(Math.random() * pool.length)], { autoplay });
+  deal(pool[Math.floor(Math.random() * pool.length)], { autoplay, via });
 }
 
 // ---------- audio: full songs for face-up cards, a 30-second preview for sealed ones ----------
@@ -307,12 +309,13 @@ function play() {
   const t = TRACKS[state.i];
   if (sk.playing || sk.want) pauseSketch();
   setSource('card');
+  const start = state.ready && audio.currentTime > 1 && !(t.sealed && state.previewEnded) ? 'resume' : 'beginning';
   if (t.sealed && state.previewEnded) { audio.currentTime = 0; state.previewEnded = false; status.hidden = true; }
   const p = audio.play();
   if (p && p.catch) p.catch(() => setPlaying(false));
   setPlaying(true);
   session.set('bs-arrived', '1');
-  track('card_play', { card: t.id, kind: t.sealed ? 'preview' : 'full', lang: getLang() });
+  track('card_play', { card: t.id, kind: t.sealed ? 'preview' : 'full', via: state.via, start, lang: getLang() });
 }
 // a preview stops on its card and says when the rest comes, instead of dealing the next
 function previewOver(t) {
@@ -336,8 +339,9 @@ function setPlaying(on) {
 }
 audio.addEventListener('ended', () => {
   const t = TRACKS[state.i];
+  track('card_complete', { card: t.id, kind: t.sealed ? 'preview' : 'full', lang: getLang() });
   if (t.sealed) previewOver(t);
-  else deal((state.i + 1) % TRACKS.length, { autoplay: true });
+  else deal((state.i + 1) % TRACKS.length, { autoplay: true, via: 'auto' });
 });
 audio.addEventListener('error', () => {
   status.textContent = T('failed')(cap(TRACKS[state.i].card));
@@ -510,6 +514,7 @@ addEventListener('message', (e) => {
   if (d.method === 'pause') { sk.playing = false; sk.want = false; syncSketch(); }
   if (d.method === 'finish') {
     if (sk.i === null) return;
+    track('sketch_complete', { sketch: SKETCHES[sk.i].title, lang: getLang() });
     sk.playing = false;
     sk.want = false;
     if (sk.i < SKETCHES.length - 1) playSketch(sk.i + 1);
@@ -624,7 +629,7 @@ function endSwipe(e) {
   // deal while the card is still where the finger left it, so it flies off from there
   swipe.used = true;
   const dir = swipe.dx < 0 ? 1 : -1;
-  deal((state.i + dir + TRACKS.length) % TRACKS.length, { autoplay: state.playing, dir });
+  deal((state.i + dir + TRACKS.length) % TRACKS.length, { autoplay: state.playing, dir, via: 'swipe' });
   released();
   requestAnimationFrame(() => cardBtn.classList.remove('is-dragging'));
 }
@@ -644,9 +649,10 @@ document.addEventListener('click', (e) => {
   if (b.dataset.track !== undefined) {
     const k = +b.dataset.track;
     if (k === state.i) return toggle();
-    return deal(k, { autoplay: true });
+    return deal(k, { autoplay: true, via: 'tracklist' });
   }
   const act = b.dataset.act;
+  if (b.closest('#status') && state.i !== null) track('preview_prompt', { choice: act, card: TRACKS[state.i].id, lang: getLang() });
   if (b.closest('#mini') && miniSketch()) {
     if (act === 'toggle') toggleSketch();
     if (act === 'next') playSketch((sk.i + 1) % SKETCHES.length);
@@ -656,8 +662,8 @@ document.addEventListener('click', (e) => {
   if (act === 'toggle') toggle();
   if (act === 'draw') drawRandom(true);
   if (act === 'follow') { setFollow(followPop.hidden); return; }
-  if (act === 'next') deal((state.i + 1) % TRACKS.length, { autoplay: state.playing });
-  if (act === 'prev') deal((state.i + TRACKS.length - 1) % TRACKS.length, { autoplay: state.playing });
+  if (act === 'next') deal((state.i + 1) % TRACKS.length, { autoplay: state.playing, via: 'next' });
+  if (act === 'prev') deal((state.i + TRACKS.length - 1) % TRACKS.length, { autoplay: state.playing, via: 'prev' });
 });
 $$('[data-bar]').forEach((bar) => {
   // positions are measured against the playable part, never the hatched remainder
@@ -697,10 +703,10 @@ document.addEventListener('keydown', (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const onControl = e.target.closest('button, a, input, [role="slider"], [role="switch"]');
   if (e.key === ' ' && !onControl) { e.preventDefault(); toggleActive(); }
-  if (e.key === 'ArrowRight' && !onControl) deal((state.i + 1) % TRACKS.length, { autoplay: state.playing });
-  if (e.key === 'ArrowLeft' && !onControl) deal((state.i + TRACKS.length - 1) % TRACKS.length, { autoplay: state.playing });
-  if (e.key === 'd' || e.key === 'D') drawRandom(true);
-  if (/^[1-9]$/.test(e.key) && +e.key <= TRACKS.length && !e.target.closest('input')) deal(+e.key - 1, { autoplay: true });
+  if (e.key === 'ArrowRight' && !onControl) deal((state.i + 1) % TRACKS.length, { autoplay: state.playing, via: 'keys' });
+  if (e.key === 'ArrowLeft' && !onControl) deal((state.i + TRACKS.length - 1) % TRACKS.length, { autoplay: state.playing, via: 'keys' });
+  if (e.key === 'd' || e.key === 'D') drawRandom(true, 'keys');
+  if (/^[1-9]$/.test(e.key) && +e.key <= TRACKS.length && !e.target.closest('input')) deal(+e.key - 1, { autoplay: true, via: 'keys' });
   if (e.key === 'Escape') setFollow(false);
 });
 
@@ -739,22 +745,24 @@ function finishArrival() {
   session.set('bs-arrived', '1');
 }
 function runArrival() {
-  if (reduce) { deal(firstCard(), { instant: true }); return; }
+  if (reduce) { table.classList.remove('arriving'); deal(firstCard(), { instant: true }); return; }
   arrival.running = true;
   arrival.start = performance.now();
+  // the table is already dark (a script in index.html hid it before it could paint)
+  table.dataset.arrival = '1';
   table.classList.add('arriving');
   const at = (ms, fn) => arrival.timers.push(setTimeout(fn, ms));
-  at(60, () => table.classList.add('s-frame'));
-  at(450, () => table.classList.add('s-brand'));
-  at(900, () => table.classList.add('s-line'));
-  at(1500, () => table.classList.add('s-deck'));
-  at(2600, () => table.classList.add('s-line-out'));
-  at(2800, () => { table.classList.add('s-card'); deal(firstCard()); });
-  at(3600, () => table.classList.add('s-ui'));
-  at(4700, finishArrival);
+  // the caller's line first, then the frame, the mark, the deck, and the first card
+  at(100, () => table.classList.add('s-line'));
+  at(700, () => table.classList.add('s-frame'));
+  at(1100, () => table.classList.add('s-brand'));
+  at(1700, () => table.classList.add('s-deck'));
+  at(2700, () => table.classList.add('s-line-out'));
+  at(2900, () => { table.classList.add('s-card'); deal(firstCard()); });
+  at(3700, () => table.classList.add('s-ui'));
+  at(4800, finishArrival);
 }
 
 // the arrival plays once a visit
 applyLang();
-if (session.get('bs-arrived')) deal(firstCard(), { instant: true });
-else runArrival();
+if (session.get('bs-arrived')) { table.classList.remove('arriving'); deal(firstCard(), { instant: true }); } else runArrival();
