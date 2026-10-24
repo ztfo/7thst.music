@@ -75,8 +75,10 @@ function buildBack() {
   sym.innerHTML = [
     `<rect width="${W}" height="${H}" rx="10" fill="#0c0b09"/>`,
     `<rect x="17.5" y="17.5" width="${W - 35}" height="${H - 35}" rx="5" fill="none" stroke="#d2b97c" stroke-opacity=".45" stroke-width="1.1"/>`,
-    t(40, 26.8, W - 80), t(40, H - 21.6, W - 80),
-    t(21.6, H - 40, H - 80, -90), t(W - 21.6, 40, H - 80, 90),
+    // each run sits centred in the band between the two borders (17.5 to 31.5);
+    // turned text grows to one side of its baseline, so the sides anchor further in
+    t(40, 26.75, W - 80), t(40, H - 22.25, W - 80),
+    t(26.75, H - 40, H - 80, -90), t(W - 26.75, 40, H - 80, 90),
     `<rect x="${inner}" y="${inner}" width="${W - inner * 2}" height="${H - inner * 2}" rx="3" fill="none" stroke="#d2b97c" stroke-opacity=".3" stroke-width=".8"/>`,
     corner(inner + 7, inner + 7, 1, 1), corner(W - inner - 7, inner + 7, -1, 1), corner(inner + 7, H - inner - 7, 1, -1), corner(W - inner - 7, H - inner - 7, -1, -1),
     // the net covers the whole field and runs past it; the field's edge clips it.
@@ -720,7 +722,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') setFollow(false);
 });
 
-// the card tilts toward the cursor, and the engraving catches the light
+// the card tilts toward the cursor
 if (fine && !reduce) {
   const stage = $('#stage');
   stage.addEventListener('pointermove', (e) => {
@@ -729,12 +731,10 @@ if (fine && !reduce) {
     const y = (e.clientY - r.top) / r.height - 0.5;
     cardBtn.style.setProperty('--ty', `${x * 5}deg`);
     cardBtn.style.setProperty('--tx', `${-y * 4}deg`);
-    cardBtn.style.setProperty('--engrave', (0.15 + Math.max(0, 0.08 - Math.hypot(x + 0.3, y + 0.3) * 0.11)).toFixed(3));
   });
   stage.addEventListener('pointerleave', () => {
     cardBtn.style.setProperty('--ty', '0deg');
     cardBtn.style.setProperty('--tx', '0deg');
-    cardBtn.style.removeProperty('--engrave');
   });
 }
 
