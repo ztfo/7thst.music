@@ -745,22 +745,24 @@ function finishArrival() {
   session.set('bs-arrived', '1');
 }
 function runArrival() {
-  if (reduce) { deal(firstCard(), { instant: true }); return; }
+  if (reduce) { table.classList.remove('arriving'); deal(firstCard(), { instant: true }); return; }
   arrival.running = true;
   arrival.start = performance.now();
+  // the table is already dark (a script in index.html hid it before it could paint)
+  table.dataset.arrival = '1';
   table.classList.add('arriving');
   const at = (ms, fn) => arrival.timers.push(setTimeout(fn, ms));
-  at(60, () => table.classList.add('s-frame'));
-  at(450, () => table.classList.add('s-brand'));
-  at(900, () => table.classList.add('s-line'));
-  at(1500, () => table.classList.add('s-deck'));
-  at(2600, () => table.classList.add('s-line-out'));
-  at(2800, () => { table.classList.add('s-card'); deal(firstCard()); });
-  at(3600, () => table.classList.add('s-ui'));
-  at(4700, finishArrival);
+  // the caller's line first, then the frame, the mark, the deck, and the first card
+  at(100, () => table.classList.add('s-line'));
+  at(700, () => table.classList.add('s-frame'));
+  at(1100, () => table.classList.add('s-brand'));
+  at(1700, () => table.classList.add('s-deck'));
+  at(2700, () => table.classList.add('s-line-out'));
+  at(2900, () => { table.classList.add('s-card'); deal(firstCard()); });
+  at(3700, () => table.classList.add('s-ui'));
+  at(4800, finishArrival);
 }
 
 // the arrival plays once a visit
 applyLang();
-if (session.get('bs-arrived')) deal(firstCard(), { instant: true });
-else runArrival();
+if (session.get('bs-arrived')) { table.classList.remove('arriving'); deal(firstCard(), { instant: true }); } else runArrival();
