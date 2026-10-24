@@ -1,541 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google" content="notranslate">
-    <title>7thSt.music</title>
-    
-    <!-- Favicon and icon links -->
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
-    <link rel="manifest" href="site.webmanifest">
-    <!-- <link rel="mask-icon" href="assets/safari-pinned-tab.svg" color="#000000"> -->
-    <meta name="msapplication-TileColor" content="#000000">
-    <meta name="theme-color" content="#000000">
-    
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G9DRK12SZE"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-G9DRK12SZE');
-    </script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="google" content="notranslate">
+<title>llü · Buena Suerte</title>
+<meta name="description" content="Buena Suerte, the new record from llü: nine songs, each one a card. Hear the first three in full and a preview of the rest, out in early 2027.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://7thst.music/">
+<meta property="og:title" content="llü · Buena Suerte">
+<meta property="og:description" content="Buena Suerte, the new record from llü: nine songs, each one a card. Hear the first three in full and a preview of the rest, out in early 2027.">
+<meta property="og:image" content="https://res.cloudinary.com/dhjy8pfsa/image/upload/c_crop,x_619,y_365,w_516,h_884/f_jpg,q_85/La_Luna_zpuyld">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<meta name="theme-color" content="#000000">
 
-        body {
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            background: #000;
-            color: #FFF;
-            margin: 0;
-            position: relative;
-            overflow-x: hidden;
-        }
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G9DRK12SZE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-G9DRK12SZE');
+</script>
 
-        main {
-            position: relative;
-            z-index: 1;
-        }
-
-        .header {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            width: 100%;
-            z-index: 2;
-            margin-top: 1rem;
-        }
-
-        .header * {
-            pointer-events: auto;  /* Re-enable clicking on header elements */
-        }
-
-        .logo {
-            width: 150px;
-            height: auto;
-            margin-bottom: 2rem;
-            position: relative;
-            /* The mark's counters are transparent and the dot grid sits behind
-               it, so without this the wave shows through the middle of the
-               logo. The SVG's outer border meets the edge of its own box, so a
-               background on the element stops exactly at the mark's edges. */
-            background: #000;
-            filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
-        }
-
-        .grid {
-            position: relative;
-            z-index: 1;
-            padding: 2rem 1rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-            box-sizing: border-box;
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-        .grid > div {
-            width: 100%;
-            padding: 0.5rem;  /* Reduced padding */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-sizing: border-box;
-        }
-
-        .player-container {
-            position: relative;
-            width: 100%;
-            height: 650px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .player-container iframe {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
-
-        h3 {
-            color: #fff;
-            font-size: 1.2rem;
-            margin: 0 0 2rem;
-            letter-spacing: 1px;
-            text-align: center;
-            text-transform: lowercase;
-        }
-
-        ul {
-            width: 100%;
-            max-width: 500px;
-            background: rgba(231, 212, 148, 0.02);
-            border: 1px solid rgba(231, 212, 148, 0.08);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        a {
-            color: rgba(231, 212, 148, 0.8);
-            transition: all 0.3s ease;
-        }
-
-        a:hover {
-            color: #E7D494;
-            text-shadow: 0 0 10px rgba(231, 212, 148, 0.3);
-        }
-
-        .link-footer {
-            text-align: center;
-            width: 100%;
-            margin: 2rem 0;
-        }
-
-        .link-footer .top-social-links {
-            justify-content: center;
-        }
-
-        .copyright {
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 0.7rem;
-            opacity: 0.4;
-            text-align: center;
-            margin: 3rem 0;
-        }
-
-        .dots {
-            margin: 2rem 0;
-        }
-
-        .dot1, .dot2, .dot3 {
-            background: linear-gradient(45deg, #E7D494, #C7AB48);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 5px rgba(231, 212, 148, 0.3));
-        }
-
-        .bio {
-            text-align: center;
-            margin: 1rem 0 3rem;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.6;
-        }
-
-        .pronunciation {
-            font-style: italic;
-            color: #E7D494;
-        }
-
-        .inspiration-card {
-            text-align: center;
-            margin: 4rem auto;
-            max-width: 360px;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 2rem;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.075)
-        }
-
-        .inspiration-card h3 {
-            color: rgba(231, 212, 148, 0.9);
-            margin-bottom: 2rem;
-        }
-
-        .inspiration-card ul {
-            background: transparent;
-            border: none;
-        }
-
-        .links-list {
-            list-style: none;
-            padding: 0;
-            margin: 2rem 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .links-list li {
-            margin: 0;
-            padding: 0;
-        }
-
-        .links-list a {
-            color: rgba(231, 212, 148, 0.8);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .links-list a:hover {
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            margin: 4rem 0;
-        }
-
-        .social-links a {
-            padding: 0.8rem 1.5rem;
-            border: 1px solid rgba(231, 212, 148, 0.15);
-            border-radius: 6px;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-        }
-
-        .social-links a:hover {
-            background: rgba(231, 212, 148, 0.05);
-            border-color: rgba(231, 212, 148, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .top-social-links {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1rem;
-            position: relative; /* Ensure links stay above gradient */
-        }
-
-        .art-link-container {
-            width: 100%;
-            text-align: center;
-            margin-top: 2rem;
-        }
-
-        .art-link-container a {
-            color: rgba(231, 212, 148, 0.8);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .art-link-container a:hover {
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        .top-social-links a {
-            color: rgba(231, 212, 148, 0.8);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .top-social-links a:hover {
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        }
-
-        @media (max-width: 1200px) {
-            .grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr;  /* Force single column on mobile */
-                padding: 1rem;
-                gap: 1rem;
-            }
-
-            .grid > div {
-                padding: 0;
-                margin-bottom: 1rem;
-            }
-
-            main {
-                overflow-x: hidden;  /* Prevent horizontal scroll */
-                width: 100%;
-            }
-
-            body {
-                overflow-x: hidden;
-                width: 100%;
-            }
-
-            .player-container iframe {
-                width: 100% !important;  /* Force iframe to respect container width */
-                max-width: 100vw;
-                box-sizing: border-box;
-            }
-
-            .top-social-links {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 1rem;
-            }
-
-            .top-social-links a:last-child {
-                width: 100%;
-                text-align: center;
-                margin-top: 0.5rem;
-            }
-        }
-
-
-        .dot-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-            pointer-events: none;
-            display: block;
-        }
-
-        /* Shown instead of the canvas when WebGL is unavailable or lost. */
-        .dot-grid--static {
-            background-image: radial-gradient(
-                rgba(231, 212, 148, 0.06) 1.5px, transparent 1.5px);
-            background-size: 25px 25px;
-        }
-
-        .scroll-indicator {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(231, 212, 148, 0.6);
-            font-size: 2.5rem;
-            animation: bounce 2s infinite;
-            z-index: 10;
-            cursor: pointer;
-            transition: opacity 0.3s ease;
-            opacity: 1;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0) translateX(-50%);
-            }
-            40% {
-                transform: translateY(-20px) translateX(-50%);
-            }
-            60% {
-                transform: translateY(-10px) translateX(-50%);
-            }
-        }
-
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-    </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+<link rel="preload" href="fonts/gambetta-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles/site.css">
+<link rel="stylesheet" href="styles/home.css">
 </head>
 <body>
-    <main>
-        <section class="header">
-            <img src="assets/squaresnake.svg" alt="logo" class="logo">
-            <div class="top-social-links">
-                <a href="https://soundcloud.com/llu-official" target="_blank">SoundCloud</a>
-                <a href="https://open.spotify.com/artist/1t00W56dAWaTPJ7YcRwY91" target="_blank">Spotify</a>
-                <a href="https://music.apple.com/us/artist/llü/1770530866" target="_blank">Apple Music</a>
-                <a href="art.html">Illustration Art</a>
-            </div>
-        </section>
 
-        <div class="grid">
-            <div>
-                <h3>Latebloomer EP</h3>
-                <div class="player-container">
-                    <iframe 
-                        width="100%" 
-                        height="650" 
-                        scrolling="no" 
-                        frameborder="no" 
-                        allow="autoplay" 
-                        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1874619647&color=%23E7D494&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
-                    </iframe>
-                </div>
-                <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/llu-official" title="llü" target="_blank" style="color: #cccccc; text-decoration: none;">llü</a> · <a href="https://soundcloud.com/llu-official/sets/latebloomer-ep" title="Latebloomer EP" target="_blank" style="color: #cccccc; text-decoration: none;">Latebloomer EP</a></div>
-            </div>
-            <div>
-                <h3>works in progress.</h3>
-                <div class="player-container">
-                    <iframe 
-                        width="100%" 
-                        height="650" 
-                        scrolling="no" 
-                        frameborder="no" 
-                        allow="autoplay" 
-                        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1866428391&color=%23E7D494&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true">
-                    </iframe>
-                </div>
-                <div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/llu-official" title="llü" target="_blank" style="color: #cccccc; text-decoration: none;">llü</a> · <a href="https://soundcloud.com/llu-official/sets/experiments" title="experiments." target="_blank" style="color: #cccccc; text-decoration: none;">experiments.</a></div>
-            </div>
+<svg class="svgdefs" aria-hidden="true" focusable="false">
+  <defs id="defs">
+    <radialGradient id="llu-gold" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(44 0) rotate(135) scale(62.2254 235.242)">
+      <stop stop-color="#E7D494"/><stop offset="0.5" stop-color="#C7AB48"/><stop offset="1" stop-color="#EDD78B"/>
+    </radialGradient>
+    <path id="llu-path" fill-rule="evenodd" d="M40 4L40 40L4 40L4 4L40 4ZM0 0H44V44H0ZM12 8H8V36H12V8ZM16 8H20V36H16V8ZM28 16H24V36H36V16H32V32H28V16ZM24 8H28V12H24V8ZM36 8H32V12H36V8Z"/>
+    <symbol id="llu" viewBox="0 0 44 44"><use href="#llu-path" fill="url(#llu-gold)"/></symbol>
+    <symbol id="llu-mono" viewBox="0 0 44 44"><use href="#llu-path" fill="currentColor"/></symbol>
+    <symbol id="i-play" viewBox="0 0 12 12"><path d="M3.6 1.9 10 6l-6.4 4.1z" fill="currentColor"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 12 12"><rect x="2.8" y="2" width="2.1" height="8" fill="currentColor"/><rect x="7.1" y="2" width="2.1" height="8" fill="currentColor"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 12 12"><path d="M2.6 2v8M10 2 4.4 6 10 10z" fill="currentColor" stroke="currentColor" stroke-width="1"/></symbol>
+    <symbol id="i-next" viewBox="0 0 12 12"><path d="M9.4 2v8M2 2l5.6 4L2 10z" fill="currentColor" stroke="currentColor" stroke-width="1"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 16 16"><path d="M1.5 4.5h2.6c1.4 0 2.3.6 3.1 1.8l1.6 3.4c.8 1.2 1.7 1.8 3.1 1.8h2.6M1.5 11.5h2.6c1 0 1.8-.3 2.4-1M9.4 5.5c.6-.7 1.4-1 2.4-1h2.7M12.6 2.6l1.9 1.9-1.9 1.9M12.6 9.6l1.9 1.9-1.9 1.9" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-follow" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 5v6M5 8h6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-out" viewBox="0 0 12 12"><path d="M3.5 8.5 8.5 3.5M4.5 3.5h4v4" fill="none" stroke="currentColor" stroke-width="1"/></symbol>
+  </defs>
+</svg>
+
+<h1 class="sr-only">llü · Buena Suerte</h1>
+
+<main>
+  <section class="table" id="table" aria-label="Buena Suerte">
+    <div class="world" id="world" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="frame" id="frame" aria-hidden="true"></div>
+
+    <div class="idx fade fade--ui" style="--d:120ms" aria-hidden="true"><small>Nº</small><b class="metal" data-b="n"></b><i></i><span class="label" data-b="card"></span></div>
+    <div class="idx idx--br fade fade--ui" style="--d:120ms" aria-hidden="true"><small>Nº</small><b class="metal" data-b="n"></b><i></i><span class="label" data-b="card"></span></div>
+
+    <div class="table__inner">
+      <div class="top">
+        <a class="brand fade fade--brand" href="#table" aria-label="llü, home">
+          <svg viewBox="0 0 44 44" aria-hidden="true"><use href="#llu"/></svg>
+          <span class="label">llü · buena suerte</span>
+        </a>
+        <nav class="nav fade fade--brand" style="--d:150ms" aria-label="Main">
+          <a href="#table" aria-current="page" data-t="music"></a>
+          <a href="art.html" data-t="art"></a>
+          <a href="#bocetos" data-t="wipNav"></a>
+          <a href="#sigue" data-t="follow"></a>
+          <button class="lang" id="lang" type="button" role="switch" aria-checked="false" aria-label="Español"><span data-l="en">EN</span><i></i><span data-l="es">ES</span></button>
+        </nav>
+      </div>
+
+      <div class="pile pile--deck fade fade--deck">
+        <button class="deck stack" id="deck" type="button" aria-label="Draw a card from the deck"></button>
+        <span class="pile__label"><span class="label">la baraja</span><b data-b="left">9</b></span>
+      </div>
+
+      <div class="stage" id="stage">
+        <button class="card" id="card" type="button" aria-label="Play">
+          <span class="card__inner" id="card-inner">
+            <span class="card__side" id="card-front"></span>
+            <span class="card__side card__side--back" id="card-reverse"></span>
+          </span>
+          <span class="playmark" aria-hidden="true"><i><svg><use href="#i-play" id="playmark-icon"/></svg></i><span id="playmark-label"></span></span>
+        </button>
+      </div>
+
+      <div class="pile pile--sung fade fade--ui" style="--d:200ms">
+        <div class="stack" id="sung"></div>
+        <span class="pile__label"><span class="label">cantadas</span><b data-b="sung">0</b></span>
+      </div>
+
+      <div class="meta fade fade--ui">
+        <div class="meta__swap" id="meta-swap">
+          <span class="pill" id="pill"><i></i><span id="pill-text"></span></span>
+          <p class="name metal" data-b="card"></p>
+          <p class="status" id="status" role="status" hidden></p>
         </div>
+      </div>
 
-        <div class="inspiration-card" style="max-width: 500px; margin: 5rem auto;">
-            <h3>stuck on arrangements?</h3>
-            <div style="margin: 1.5rem 0; text-align: center;">
-                <a href="https://arreglo.ai" target="_blank">
-                    <img src="assets/arreglo-logo.svg" alt="Arreglo" style="width: 120px; height: auto; margin-bottom: 1.5rem; filter: brightness(0.9);">
-                </a>
-                <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;">
-                    Transform your track ideas into complete arrangements in minutes with Arreglo, 
-                    an AI-powered music arrangement generator for Figma. By 7thSt.music + llü.
-                </p>
-                <a href="https://arreglo.ai" target="_blank" style="
-                    display: inline-block;
-                    padding: 0.8rem 1.5rem;
-                    background: rgba(231, 212, 148, 0.1);
-                    border: 1px solid rgba(231, 212, 148, 0.3);
-                    border-radius: 6px;
-                    color: rgba(231, 212, 148, 0.9);
-                    text-decoration: none;
-                    transition: all 0.3s ease;
-                    font-size: 0.9rem;
-                    letter-spacing: 1px;
-                ">Try Arreglo &rang;</a>
-            </div>
+      <div class="player fade fade--ui" style="--d:90ms" id="player">
+        <div class="transport">
+          <button class="tbtn" type="button" data-act="draw" data-tip=""><svg><use href="#i-shuffle"/></svg></button>
+          <button class="tbtn" type="button" data-act="prev" data-tip=""><svg><use href="#i-prev"/></svg></button>
+          <button class="play" type="button" data-act="toggle" data-tip=""><svg><use href="#i-play" data-toggle-icon/></svg></button>
+          <button class="tbtn" type="button" data-act="next" data-tip=""><svg><use href="#i-next"/></svg></button>
+          <button class="tbtn" type="button" data-act="follow" data-tip="" aria-expanded="false" aria-controls="follow-pop"><svg><use href="#i-follow"/></svg></button>
         </div>
-
-        <div class="inspiration-card">
-            <h3>need inspiration?</h3>
-            <ul class="links-list">
-                <li>
-                    <a href="https://soundcloud.com/emotionalmusic" target="_blank">Emotional &rang;</a>
-                </li>
-                <li>
-                    <a href="https://open.spotify.com/playlist/37i9dQZF1DWZJmo7mlltU6?si=de302ceb17924d48" target="_blank">Borderless &rang;</a>
-                </li>
-                <li>
-                    <a href="https://open.spotify.com/playlist/29jL3I7s8q3GABpw359UIo?si=7c3e1236992d450e" target="_blank">Honest &rang;</a>
-                </li>
-                <li>
-                    <a href="https://open.spotify.com/playlist/1cdTAxPUXieR9ZkcGKCleO?si=3e3d8d7fbeb44688" target="_blank">Dark &rang;</a>
-                </li>
-                <li>
-                    <a href="https://open.spotify.com/playlist/5KuWQUO3X0dGalovbeC6aX?si=3ee6157b94974abb" target="_blank">
-                        Smooth &rang;
-                    </a>
-                </li>
-            </ul>
+        <div class="scrub">
+          <span class="time tnum" data-now>0:00</span>
+          <div class="bar" data-bar role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+          <span class="time tnum" data-total></span>
         </div>
-        
-        <section class="link-footer">
+        <div class="follow-pop" id="follow-pop" hidden></div>
+      </div>
 
-        </section>
-        <section class="copyright">
-            <small>
-                &copy; 2025 - Luis Palomares - 7thSt.Music - All rights reserved.
-            </small>
-        </section>
-    </main>
-    <div class="scroll-indicator"></div>
-    <script>
-        // Update scroll indicator behavior
-        window.addEventListener('DOMContentLoaded', () => {
-            const scrollIndicator = document.createElement('div');
-            scrollIndicator.className = 'scroll-indicator';
-            scrollIndicator.innerHTML = '⌄';
-            document.body.appendChild(scrollIndicator);
-            
-            // Handle scroll behavior
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    scrollIndicator.style.opacity = '0';
-                } else {
-                    scrollIndicator.style.opacity = '1';
-                }
-            });
-        });
+      <div class="tracks fade fade--ui" style="--d:160ms">
+        <div class="tracks__head">
+          <span class="label">la baraja · <span data-b="total">9</span></span>
+          <span class="tracks__legend"><span><i class="glyph"></i><span data-t="fullSong"></span></span><span><i class="glyph glyph--preview"></i><span data-t="previewLong"></span></span></span>
+        </div>
+        <nav class="tracks__list" id="tracks" aria-label="Cards in the deck"></nav>
+      </div>
+    </div>
 
-        // Google Analytics event tracking
-        document.addEventListener('DOMContentLoaded', function() {
-            // Track music profile link clicks
-            const musicLinks = document.querySelectorAll('.top-social-links a');
-            musicLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const linkText = this.textContent.trim();
-                    gtag('event', 'click', {
-                        'event_category': 'Music Profile',
-                        'event_label': linkText,
-                        'transport_type': 'beacon'
-                    });
-                });
-            });
+    <p class="arrival-line" aria-hidden="true">se va y se corre.</p>
+  </section>
 
-            // Track external link clicks (playlists, etc.)
-            const externalLinks = document.querySelectorAll('a[target="_blank"]');
-            externalLinks.forEach(link => {
-                if (!link.closest('.top-social-links')) {
-                    link.addEventListener('click', function(e) {
-                        const linkText = this.textContent.trim() || this.href;
-                        gtag('event', 'click', {
-                            'event_category': 'External Link',
-                            'event_label': linkText,
-                            'transport_type': 'beacon'
-                        });
-                    });
-                }
-            });
-        });
-    </script>
-    <script type="module" src="dot-grid.js"></script>
+  <section class="band" id="bocetos" aria-labelledby="bocetos-h">
+    <div class="band__in band__in--start">
+      <div>
+        <span class="label" style="color:var(--gold)" data-t="wip"></span>
+        <h2 id="bocetos-h" data-t="wipH"></h2>
+        <p data-t="wipP"></p>
+      </div>
+      <div>
+        <ol class="sketches" id="sketches"></ol>
+        <a class="sketches__all" id="sketches-all" target="_blank" rel="noopener"><span></span><svg><use href="#i-out"/></svg></a>
+        <p class="sketches__note" id="sketches-note" data-t="opensSC" hidden></p>
+      </div>
+    </div>
+    <div class="sc-host" id="sc-host" aria-hidden="true"></div>
+  </section>
+
+  <section class="band" id="sigue" aria-labelledby="sigue-h">
+    <div class="band__in">
+      <div>
+        <span class="label" style="color:var(--gold)" data-t="follow"></span>
+        <h2 id="sigue-h" data-t="followH"></h2>
+        <p data-t="followP"></p>
+      </div>
+      <nav class="platforms" id="platforms" aria-label="Follow llü"></nav>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot__in">
+    <span class="who"><svg viewBox="0 0 44 44" aria-hidden="true"><use href="#llu"/></svg><span>llü · <a href="https://www.instagram.com/im.llu/" target="_blank" rel="noopener">@im.llu</a></span></span>
+    <span class="studio"><span data-t="studio"></span> <a href="https://arreglo.ai" target="_blank" rel="noopener">Arreglo</a></span>
+    <span>© <span id="year">2026</span> Luis Palomares · 7th St. Music</span>
+  </div>
+</footer>
+
+<div class="mini" id="mini" aria-label="Now playing">
+  <div class="mini__in">
+    <span class="mini__thumb" id="mini-thumb"></span>
+    <div class="mini__who"><span class="label tnum" id="mini-eyebrow"></span><span class="mini__title" id="mini-title"></span></div>
+    <div class="mini__ctl">
+      <button class="tbtn" type="button" data-act="prev" data-tip=""><svg><use href="#i-prev"/></svg></button>
+      <button class="play" type="button" data-act="toggle" data-tip=""><svg><use href="#i-play" data-toggle-icon/></svg></button>
+      <button class="tbtn" type="button" data-act="next" data-tip=""><svg><use href="#i-next"/></svg></button>
+    </div>
+    <div class="scrub"><span class="time tnum" data-now>0:00</span><div class="bar" data-bar aria-hidden="true"></div><span class="time tnum" data-total></span></div>
+  </div>
+</div>
+
+<audio id="audio" preload="metadata"></audio>
+<script type="module" src="js/home.js"></script>
 </body>
 </html>
