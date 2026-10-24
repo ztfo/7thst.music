@@ -126,12 +126,13 @@
 .meta__swap.is-swapping { opacity: 0; transform: translateY(6px); transition-duration: 200ms; }
 .name { margin: 0; font: 500 clamp(28px, 2.8vw, 42px)/1 var(--serif); letter-spacing: 0.12em; text-transform: uppercase; padding-left: 0.12em; }
 
-/* ---------- status: full song or preview, said before you press play ---------- */
-.pill { display: inline-flex; align-items: center; gap: 8px; height: 24px; padding: 0 11px; border-radius: 12px; font: 500 10.5px/1 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
-.pill i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
-.pill--full { color: var(--paper-2); box-shadow: inset 0 0 0 1px rgba(242, 234, 214, 0.3); }
-.pill--preview { color: rgba(18, 15, 11, 0.9); background: var(--field); }
-.pill--preview i { background: none; box-shadow: inset 0 0 0 1.5px currentColor; }
+/* ---------- status: full song or preview, said before you press play ----------
+   A quiet line, not a badge: the card's own seal already says it, so this only confirms it. */
+.pill { display: inline-flex; align-items: center; gap: 7px; font: 500 10px/1 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; }
+.pill i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex: none; }
+.pill--full { color: var(--paper-3); }
+.pill--preview { color: var(--gold); }
+.pill--preview i { background: var(--field); }
 
 /* ---------- the player: transport over a scrub bar ---------- */
 .player { grid-column: 1 / -1; justify-self: center; width: min(600px, 100%); display: grid; justify-items: center; gap: 10px; position: relative; }
@@ -299,7 +300,9 @@
   .tracks__list::-webkit-scrollbar { display: none; }
 }
 @media (max-width: 760px) {
-  :root { --card-h: clamp(230px, calc(100svh - 500px), 420px); --m: 18px; }
+  :root { --card-h: 640px; --m: 18px; }
+  .meta__swap { gap: 10px; }
+  .pill { font-size: 9px; gap: 6px; }
   .table { min-height: 600px; }
   .pile, .idx { display: none; }
   .table__inner { grid-template-columns: minmax(0, 1fr); }
