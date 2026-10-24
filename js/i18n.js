@@ -1,6 +1,6 @@
 // Both pages, both languages. Lotería words stay Spanish in either one, and the
 // Spanish is Mexican, norteño leaning: "rolas", "pásale", "hasta arriba", the
-// preterite over the perfect. The choice is remembered across pages.
+// preterite over the perfect. Spanish comes first; a visitor's switch is remembered across pages.
 
 const KEY = 'bs-lang';
 
@@ -44,7 +44,7 @@ export const STR = {
 
 let lang = (() => {
   try { const saved = localStorage.getItem(KEY); if (saved === 'es' || saved === 'en') return saved; } catch {}
-  return (navigator.language || '').toLowerCase().startsWith('es') ? 'es' : 'en';
+  return 'es';
 })();
 
 export const getLang = () => lang;
