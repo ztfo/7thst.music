@@ -525,12 +525,14 @@ function scLoadSet() {
   sk.frame.src = widgetSrc(`https://api.soundcloud.com/playlists/${SKETCH_SET.playlist}`);
   scTimeout();
 }
+// sketches read from SoundCloud only get in with a real SoundCloud link, a date and a length
+const soundcloudLink = (u) => typeof u === 'string' && u.startsWith('https://soundcloud.com/');
 function mergeSketches(sounds) {
   if (!Array.isArray(sounds) || !sounds.length) return;
   const inSet = new Set(sounds.map((s) => s.id));
   // only the set's first few come with details, which is where new uploads land
   const fresh = sounds
-    .filter((s) => s.title && s.duration && !SKETCHES.some((k) => k.id === s.id))
+    .filter((s) => typeof s.title === 'string' && Number(s.duration) > 0 && /^\d{4}-\d{2}-\d{2}/.test(String(s.display_date || s.created_at)) && soundcloudLink(s.permalink_url) && !SKETCHES.some((k) => k.id === s.id))
     .map((s) => ({ id: s.id, title: s.title, dur: Math.round(s.duration / 1000), date: String(s.display_date || s.created_at).slice(0, 10), url: s.permalink_url }));
   const keep = (k) => inSet.has(k.id);
   const current = sk.i !== null ? SKETCHES[sk.i].id : null;
@@ -620,7 +622,7 @@ function renderSketches() {
   skEl.innerHTML = SKETCHES.map((s, i) => {
     const inner = `<span class="sk__n">${pad2(i + 1)}</span><span class="sk__t">${esc(s.title)}</span><span class="sk__d">${monthYear(s.date)}</span><span class="sk__l tnum">${fmt(s.dur)}</span><span class="sk__i"><svg><use href="#i-${sk.failed ? 'out' : 'play'}"/></svg></span>`;
     return sk.failed
-      ? `<li><a class="sk" href="${s.url}" target="_blank" rel="noopener">${inner}</a></li>`
+      ? `<li><a class="sk" href="${esc(soundcloudLink(s.url) ? s.url : SKETCH_SET.url)}" target="_blank" rel="noopener">${inner}</a></li>`
       : `<li><button class="sk" type="button" data-sketch="${i}" aria-label="${esc(s.title)}, ${fmt(s.dur)}">${inner}</button></li>`;
   }).join('');
   const all = $('#sketches-all');
