@@ -35,7 +35,9 @@ $('#year').textContent = String(new Date().getFullYear());
 const SVGNS = 'http://www.w3.org/2000/svg';
 
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+// card names take every word capitalized; labels and tips only their first
 const cap = (s) => s.replace(/(^|\s)\S/g, (c) => c.toUpperCase());
+const first = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const pad2 = (n) => String(n).padStart(2, '0');
 const monthYear = (iso) => { const [y, m] = iso.split('-').map(Number); return `${T('months')[m - 1]} ${y}`; };
@@ -208,7 +210,7 @@ function syncMiniIcon() {
   const on = miniSketch() ? sk.playing || sk.want : state.playing;
   $('#mini [data-toggle-icon]').setAttribute('href', on ? '#i-pause' : '#i-play');
   const b = $('#mini [data-act="toggle"]');
-  b.dataset.tip = cap(on ? T('pause') : T('play'));
+  b.dataset.tip = first(on ? T('pause') : T('play'));
   b.setAttribute('aria-label', b.dataset.tip);
 }
 function setPill(t) {
@@ -222,8 +224,8 @@ function setTips() {
   $$('[data-tip]').forEach((b) => {
     const v = tip[b.dataset.act];
     if (!v) return;
-    b.dataset.tip = cap(v);
-    b.setAttribute('aria-label', cap(v));
+    b.dataset.tip = first(v);
+    b.setAttribute('aria-label', first(v));
   });
 }
 
@@ -237,7 +239,7 @@ function bind(t) {
   cardBtn.classList.toggle('is-sealed', !!t.sealed);
   buildBar(t);
   $('#playmark-label').textContent = t.sealed ? T('previewListen') : T('listen');
-  cardBtn.setAttribute('aria-label', `${state.playing ? T('pause') : T('play')} ${cap(t.card)}`);
+  cardBtn.setAttribute('aria-label', `${first(state.playing ? T('pause') : T('play'))}: ${cap(t.card)}`);
 }
 function bindCounts() {
   $$('[data-b="sung"]').forEach((n) => { n.textContent = String(state.sung.length); });
@@ -387,7 +389,7 @@ function setPlaying(on) {
   syncMiniIcon();
   markTracks();
   $('#playmark-icon').setAttribute('href', on ? '#i-pause' : '#i-play');
-  if (state.i !== null) cardBtn.setAttribute('aria-label', `${on ? T('pause') : T('play')} ${cap(TRACKS[state.i].card)}`);
+  if (state.i !== null) cardBtn.setAttribute('aria-label', `${first(on ? T('pause') : T('play'))}: ${cap(TRACKS[state.i].card)}`);
 }
 audio.addEventListener('ended', () => {
   const t = TRACKS[state.i];

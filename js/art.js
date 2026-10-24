@@ -9,6 +9,7 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const pad2 = (n) => String(n).padStart(2, '0');
 const cap = (s) => s.replace(/(^|\s)\S/g, (c) => c.toUpperCase());
+const first = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const track = (name, params) => { try { window.gtag?.('event', name, params); } catch {} };
 $('#year').textContent = String(new Date().getFullYear());
 
@@ -120,7 +121,7 @@ document.addEventListener('keydown', (e) => {
 // ---------- language ----------
 function applyLang() {
   paintLang();
-  $$('[data-view]').forEach((b) => b.setAttribute('aria-label', cap(T(b.dataset.view === '1' ? 'nextWork' : 'prevWork'))));
+  $$('[data-view]').forEach((b) => b.setAttribute('aria-label', first(T(b.dataset.view === '1' ? 'nextWork' : 'prevWork'))));
   renderObra();
   if (obra.v !== null) showWork(obra.v);
 }

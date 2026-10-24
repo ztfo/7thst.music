@@ -6,20 +6,21 @@ const KEY = 'bs-lang';
 
 export const STR = {
   es: {
-    music: 'música', art: 'arte', wipNav: 'en proceso', follow: 'seguir', prev: 'anterior', play: 'reproducir', pause: 'pausar', next: 'siguiente',
-    listen: 'escuchar', previewListen: 'adelanto', preview: 'adelanto', out: 'sale',
-    failed: (n) => `No cargó ${n}. Recarga la página y vuelve a intentar.`,
+    // said the way an artist says it, not the way a label reads: "probadita", "dale play", "inténtale"
+    music: 'música', art: 'arte', wipNav: 'en proceso', follow: 'seguir', prev: 'anterior', play: 'dale play', pause: 'pausa', next: 'siguiente',
+    listen: 'dale play', previewListen: 'probadita', preview: 'probadita', out: 'sale',
+    failed: (n) => `No cargó ${n}. Recarga la página e inténtale otra vez.`,
     followH: 'Sigue a llü.', followP: 'Buena Suerte se va cantando carta por carta. Síguelo donde escuchas música para que no se te pase ninguna.',
-    fullSong: 'canción completa', previewLong: 'adelanto de 30 segundos', previewPill: 'adelanto de 30 s', restOf: 'completa a principios de 2027',
-    when: 'principios de 2027', outWhen: 'sale a principios de 2027',
-    draw: 'sacar carta', prevCard: 'carta anterior', nextCard: 'carta que sigue', followTip: 'seguir a llü', position: 'posición',
+    fullSong: 'completa', previewLong: 'probadita de 30 segundos', previewPill: 'probadita', restOf: 'completa a inicios del 2027',
+    when: 'inicios del 2027', outWhen: 'sale a inicios del 2027',
+    draw: 'saca una carta', prevCard: 'la anterior', nextCard: 'la que sigue', followTip: 'sigue a llü', position: 'posición',
     followPop: 'Sigue a llü.',
-    previewOver: (n) => `Hasta aquí el adelanto. ${n} sale completa a principios de 2027.`, followToHear: 'Síguelo para escucharla ese día', orNext: 'o pásale a la que sigue',
+    previewOver: (n) => `Hasta aquí la probadita. ${n} sale completa a inicios del 2027.`, followToHear: 'Síguelo para que no te la pierdas', orNext: 'o pásale a la que sigue',
     wip: 'en proceso', wipH: 'Rolas sin terminar.', wipP: 'Así como van, todavía en el estudio. Lo más nuevo hasta arriba.',
     allOnSC: (n) => `Las ${n} en SoundCloud`, opensSC: 'Se abren en SoundCloud.', tapToPlay: 'Dale play aquí abajo.',
     back: 'regresar a la música', brand: 'llü · mis dibujos', studio: 'del estudio:',
-    obraH: 'Mis dibujos.', obraP: 'Portadas, sueños, mandalas y lo que va saliendo entre canción y canción.',
-    seeAll: (n) => `ver todo · ${n}`, seeLess: 'ver menos', close: 'cerrar', prevWork: 'anterior', nextWork: 'siguiente',
+    obraH: 'Mis dibujos.', obraP: 'Portadas, sueños, mandalas y lo que va saliendo entre rola y rola.',
+    seeAll: (n) => `ver todos · ${n}`, seeLess: 'ver menos', close: 'cerrar', prevWork: 'anterior', nextWork: 'siguiente',
     months: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
   },
   en: {
