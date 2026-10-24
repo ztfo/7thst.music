@@ -578,10 +578,13 @@ addEventListener('message', (e) => {
 });
 function playSketch(i) {
   if (state.playing) pause();
-  if (sk.i !== i) sk.pos = 0;
+  const changed = sk.i !== i;
+  if (changed) sk.pos = 0;
   sk.i = i;
   sk.want = true;
   setSource('sketch');
+  // setSource skips the redraw when a sketch was already on, so the next one redraws here
+  if (changed) syncMini();
   // a player still loading this sketch plays it as soon as it's ready
   if (sk.loaded !== i || sk.failed) scLoad(i);
   else if (sk.ready) { scSend('play'); armNudge(); }
