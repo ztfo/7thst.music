@@ -1,0 +1,65 @@
+// Both pages, both languages. Lotería words stay Spanish in either one, and the
+// Spanish is Mexican, norteño leaning: "rolas", "pásale", "hasta arriba", the
+// preterite over the perfect. The choice is remembered across pages.
+
+const KEY = 'bs-lang';
+
+export const STR = {
+  es: {
+    music: 'música', art: 'arte', wipNav: 'en proceso', follow: 'seguir', prev: 'anterior', play: 'reproducir', pause: 'pausar', next: 'siguiente',
+    listen: 'escuchar', previewListen: 'adelanto', preview: 'adelanto', out: 'sale',
+    failed: (n) => `No cargó ${n}. Recarga la página y vuelve a intentar.`,
+    followH: 'Sigue a llü.', followP: 'Buena Suerte se va cantando carta por carta. Síguelo donde escuchas música para que no se te pase ninguna.',
+    fullSong: 'canción completa', previewLong: 'adelanto de 30 segundos', previewPill: 'adelanto de 30 s', restOf: 'completa a principios de 2027',
+    when: 'principios de 2027', outWhen: 'sale a principios de 2027',
+    draw: 'sacar carta', prevCard: 'carta anterior', nextCard: 'carta que sigue', followTip: 'seguir a llü', position: 'posición',
+    followPop: 'Sigue a llü.',
+    previewOver: (n) => `Hasta aquí el adelanto. ${n} sale completa a principios de 2027.`, followToHear: 'Síguelo para escucharla ese día', orNext: 'o pásale a la que sigue',
+    wip: 'en proceso', wipH: 'Rolas sin terminar.', wipP: 'Así como van, todavía en el estudio. Lo más nuevo hasta arriba.',
+    allOnSC: (n) => `Las ${n} en SoundCloud`, opensSC: 'Se abren en SoundCloud.', tapToPlay: 'Dale play aquí abajo.',
+    back: 'regresar a la música', brand: 'llü · mis dibujos', studio: 'del estudio:',
+    obraH: 'Mis dibujos.', obraP: 'Portadas, sueños, mandalas y lo que va saliendo entre canción y canción.',
+    seeAll: (n) => `ver todo · ${n}`, seeLess: 'ver menos', close: 'cerrar', prevWork: 'anterior', nextWork: 'siguiente',
+    months: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
+  },
+  en: {
+    music: 'music', art: 'art', wipNav: 'in progress', follow: 'follow', prev: 'prev', play: 'play', pause: 'pause', next: 'next',
+    listen: 'listen', previewListen: 'preview', preview: 'preview', out: 'out',
+    failed: (n) => `${n} didn't load. Reload the page to try again.`,
+    followH: 'Follow llü.', followP: 'Buena Suerte is dealt one card at a time. Follow where you listen to hear each one the day it turns over.',
+    fullSong: 'full song', previewLong: '30-second preview', previewPill: '30-second preview', restOf: 'full song in early 2027',
+    when: 'early 2027', outWhen: 'out early 2027',
+    draw: 'draw a card', prevCard: 'previous card', nextCard: 'next card', followTip: 'follow llü', position: 'position',
+    followPop: 'Follow llü.',
+    previewOver: (n) => `That's the preview. ${n} is out in full in early 2027.`, followToHear: 'Follow to hear it that day', orNext: 'or go to the next card',
+    wip: 'works in progress', wipH: 'Unfinished songs.', wipP: 'As they are, still in the studio. Newest at the top.',
+    allOnSC: (n) => `All ${n} on SoundCloud`, opensSC: 'Opens on SoundCloud.', tapToPlay: 'Press play below.',
+    back: 'back to the music', brand: 'llü · my art', studio: 'from the studio:',
+    obraH: 'My art.', obraP: 'Covers, dreams, mandalas, and whatever turns up between songs.',
+    seeAll: (n) => `see all · ${n}`, seeLess: 'see less', close: 'close', prevWork: 'previous', nextWork: 'next',
+    months: ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
+  },
+};
+
+let lang = (() => {
+  try { const saved = localStorage.getItem(KEY); if (saved === 'es' || saved === 'en') return saved; } catch {}
+  return (navigator.language || '').toLowerCase().startsWith('es') ? 'es' : 'en';
+})();
+
+export const getLang = () => lang;
+export function setLang(next) {
+  lang = next;
+  try { localStorage.setItem(KEY, next); } catch {}
+}
+export const T = (k) => STR[lang][k];
+
+// fills every [data-t] with its string and sets the switch
+export function paintLang(root = document) {
+  document.documentElement.lang = lang;
+  root.querySelectorAll('[data-t]').forEach((n) => { const v = T(n.dataset.t); if (typeof v === 'string') n.textContent = v; });
+  const sw = document.getElementById('lang');
+  if (sw) {
+    sw.setAttribute('aria-checked', String(lang === 'es'));
+    sw.querySelectorAll('[data-l]').forEach((s) => s.classList.toggle('on', s.dataset.l === lang));
+  }
+}

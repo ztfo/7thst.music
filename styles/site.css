@@ -1,0 +1,86 @@
+@font-face { font-family: 'Gambetta'; src: url('../fonts/gambetta-400.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Gambetta'; src: url('../fonts/gambetta-400i.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Gambetta'; src: url('../fonts/gambetta-500.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+
+/* Shared by both pages. One frame at --f, everything on one margin --m inside it.
+   Detail is layered by distance: calm composition from across the room; controls,
+   edges and seals at arm's length; microtext and engraving up close. Serif for
+   names and numbers; sans for everything read. Dark by design. */
+:root {
+  color-scheme: dark;
+  --ink: #000000;
+  --paper: #f2ead6;
+  --paper-2: rgba(242, 234, 214, 0.74);
+  --paper-3: rgba(242, 234, 214, 0.5);
+  --paper-4: rgba(242, 234, 214, 0.28);
+  --gold: #d2b97c;
+  --rule: rgba(210, 185, 124, 0.42);
+  --rule-soft: rgba(210, 185, 124, 0.2);
+  --stock: #0c0b09;
+  --veil: rgba(0, 0, 0, 0.86);
+  --well: rgba(242, 234, 214, 0.03);
+  --metal: linear-gradient(180deg, #f1e3b6 0%, #d7bd7f 52%, #b39752 100%);
+
+  --serif: 'Gambetta', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  --t-ui: 240ms;
+  --t-world: 1600ms;
+
+  --f: clamp(12px, 1.4vw, 20px);
+  --m: clamp(22px, 2.6vw, 40px);
+  --ar: 516 / 884;
+  --card-h: clamp(240px, calc(100svh - 520px), 520px);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+img { max-width: 100%; }
+body { margin: 0; background: var(--ink); color: var(--paper); font: 400 15px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; z-index: 60; height: env(safe-area-inset-top, 0px); background: var(--ink); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
+::selection { background: var(--gold); color: var(--ink); }
+a { color: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.svgdefs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.tnum { font-variant-numeric: tabular-nums; }
+.label { font: 500 10.5px/1.2 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--paper-3); }
+.metal { background: var(--metal); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* the frame is a line of microtext: a hairline from across the room, words up close */
+.frame { position: absolute; inset: var(--f); z-index: 1; pointer-events: none; }
+.frame svg { position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); overflow: visible; }
+.frame text, .rule text { font: 500 7px/1 var(--sans); letter-spacing: 0.34em; fill: rgba(210, 185, 124, 0.32); }
+.frame .corner { fill: none; stroke: rgba(210, 185, 124, 0.42); stroke-width: 0.8; }
+
+/* language: a two-position selector switch */
+.lang { appearance: none; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; padding: 8px 0; font: 500 10px/1 var(--sans); letter-spacing: 0.14em; color: var(--paper-3); }
+.lang .on { color: var(--paper); }
+.lang i { position: relative; width: 30px; height: 14px; border-radius: 7px; border: 1px solid var(--rule); background: #070605; box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8); }
+.lang i::after {
+  content: ''; position: absolute; top: 1px; left: 1px; width: 10px; height: 10px; border-radius: 50%;
+  background: repeating-conic-gradient(rgba(242, 234, 214, 0.22) 0 2deg, rgba(0, 0, 0, 0) 2deg 8deg), #2a2721;
+  box-shadow: 0 0 0 1px rgba(210, 185, 124, 0.45);
+  transition: transform 320ms var(--ease);
+}
+.lang[aria-checked="true"] i::after { transform: translateX(16px); }
+
+/* ---------- footer, the same on both pages ---------- */
+.foot { border-top: 1px solid var(--rule-soft); }
+.foot__in { max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 28px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); font-size: 13px; color: var(--paper-3); }
+.foot__in .who { display: flex; align-items: center; gap: 12px; }
+.foot__in svg { width: 22px; height: 22px; }
+.foot__in a { text-decoration: none; transition: color var(--t-ui); }
+.foot__in a:hover { color: var(--gold); }
+
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: 1ms !important; }
+  html { scroll-behavior: auto; }
+}
