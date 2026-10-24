@@ -70,6 +70,22 @@ English has its own address for search engines: `?lang=en` (for example `https:/
 
 Also in the root: `robots.txt` (everything allowed), `sitemap.xml`, `site.webmanifest` (home screen name and icons), and `404.html`.
 
+## Analytics
+
+Google Analytics 4 (`G-G9DRK12SZE`) runs on both pages. On top of the page views GA tracks by itself, the site sends these events. Every one carries `lang`.
+
+| Event | When | Details |
+| --- | --- | --- |
+| `card_play` | a card starts playing | `card`, `kind` (full or preview), `via` (first, draw, tracklist, swipe, next, prev, keys, auto), `start` (beginning or resume) |
+| `card_complete` | a song or probadita plays to the end | `card`, `kind` |
+| `preview_prompt` | a choice in the end-of-preview prompt | `choice` (follow or next), `card` |
+| `sketch_play` / `sketch_complete` | a work in progress starts / plays to the end | `sketch` |
+| `follow_click` | Spotify, Apple Music, SoundCloud or Instagram tapped | `platform` |
+| `art_open` | a drawing opened in the viewer | `series`, `piece` |
+| `lang_switch` | the EN/ES switch | `lang` |
+
+For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `choice`, `sketch`, `platform`, `series`, `piece`, `lang`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
+
 ## Local preview
 
 ```sh
