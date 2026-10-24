@@ -1,0 +1,54 @@
+# llü
+
+> llü is the dance music project of Luis Palomares, who writes and produces the songs and draws their art. The site, https://7thst.music, is in Spanish first, with English at https://7thst.music/?lang=en.
+
+## Buena Suerte
+
+The new record: nine songs dealt like a Lotería deck, one card each. On the site a card is drawn at a time and the room takes the color of its painted world. The cards that are out play in full; the ones still to come are sealed and play a 30-second preview ("probadita") until they come out in early 2027.
+
+- 1. La Luna: out now, 4:04
+- 2. El Cotorro: out now, 3:09
+- 3. El Diablito: out now, 4:19
+- 4. El Sueño: sealed, 30-second preview on the site, out in full in early 2027
+- 5. Los Amigos: sealed, 30-second preview on the site, out in full in early 2027
+- 6. El Corazón: sealed, 30-second preview on the site, out in full in early 2027
+- 7. El Fuego: sealed, 30-second preview on the site, out in full in early 2027
+- 8. El Perdido: sealed, 30-second preview on the site, out in full in early 2027
+- 9. La Dama: sealed, 30-second preview on the site, out in full in early 2027
+
+## Listen and follow
+
+- [Spotify](https://open.spotify.com/artist/1t00W56dAWaTPJ7YcRwY91)
+- [Apple Music](https://music.apple.com/us/artist/ll%C3%BC/1770530866)
+- [SoundCloud](https://soundcloud.com/llu-official)
+- [Instagram](https://www.instagram.com/im.llu/)
+
+## Works in progress
+
+Unfinished songs, newest first, from the SoundCloud set [works in progress.](https://soundcloud.com/llu-official/sets/experiments) (38 in all). The newest play right on the site:
+
+- [danza notturna](https://soundcloud.com/llu-official/danza-notturna)
+- [chopsuey](https://soundcloud.com/llu-official/chopsuey)
+- [use me](https://soundcloud.com/llu-official/use-me-bill-withers-bootleg)
+- [el altar](https://soundcloud.com/llu-official/el-altar)
+- [silver and gold](https://soundcloud.com/llu-official/silver-and-gold)
+- [so, be it.](https://soundcloud.com/llu-official/so-be-it)
+- [to be alive](https://soundcloud.com/llu-official/to-be-alive)
+- [push](https://soundcloud.com/llu-official/push-1)
+- [who do you think you are?](https://soundcloud.com/llu-official/who-do-you-think-you-are-2)
+- [enough](https://soundcloud.com/llu-official/enough)
+- [conflicted](https://soundcloud.com/llu-official/conflicted)
+- [summer with you](https://soundcloud.com/llu-official/summer-with-you)
+
+## Art
+
+[Mis dibujos / My art](https://7thst.music/art.html): covers (portadas, 11), dreams (sueños, 38), mandalas (34), voices (voces, 4), animals (animales, 2).
+
+## From the studio
+
+- [Arreglo](https://arreglo.ai): an AI-powered music arrangement generator for Figma, by 7thSt.music and llü.
+
+## Pages
+
+- [Home: Buena Suerte, works in progress, follow](https://7thst.music/)
+- [Mis dibujos / My art](https://7thst.music/art.html)

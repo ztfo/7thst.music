@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Share image: Mis dibujos</title>
+<!-- The art page's share image. Serve the repo (python3 -m http.server), open this at
+     1200x630, screenshot it, and save it as assets/og/mis-dibujos.jpg. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../styles/site.css">
+<style>
+  :root { padding: 0; --f: 18px; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  .og { position: relative; width: 1200px; height: 630px; overflow: hidden; background: var(--ink); }
+  .og__words { position: absolute; left: 92px; top: 0; bottom: 0; width: 430px; display: grid; align-content: center; gap: 22px; }
+  .og__words .label { color: var(--gold); font-size: 13px; }
+  .og__words h1 { margin: 0; font: 500 96px/0.95 var(--serif); letter-spacing: -0.01em; }
+  .og__words p { margin: 0; font: 400 24px/1.4 var(--sans); color: var(--paper-2); max-width: 18ch; }
+  .og__site { position: absolute; left: 92px; bottom: 58px; font: 500 12px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--paper-3); }
+  .og__grid { position: absolute; right: 88px; top: 50%; translate: 0 -50%; display: grid; grid-template-columns: repeat(3, 178px); gap: 16px; }
+  .og__grid img { display: block; width: 178px; height: 178px; object-fit: contain; background: var(--well); filter: brightness(0.94); }
+</style>
+</head>
+<body>
+<div class="og">
+  <div class="frame" id="frame" aria-hidden="true"></div>
+  <div class="og__words">
+    <span class="label">llü · arte</span>
+    <h1 class="metal">Mis dibujos</h1>
+    <p>Portadas, sueños, mandalas, voces y animales.</p>
+  </div>
+  <span class="og__site">7thst.music</span>
+  <div class="og__grid" id="grid"></div>
+</div>
+
+<script type="module">
+  import { drawFrame } from '../../js/microtext.js';
+  drawFrame(document.getElementById('frame'));
+  // six pieces across the series, at the size the grid shows them
+  const PIECES = ['Wander_h3lh04', 'Wild_Elements_bu9ahz', 'Sol_zesbgq', 'Remember_h28gcj', 'Petals_In_Water_tkcegs', 'What_Happens_Now_zcagjj'];
+  document.getElementById('grid').innerHTML = PIECES.map((pid) => `<img src="https://res.cloudinary.com/dhjy8pfsa/image/upload/f_auto,q_auto/c_limit,w_400,h_400/${pid}" alt="">`).join('');
+</script>
+</body>
+</html>

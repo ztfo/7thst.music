@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Share image: Buena Suerte</title>
+<!-- The home page's share image. Serve the repo (python3 -m http.server), open this at
+     1200x630, screenshot it, and save it as assets/og/buena-suerte.jpg. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../styles/site.css">
+<link rel="stylesheet" href="../../styles/home.css">
+<style>
+  :root { padding: 0; --f: 18px; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  .og { position: relative; width: 1200px; height: 630px; overflow: hidden; isolation: isolate; background: var(--ink); }
+  .og__world { position: absolute; inset: -4%; z-index: -3; background: var(--img) center / cover no-repeat; filter: brightness(0.4); }
+  .og__words { position: absolute; left: 92px; top: 0; bottom: 0; width: 470px; display: grid; align-content: center; gap: 22px; }
+  .og__words .label { color: var(--gold); font-size: 13px; }
+  .og__words h1 { margin: 0; font: 500 104px/0.95 var(--serif); letter-spacing: -0.01em; }
+  .og__words p { margin: 0; font: 400 25px/1.35 var(--sans); color: var(--paper-2); }
+  .og__site { position: absolute; left: 92px; bottom: 58px; font: 500 12px/1 var(--sans); letter-spacing: 0.2em; text-transform: uppercase; color: var(--paper-3); }
+  .og__fan { position: absolute; right: 176px; top: 0; bottom: 0; width: 460px; }
+  .og__card { position: absolute; left: 50%; bottom: 96px; width: 226px; aspect-ratio: var(--ar); margin-left: -113px; border-radius: 4px; transform-origin: 50% 100%; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 40px 70px -24px rgba(0, 0, 0, 0.95); }
+  .og__card .face { border-radius: 4px; }
+</style>
+</head>
+<body>
+<svg class="svgdefs" aria-hidden="true" focusable="false">
+  <defs id="defs">
+    <radialGradient id="llu-gold" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(44 0) rotate(135) scale(62.2254 235.242)">
+      <stop stop-color="#E7D494"/><stop offset="0.5" stop-color="#C7AB48"/><stop offset="1" stop-color="#EDD78B"/>
+    </radialGradient>
+    <path id="llu-path" fill-rule="evenodd" d="M40 4L40 40L4 40L4 4L40 4ZM0 0H44V44H0ZM12 8H8V36H12V8ZM16 8H20V36H16V8ZM28 16H24V36H36V16H32V32H28V16ZM24 8H28V12H24V8ZM36 8H32V12H36V8Z"/>
+    <symbol id="llu" viewBox="0 0 44 44"><use href="#llu-path" fill="url(#llu-gold)"/></symbol>
+    <symbol id="llu-mono" viewBox="0 0 44 44"><use href="#llu-path" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<div class="og">
+  <div class="og__world" id="world" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="frame" id="frame" aria-hidden="true"></div>
+  <div class="og__words">
+    <span class="label">llü · disco nuevo</span>
+    <h1 class="metal">Buena Suerte</h1>
+    <p>Nueve rolas, cada una una carta.</p>
+  </div>
+  <span class="og__site">7thst.music</span>
+  <div class="og__fan" id="fan"></div>
+</div>
+
+<script type="module">
+  import { TRACKS, groundUrl } from '../../data/tracks.js';
+  import { STR } from '../../js/i18n.js';
+  import { drawFrame } from '../../js/microtext.js';
+  import { buildBack } from '../../js/cardback.js';
+
+  buildBack(document.getElementById('defs'));
+  drawFrame(document.getElementById('frame'));
+  const T = (k) => STR.es[k];
+  const by = (id) => TRACKS.find((t) => t.id === id);
+  document.getElementById('world').style.setProperty('--img', `url(${groundUrl(by('la-luna').ground, 1600)})`);
+
+  const art = (t) => `<span class="face face--art"><img src="${t.img}" alt=""></span>`;
+  const sealed = (t) => `<span class="face face--back face--sealed" style="--field:${t.field}"><svg viewBox="0 0 516 884"><use href="#card-back"/></svg><span class="seal"><span class="seal__n">${t.n}</span><span class="seal__mid"><span class="seal__name">${t.card}</span><span class="seal__date">${T('preview')} · ${T('when')}</span></span><span class="seal__stamp"><svg viewBox="0 0 44 44"><use href="#llu-mono"/></svg></span></span></span>`;
+  // a sealed card at the back, the three that are out fanned in front of it
+  const fan = [
+    [by('el-fuego'), -14, -126, sealed],
+    [by('la-luna'), -5, -44, art],
+    [by('el-cotorro'), 5, 42, art],
+    [by('el-diablito'), 14, 124, art],
+  ];
+  document.getElementById('fan').innerHTML = fan.map(([t, deg, x, face]) => `<div class="og__card" style="transform: translateX(${x}px) rotate(${deg}deg)">${face(t)}</div>`).join('');
+</script>
+</body>
+</html>
