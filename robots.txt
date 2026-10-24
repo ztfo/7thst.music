@@ -1,0 +1,5 @@
+# Everything here is public: the music, the art, and the pages about them.
+User-agent: *
+Allow: /
+
+Sitemap: https://7thst.music/sitemap.xml

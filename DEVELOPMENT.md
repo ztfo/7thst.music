@@ -18,6 +18,9 @@ Plain HTML, CSS and ES modules on GitHub Pages. There is no build step: edit, co
 | `js/microtext.js` | the "BUENA SUERTE · LLÜ · 7TH ST" line used for frames and rules |
 | `data/tracks.js` | the nine cards, the SoundCloud sketches, follow links |
 | `data/envelopes.js` | generated: each song's low-end energy, which makes the room breathe |
+| `js/markup.js`, `js/art-markup.js` | the lists both pages draw, shared with the prerender |
+| `js/cardback.js` | the engraved card back |
+| `scripts/prerender.mjs` | writes the pages' content, head tags, structured data and `llms.txt` into the HTML |
 | `images-data.js` | generated: the art, from Cloudinary (`pnpm run fetch-images`) |
 | `fonts/` | Gambetta (Fontshare), self-hosted; Archivo loads from Google Fonts |
 
@@ -46,6 +49,26 @@ The list shows the newest 12 from the SoundCloud set "works in progress." and pl
 ## Art
 
 Upload through the existing tool (`upload.html` with `pnpm run upload-server`, kept out of git), then run `pnpm run fetch-images` and commit `images-data.js`. Titles come from the Cloudinary display names, and untitled pieces are numbered.
+
+## Search and sharing
+
+The pages draw themselves with JavaScript, but most AI crawlers and link previews don't run it. So `pnpm run prerender` writes what the pages say into their HTML, in Spanish:
+- the nav, headings and copy;
+- the tracklist, the works in progress and the follow links;
+- the art page's series and first set of drawings.
+
+It also writes the head tags (description, canonical, `es`/`en` alternates, Open Graph and Twitter cards), the JSON-LD structured data (the artist, Buena Suerte and its tracks, the art), and `llms.txt`, a plain summary for AI assistants. The same templates (`js/markup.js`, `js/art-markup.js`) draw the pages, so the HTML always matches.
+
+**Run `pnpm run prerender` whenever you change `data/tracks.js`, `js/i18n.js` or `images-data.js`**, such as a card coming out, a new sketch list or new art, and commit what it changes. It only rewrites `index.html`, `art.html` and `llms.txt`, and running it twice changes nothing.
+
+English has its own address for search engines: `?lang=en` (for example `https://7thst.music/?lang=en`).
+
+**Share images** are `assets/og/buena-suerte.jpg` and `assets/og/mis-dibujos.jpg`, at 1200 by 630. To redo one:
+1. Serve the repo.
+2. Open `scripts/og/buena-suerte.html` or `scripts/og/mis-dibujos.html` in a 1200 by 630 window.
+3. Screenshot it and save it over the JPEG.
+
+Also in the root: `robots.txt` (everything allowed), `sitemap.xml`, `site.webmanifest` (home screen name and icons), and `404.html`.
 
 ## Local preview
 

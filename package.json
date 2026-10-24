@@ -6,6 +6,7 @@
     "preinstall": "npx only-allow pnpm",
     "fetch-images": "node scripts/fetch-cloudinary-images.js",
     "audio": "node scripts/cut-and-upload-audio.js",
+    "prerender": "node scripts/prerender.mjs",
     "serve": "npx http-server -p 8000 -o",
     "upload-server": "node upload-server.js"
   },

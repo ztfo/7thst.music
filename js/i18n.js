@@ -42,7 +42,10 @@ export const STR = {
   },
 };
 
+// a ?lang=en or ?lang=es link wins (search engines index each language at its own address),
+// then the visitor's own switch, then Spanish
 let lang = (() => {
+  try { const asked = new URLSearchParams(location.search).get('lang'); if (asked === 'es' || asked === 'en') return asked; } catch {}
   try { const saved = localStorage.getItem(KEY); if (saved === 'es' || saved === 'en') return saved; } catch {}
   return 'es';
 })();
