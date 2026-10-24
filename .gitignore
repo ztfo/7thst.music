@@ -80,3 +80,6 @@ list-cloudinary-tags.js
 
 # Claude Code
 .claude/sessions/
+
+# Browser test output
+.playwright-mcp/

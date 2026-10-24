@@ -26,7 +26,9 @@ if (!cloudName || !apiKey || !apiSecret) {
 cloudinary.config({
   cloud_name: cloudName,
   api_key: apiKey,
-  api_secret: apiSecret
+  api_secret: apiSecret,
+  secure: true,
+  urlAnalytics: false
 });
 
 console.log(`✓ Connected to Cloudinary: ${cloudName}\n`);
