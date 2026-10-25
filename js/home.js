@@ -682,6 +682,9 @@ function endSwipe(e) {
 }
 stageEl.addEventListener('pointerup', endSwipe);
 stageEl.addEventListener('pointercancel', endSwipe);
+// On iPhones the card gets its own invisible switch, so a tap on it ticks. Safari's switch also
+// follows a drag, which is the only way a swipe there can tick at all.
+arm(cardBtn);
 // a swipe that ends on the card isn't also a tap on it
 cardBtn.addEventListener('click', () => {
   if (swipe.used) { swipe.used = false; return; }
@@ -873,13 +876,29 @@ const feel = { on: false, inView: true };
 const feelBtn = $('#feel');
 feelBtn.hidden = !(coarse && (typeof DeviceOrientationEvent !== 'undefined' || canBuzz));
 arm(feelBtn);
-// the card leans a little the way the phone does, about half as far as it follows a cursor
+// only the light moves; the card stays flat, since on a phone it fills its space edge to edge
+// and Safari clips a card that leans past it
 function onTilt(x, y) {
-  cardBtn.style.setProperty('--ty', `${(x * 3).toFixed(2)}deg`);
-  cardBtn.style.setProperty('--tx', `${(-y * 2.5).toFixed(2)}deg`);
   table.style.setProperty('--lx', x.toFixed(3));
   table.style.setProperty('--ly', y.toFixed(3));
 }
+// says what sentir does when it's turned on, or why it couldn't be
+const feelTip = $('#feel-tip');
+let feelTipTimer = 0;
+function showFeelTip(text) {
+  feelTip.textContent = text;
+  feelTip.hidden = false;
+  requestAnimationFrame(() => feelTip.classList.add('is-on'));
+  clearTimeout(feelTipTimer);
+  feelTipTimer = setTimeout(hideFeelTip, 6000);
+}
+function hideFeelTip() {
+  clearTimeout(feelTipTimer);
+  feelTip.classList.remove('is-on');
+  feelTipTimer = setTimeout(() => { feelTip.hidden = true; }, 400);
+}
+document.addEventListener('pointerdown', (e) => { if (!feelTip.hidden && !e.target.closest('#feel')) hideFeelTip(); });
+const feelSays = () => [!reduce && T('feelTilt'), T('feelShake'), canBuzz && T('feelKick')].filter(Boolean).join(' ');
 // a shake draws a card, while the table is in view and a card is on it
 function onShake() {
   if (!feel.inView || arrival.running || state.i === null) return;
@@ -895,10 +914,11 @@ function setFeel(on) {
 }
 feelBtn.addEventListener('click', () => {
   tick();
-  if (feel.on) { setFeel(false); track('feel_switch', { feel: 'off', lang: getLang() }); return; }
+  if (feel.on) { setFeel(false); hideFeelTip(); track('feel_switch', { feel: 'off', lang: getLang() }); return; }
   // an iPhone asks here, inside the tap
   motion.ask().then((ok) => {
     setFeel(ok);
+    showFeelTip(ok ? feelSays() : T('feelDenied'));
     track('feel_switch', { feel: ok ? 'on' : 'denied', lang: getLang() });
   });
 });
