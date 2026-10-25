@@ -1,6 +1,7 @@
 /* ================= the table ================= */
-.table { --breath: 0; --kick: 0; position: relative; height: 100svh; min-height: 680px; overflow: hidden; isolation: isolate; }
-.world { position: absolute; inset: -4%; z-index: -3; filter: brightness(calc(0.46 + var(--breath) * 0.1)); transform: scale(calc(1 + var(--kick) * 0.008)); transition: opacity var(--t-world) var(--ease); }
+/* --lift and --jump: how far the room brightens with the low end and jumps on a kick; phones get more, since a small screen and the card over it hide the move */
+.table { --breath: 0; --kick: 0; --lift: 0.1; --jump: 0.008; position: relative; height: 100svh; min-height: 680px; overflow: hidden; isolation: isolate; }
+.world { position: absolute; inset: -4%; z-index: -3; filter: brightness(calc(0.46 + var(--breath) * var(--lift))); transform: scale(calc(1 + var(--kick) * var(--jump))); transition: opacity var(--t-world) var(--ease); }
 .world__layer { position: absolute; inset: 0; opacity: 0; isolation: isolate; transition: opacity var(--t-world) var(--ease); animation: drift 48s ease-in-out infinite alternate; }
 .world__layer.is-on { opacity: 1; }
 .world__tex { position: absolute; inset: 0; background: var(--img) center / cover no-repeat; transform: scale(var(--fx, 1), var(--fy, 1)); }
@@ -331,7 +332,7 @@
   :root { --card-h: 640px; --m: 18px; }
   .meta__swap { gap: 10px; }
   .pill { font-size: 9px; gap: 6px; }
-  .table { min-height: 600px; }
+  .table { min-height: 600px; --lift: 0.22; --jump: 0.025; }
   .pile, .idx { display: none; }
   .table__inner { grid-template-columns: minmax(0, 1fr); }
   .stage { grid-column: 1; justify-self: stretch; width: auto; }
