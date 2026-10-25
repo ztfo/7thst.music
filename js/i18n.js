@@ -1,6 +1,7 @@
 // Both pages, both languages. Lotería words stay Spanish in either one, and the
 // Spanish is Mexican, norteño leaning: "rolas", "pásale", "hasta arriba", the
-// preterite over the perfect. Spanish comes first; a visitor's switch is remembered across pages.
+// preterite over the perfect. A first visit follows the browser's language (Spanish when it's
+// neither); a visitor's switch is remembered across pages.
 
 const KEY = 'bs-lang';
 
@@ -45,10 +46,15 @@ export const STR = {
 };
 
 // a ?lang=en or ?lang=es link wins (search engines index each language at its own address),
-// then the visitor's own switch, then Spanish
+// then the visitor's own switch, then the first of the browser's languages that's Spanish or English
+// ("es-MX", "en-US"…), then Spanish
 let lang = (() => {
   try { const asked = new URLSearchParams(location.search).get('lang'); if (asked === 'es' || asked === 'en') return asked; } catch {}
   try { const saved = localStorage.getItem(KEY); if (saved === 'es' || saved === 'en') return saved; } catch {}
+  try {
+    const prefs = navigator.languages?.length ? navigator.languages : [navigator.language];
+    for (const p of prefs) { const base = String(p || '').toLowerCase().split('-')[0]; if (base === 'es' || base === 'en') return base; }
+  } catch {}
   return 'es';
 })();
 
