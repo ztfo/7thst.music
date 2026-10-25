@@ -77,7 +77,7 @@ Mini-notation reads like a step sequencer: `*4` is four on the floor, `~` is a r
 the starter patterns swap to `s("llu_kick*4")` and the rest.
 
 **The license.** Strudel is AGPL-3.0, and this repo is MIT. Strudel loads unchanged from
-a pinned CDN version, and everything the terminal adds lives in `maquina/`, which has its
+a pinned copy served from this site, and everything the terminal adds lives in `maquina/`, which has its
 own AGPL-3.0 `LICENSE`. The rest of the site stays MIT. `help` ends with a credit line and
 links to Strudel and to the terminal's source on GitHub, which covers AGPL's
 offer-the-source rule. Code under `maquina/` can import the site's MIT modules (such as
@@ -137,10 +137,12 @@ site's language.
 | `maquina/js/live.js` | the editor and Strudel, loaded only when `live` or `play` runs |
 | `maquina/js/scope.js` | the scope and spectrum, from a Web Audio analyser |
 | `maquina/js/themes.js` | the palettes `theme` switches between |
+| `maquina/sandbox.html` | the sandboxed frame that runs pattern code and makes the sound |
+| `maquina/vendor/` | a pinned copy of Strudel, served from this site |
 | `maquina/js/strings.js` | the terminal's strings in both languages. It reads the language from `js/i18n.js`, so the switch is shared with the deck |
 | `maquina/data/techno.js` | the techno tracks, the samples and the track patterns |
 
-- **Editor**: CodeMirror 6 from a pinned CDN (Strudel's own REPL uses it). On a phone the
+- **Editor**: CodeMirror 6, a pinned copy in `maquina/vendor/` (Strudel's own REPL uses it). On a phone the
   editor gets a row of keys for `~ * [ ] < > ( ) " .` and a big ▶, because a phone
   keyboard hides those.
 - **Phones**: typing code on a phone is hard, so phones get a step grid under the editor.
@@ -202,6 +204,75 @@ The terminal should feel found, not linked. A few ways in, from obvious to burie
 - **A remix contest.** Remix a track with its own sounds. The winner's pattern becomes
   the default `live` opens with, credited in `cat`. This one waits for the stems.
 
+## Security and safety
+
+The site has no accounts, no payments and no server, so there isn't much to steal. The one
+real risk is built into live coding: **a Strudel pattern is JavaScript, and a share link
+carries someone else's pattern.** Everything else is small. In order of how much it matters:
+
+**1. Shared links run a stranger's code.** If `/maquina#p=...` ran its pattern straight in
+the page, anyone could send a link that runs any script on 7thst.music: put up a fake
+"llü" message or a scam, send the visitor somewhere else, run a crypto miner, or read
+and change what the site keeps in the browser (the language, sentir, saved patterns).
+That's cross-site scripting, handed out by design. How we stop it:
+- **Patterns run in a sandbox.** All pattern code, the visitor's own and shared, runs in
+  an `<iframe sandbox="allow-scripts">` without `allow-same-origin`. It gets a blank
+  origin of its own: it can make sound, but it can't touch the terminal, the deck, the
+  site's storage or its cookies, and it can't navigate the window. The terminal sends it
+  code and gets back sound levels for the scope through `postMessage`, nothing else.
+  The frame gets `allow="autoplay"` so it can make sound after the visitor's tap. That
+  needs testing on iPhone Safari first thing in phase 1. If Safari won't play from the
+  frame, the fallback is serving the sandbox from a second address of its own (such as
+  a `maquina-sandbox` subdomain), which keeps it walled off the same way.
+- **Nothing runs until you press play.** A shared link opens with the code showing, under
+  a line saying it's someone else's pattern. Strudel's own site works the same way.
+- **The shell never evaluates.** `help`, `ls`, `play` and the rest are a fixed list of
+  commands. What's typed at the prompt is matched against that list, never run. The
+  same goes for the 404 page's prompt.
+- **A Content Security Policy** in a `<meta>` tag on `/maquina` (Pages can't send
+  headers, but the meta tag covers this) lets scripts load only from this site and the
+  pinned Strudel source, and sounds only from Cloudinary and Strudel's sample hosts.
+
+**2. Volume and hearing.** A pattern can be painfully loud or shrill (`.gain(50)`, a
+piercing sine), and a share link could be made to hurt someone in headphones. How we stop
+it:
+- a limiter on the master output, so nothing goes past a safe ceiling whatever the code
+  says;
+- the first play starts at a moderate volume, with a volume control in the title bar;
+- `Esc`, a `hush` command and a stop button always silence everything at once.
+
+**3. Flashing.** Anything that flashes more than three times a second can trigger
+seizures. The scope and the border pulse softly and never flash the whole screen. With
+reduced motion they stop. Pattern code can't draw visuals, since the sandbox only makes
+sound.
+
+**4. Where Strudel comes from.** Loading a script from a CDN means trusting that CDN. A
+copy of one exact Strudel version is kept in `maquina/vendor/` and served from this site,
+so nothing outside can change it. Upgrading means copying a newer version in on purpose.
+
+**5. Freezing a phone.** An endless loop or a huge pattern can hang the tab and drain the
+battery. In the sandbox that's contained: if the frame stops answering, the terminal
+reloads it and says so.
+
+**6. What's given away.** Anything on Cloudinary can be downloaded by anyone, so:
+- the hidden track is effectively released the day it goes up, since anyone can save it
+  and post it;
+- the stems can be saved and used too, so only upload stems you're happy to give away;
+- `help` says what people may do with what they make (for example, share it with credit,
+  not sell it).
+
+**7. Bandwidth.** If a link goes viral, the samples are fetched over and over from
+Cloudinary. Turn on Cloudinary's usage alerts, and keep samples short and compressed.
+
+**8. Privacy.** Analytics never sends pattern code or anything typed at the prompt, since
+people type all sorts of things. Only the command's name goes, like `term_command:
+play`. Listening for keys on the deck ignores anything typed into a field, and keeps
+only the last few letters, to spot a secret word.
+
+**Later, the gallery** brings in a server and what other people post, so spam,
+moderation and access rules (Supabase row-level security) get their own plan when we get
+there.
+
 ## Phases
 
 The machine can go up before the music, so it comes first.
@@ -228,7 +299,7 @@ Each phase can ship on its own. Phase 1 is worth having even if the rest never h
 
 | Question | Answer |
 | --- | --- |
-| Engine and license | Strudel, from a pinned CDN. The terminal's code is AGPL-3.0 in `maquina/`; the rest of the site stays MIT |
+| Engine and license | Strudel, a pinned copy served from this site. The terminal's code is AGPL-3.0 in `maquina/`; the rest of the site stays MIT |
 | Address | `/maquina` |
 | Name and artist | La Máquina, by llü |
 | Look | Close to Hyper: a clean, modern terminal window with tabs and split panes, not a retro CRT |
