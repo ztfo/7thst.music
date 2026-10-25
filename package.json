@@ -7,6 +7,7 @@
     "fetch-images": "node scripts/fetch-cloudinary-images.js",
     "audio": "node scripts/cut-and-upload-audio.js",
     "prerender": "node scripts/prerender.mjs",
+    "cards": "node scripts/render-cards.mjs",
     "serve": "npx http-server -p 8000 -o",
     "upload-server": "node upload-server.js"
   },

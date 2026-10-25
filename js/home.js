@@ -1,10 +1,12 @@
 // The home page: the table, the deck, the player, the sketches from SoundCloud.
-import { TRACKS, SKETCHES, SKETCH_SET, PLATFORMS, groundUrl } from '../data/tracks.js';
+import { TRACKS, SKETCHES, SKETCH_SET, PLATFORMS, groundUrl, groundAvgUrl } from '../data/tracks.js';
 import ENVELOPES from '../data/envelopes.js';
 import { T, getLang, setLang, paintLang } from './i18n.js';
 import { drawFrame, fit } from './microtext.js';
 import { buildBack } from './cardback.js';
 import { fmt, cap, first, esc, soundcloudLink, trackButtons, platformLinks, sketchRows } from './markup.js';
+import { tick, arm, canBuzz } from './haptics.js';
+import * as motion from './motion.js';
 
 const PREVIEW = 30;
 // worlds load at the size the screen needs
@@ -27,6 +29,7 @@ const track = (name, params) => { try { window.gtag?.('event', name, params); } 
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+const coarse = matchMedia('(pointer: coarse)').matches;
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const session = {
@@ -88,6 +91,7 @@ const tracksEl = $('#tracks');
 function renderTracks() {
   tracksEl.style.setProperty('--n', TRACKS.length);
   tracksEl.innerHTML = trackButtons(TRACKS, T);
+  $$('.tk', tracksEl).forEach(arm);
   markTracks();
 }
 function markTracks() {
@@ -101,7 +105,14 @@ function markTracks() {
 const followLinks = () => platformLinks(PLATFORMS);
 $('#platforms').innerHTML = followLinks();
 const followPop = $('#follow-pop');
+// the popover leads with sharing the card that's on, then where to follow
+function followPopHTML() {
+  const t = state.i !== null ? TRACKS[state.i] : null;
+  const share = t ? `<button type="button" class="share" data-act="share"><span>${T('share')(cap(t.card))}</span><svg><use href="#i-share"/></svg></button>` : '';
+  return `<p>${T('followPop')}</p>${share}${followLinks()}`;
+}
 function setFollow(open) {
+  if (open) { followPop.innerHTML = followPopHTML(); prepShare(); }
   followPop.hidden = !open;
   $('[data-act="follow"]').setAttribute('aria-expanded', String(open));
 }
@@ -154,6 +165,8 @@ function syncMiniIcon() {
   const b = $('#mini [data-act="toggle"]');
   b.dataset.tip = first(on ? T('pause') : T('play'));
   b.setAttribute('aria-label', b.dataset.tip);
+  // the phone's own player and the tab follow the same thing
+  syncSession();
 }
 function setPill(t) {
   const pill = $('#pill');
@@ -191,7 +204,7 @@ function bindCounts() {
 function applyLang() {
   paintLang();
   setTips();
-  followPop.innerHTML = `<p>${T('followPop')}</p>${followLinks()}`;
+  followPop.innerHTML = followPopHTML();
   renderTracks();
   renderSung();
   renderDeck();
@@ -203,6 +216,7 @@ function applyLang() {
   }
 }
 $('#lang').addEventListener('click', () => {
+  tick();
   setLang(getLang() === 'es' ? 'en' : 'es');
   applyLang();
   track('lang_switch', { lang: getLang() });
@@ -216,6 +230,7 @@ function stackHTML(list, topHTML) {
 function renderDeck() {
   const left = TRACKS.filter((_, k) => !state.drawn.has(k));
   deckBtn.innerHTML = left.length ? stackHTML(left, backHTML()) : '<span class="stack-empty"></span>';
+  arm(deckBtn);
 }
 function renderSung() {
   const list = state.sung.map((k) => TRACKS[k]);
@@ -242,7 +257,9 @@ function flyToSung(k, dir = 0) {
   const s = visible ? to.height / from.height : (dir ? 0.9 : 0.6);
   fly.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(${s})`, opacity: visible ? 1 : 0 }], { duration: 820, easing: 'cubic-bezier(.5,0,.2,1)' }).onfinish = () => { fly.remove(); renderSung(); };
 }
-// via says how the card got here (for analytics): first, draw, tracklist, swipe, next, prev, keys, auto
+// via says how the card got here (for analytics): first, link, draw, tracklist, swipe, next, prev, keys, shake, lockscreen, auto
+// a card that came by the visitor's hand lands with a tick (Android; iPhones tick on the tap itself)
+const byHand = (via) => !['first', 'link', 'auto', 'lockscreen'].includes(via);
 function deal(i, { instant = false, autoplay = false, dir = 0, via = 'first' } = {}) {
   const t = TRACKS[i];
   const prev = state.i;
@@ -257,10 +274,13 @@ function deal(i, { instant = false, autoplay = false, dir = 0, via = 'first' } =
   status.hidden = true;
   setFollow(false);
   layers.forEach((l, k) => l.classList.toggle('is-on', k === i));
+  toneOf(t).then((c) => { if (state.i === i) themeColor.content = c; });
   cardFront.innerHTML = faceHTML(t, true);
   renderDeck();
   swapMeta(t, instant);
-  if (!instant && !reduce) {
+  const landed = () => { if (byHand(via)) tick(); };
+  if (instant || reduce) landed();
+  else {
     const d = deckBtn.getBoundingClientRect();
     const c = cardBtn.getBoundingClientRect();
     const fromDeck = d.width > 0;
@@ -277,7 +297,7 @@ function deal(i, { instant = false, autoplay = false, dir = 0, via = 'first' } =
         { transform: 'none' },
       ],
       { duration: 1150, easing: 'cubic-bezier(.16,1,.3,1)', delay: prev === null ? 0 : 140, fill: 'backwards' },
-    ).onfinish = () => table.classList.remove('is-dealing');
+    ).onfinish = () => { table.classList.remove('is-dealing'); landed(); };
   }
   load(t, autoplay);
 }
@@ -373,7 +393,13 @@ function loop(now) {
     if (state.playing && !audio.paused && t.env) {
       const f = Math.min(t.env.low.length - 1, Math.floor(ct / t.env.hop));
       target = t.env.low[f] || 0;
-      if (f > state.lastFrame) { for (let g = Math.max(state.lastFrame + 1, f - 3); g <= f; g++) if (t.env.onset[g]) state.kick = 1; }
+      let hit = false;
+      if (f > state.lastFrame) { for (let g = Math.max(state.lastFrame + 1, f - 3); g <= f; g++) if (t.env.onset[g]) hit = true; }
+      if (hit) {
+        state.kick = 1;
+        // with sentir on, an Android phone pulses with the kick
+        if (feel.on) tick(14);
+      }
       state.lastFrame = f;
     } else if (!state.playing) { state.lastFrame = -1; }
     state.breath += (target - state.breath) * (target > state.breath ? 0.35 : 0.05);
@@ -620,18 +646,20 @@ const toggleActive = () => (miniSketch() ? toggleSketch() : toggle());
 // On touch screens the card swipes: left for the next song, right for the one before.
 // It follows the finger a little; a short drag springs back, and vertical scrolling is left alone.
 const SWIPE = 56;
-const swipe = { id: null, x: 0, y: 0, dx: 0, used: false };
+// past: the drag has gone far enough to change songs, which it says with a tick (Android)
+const swipe = { id: null, x: 0, y: 0, dx: 0, used: false, past: false };
 const stageEl = $('#stage');
 stageEl.addEventListener('pointerdown', (e) => {
   swipe.used = false;
   if (e.pointerType === 'mouse' || arrival.running || state.i === null) return;
-  Object.assign(swipe, { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0 });
+  Object.assign(swipe, { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, past: false });
 });
 stageEl.addEventListener('pointermove', (e) => {
   if (e.pointerId !== swipe.id) return;
   const dx = e.clientX - swipe.x;
   if (!swipe.dx && (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - swipe.y))) return;
   swipe.dx = dx;
+  if (swipe.past !== Math.abs(dx) >= SWIPE) { swipe.past = !swipe.past; if (swipe.past) tick(); }
   cardBtn.classList.add('is-dragging');
   cardBtn.style.setProperty('--dx', `${(dx * 0.6).toFixed(1)}px`);
   cardBtn.style.setProperty('--rz', `${(dx * 0.02).toFixed(2)}deg`);
@@ -654,6 +682,9 @@ function endSwipe(e) {
 }
 stageEl.addEventListener('pointerup', endSwipe);
 stageEl.addEventListener('pointercancel', endSwipe);
+// On iPhones the card gets its own invisible switch, so a tap on it ticks. Safari's switch also
+// follows a drag, which is the only way a swipe there can tick at all.
+arm(cardBtn);
 // a swipe that ends on the card isn't also a tap on it
 cardBtn.addEventListener('click', () => {
   if (swipe.used) { swipe.used = false; return; }
@@ -671,6 +702,7 @@ document.addEventListener('click', (e) => {
     return deal(k, { autoplay: true, via: 'tracklist' });
   }
   const act = b.dataset.act;
+  if (act === 'share') return shareCard(b);
   if (b.closest('#mini') && miniSketch()) {
     if (act === 'toggle') toggleSketch();
     if (act === 'next') playSketch((sk.i + 1) % SKETCHES.length);
@@ -683,6 +715,9 @@ document.addEventListener('click', (e) => {
   if (act === 'next') deal((state.i + 1) % TRACKS.length, { autoplay: state.playing, via: 'next' });
   if (act === 'prev') deal((state.i + TRACKS.length - 1) % TRACKS.length, { autoplay: state.playing, via: 'prev' });
 });
+// the taps that change the song, and the language switch, tick under the finger on iPhones
+$$('[data-act="draw"], [data-act="prev"], [data-act="next"]').forEach(arm);
+arm($('#lang'));
 $$('[data-bar]').forEach((bar) => {
   // positions are measured against the playable part, never the hatched remainder
   const frac = (e) => {
@@ -745,25 +780,218 @@ if (fine && !reduce) {
 }
 
 new IntersectionObserver(([e]) => {
-  const on = e.intersectionRatio < 0.35 && state.i !== null;
+  feel.inView = e.intersectionRatio >= 0.35;
+  const on = !feel.inView && state.i !== null;
   $('#mini').classList.toggle('is-on', on);
   document.body.classList.toggle('mini-on', on);
 }, { threshold: [0, 0.35, 0.6, 1] }).observe(table);
 
+// ---------- the phone: lock screen, tab, browser bar ----------
+// The phone's own player (lock screen, Control Center, headphones, the car) shows what's on and
+// works its buttons, and the tab's title says it too. Each card's artwork is made by scripts/render-cards.mjs.
+const ms = 'mediaSession' in navigator ? navigator.mediaSession : null;
+const TITLE = document.title;
+const abs = (p) => new URL(p, location.href).href;
+let sessionKey = '';
+// fresh: set the details again even when they're the same (a new file can clear them on iPhones)
+function syncSession(fresh = false) {
+  const s = miniSketch();
+  const t = state.i !== null ? TRACKS[state.i] : null;
+  if (!s && !t) return;
+  const on = s ? sk.playing || sk.want : state.playing;
+  const name = s ? s.title : cap(t.card);
+  document.title = on ? `▶ ${name} · llü` : TITLE;
+  if (!ms) return;
+  ms.playbackState = on ? 'playing' : 'paused';
+  const key = `${s ? s.id : t.id}·${getLang()}`;
+  if (key !== sessionKey || fresh) {
+    sessionKey = key;
+    try {
+      ms.metadata = new MediaMetadata(s
+        ? { title: s.title, artist: 'llü', album: first(T('wip')), artwork: [{ src: abs('assets/android-chrome-512x512.png'), sizes: '512x512', type: 'image/png' }] }
+        : { title: name, artist: 'llü', album: t.sealed ? `Buena Suerte · ${T('previewPill')}` : 'Buena Suerte', artwork: [{ src: abs(`assets/cards/${t.id}.jpg`), sizes: '600x600', type: 'image/jpeg' }] });
+    } catch {}
+  }
+  syncPosition();
+}
+function syncPosition() {
+  if (!ms?.setPositionState) return;
+  const s = miniSketch();
+  const t = state.i !== null ? TRACKS[state.i] : null;
+  try {
+    if (s) ms.setPositionState({ duration: s.dur, playbackRate: 1, position: Math.min(sk.pos, s.dur) });
+    else if (t && state.ready) ms.setPositionState({ duration: lenOf(t), playbackRate: 1, position: Math.min(audio.currentTime || 0, lenOf(t)) });
+  } catch {}
+}
+audio.addEventListener('play', () => syncSession(true));
+['loadedmetadata', 'pause', 'seeked'].forEach((ev) => audio.addEventListener(ev, syncPosition));
+if (ms) {
+  const on = (action, fn) => { try { ms.setActionHandler(action, fn); } catch {} };
+  const step = (d) => {
+    if (miniSketch()) return playSketch((sk.i + d + SKETCHES.length) % SKETCHES.length);
+    if (state.i !== null) deal((state.i + d + TRACKS.length) % TRACKS.length, { autoplay: true, via: 'lockscreen' });
+  };
+  on('play', () => { if (miniSketch() ? !sk.want : !state.playing) toggleActive(); });
+  on('pause', () => { if (miniSketch() ? sk.want : state.playing) toggleActive(); });
+  on('previoustrack', () => step(-1));
+  on('nexttrack', () => step(1));
+  on('seekto', (d) => {
+    const s = miniSketch();
+    if (s) { seekSketch(d.seekTime / s.dur); syncPosition(); } else if (state.i !== null) seekTo(d.seekTime / lenOf(TRACKS[state.i]));
+  });
+}
+
+// On Android the browser bar takes the colour of the room's dark top edge, so it reads as part of
+// the table: the card's ground, darkened about as the page darkens it up there. A sealed card's
+// tint sets the hue, as its color blend does on the page.
+const themeColor = $('meta[name="theme-color"]');
+// measured against a screenshot of the table's top edge
+const ROOM_TOP = 0.2;
+const tones = new Map();
+function toneOf(t) {
+  if (!tones.has(t.id)) tones.set(t.id, new Promise((done) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const g = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+        g.drawImage(img, 0, 0, 1, 1);
+        if (t.tint) { g.globalCompositeOperation = 'color'; g.fillStyle = t.tint; g.fillRect(0, 0, 1, 1); }
+        const [r, gr, b] = g.getImageData(0, 0, 1, 1).data;
+        done(`#${[r, gr, b].map((v) => Math.round(v * ROOM_TOP).toString(16).padStart(2, '0')).join('')}`);
+      } catch { done('#000000'); }
+    };
+    img.onerror = () => done('#000000');
+    img.src = groundAvgUrl(t.ground);
+  }));
+  return tones.get(t.id);
+}
+
+// ---------- sentir: the phone's own movement, and its motor ----------
+// Off until the visitor turns it on, then remembered. With it on, tilting the phone moves the light
+// across the gold and the card, a shake draws a new card, and an Android phone pulses with each kick.
+// Only on touch screens that have the sensors or a motor for it.
+const FEEL = 'bs-feel';
+const feel = { on: false, inView: true };
+const feelBtn = $('#feel');
+feelBtn.hidden = !(coarse && (typeof DeviceOrientationEvent !== 'undefined' || canBuzz));
+arm(feelBtn);
+// only the light moves; the card stays flat, since on a phone it fills its space edge to edge
+// and Safari clips a card that leans past it
+function onTilt(x, y) {
+  table.style.setProperty('--lx', x.toFixed(3));
+  table.style.setProperty('--ly', y.toFixed(3));
+}
+// says what sentir does when it's turned on, or why it couldn't be
+const feelTip = $('#feel-tip');
+let feelTipTimer = 0;
+function showFeelTip(text) {
+  feelTip.textContent = text;
+  feelTip.hidden = false;
+  requestAnimationFrame(() => feelTip.classList.add('is-on'));
+  clearTimeout(feelTipTimer);
+  feelTipTimer = setTimeout(hideFeelTip, 6000);
+}
+function hideFeelTip() {
+  clearTimeout(feelTipTimer);
+  feelTip.classList.remove('is-on');
+  feelTipTimer = setTimeout(() => { feelTip.hidden = true; }, 400);
+}
+document.addEventListener('pointerdown', (e) => { if (!feelTip.hidden && !e.target.closest('#feel')) hideFeelTip(); });
+const feelSays = () => [!reduce && T('feelTilt'), T('feelShake'), canBuzz && T('feelKick')].filter(Boolean).join(' ');
+// a shake draws a card, while the table is in view and a card is on it
+function onShake() {
+  if (!feel.inView || arrival.running || state.i === null) return;
+  drawRandom(state.playing, 'shake');
+}
+function setFeel(on) {
+  feel.on = on;
+  feelBtn.setAttribute('aria-checked', String(on));
+  table.classList.toggle('is-feel', on);
+  try { localStorage.setItem(FEEL, on ? '1' : '0'); } catch {}
+  if (on) motion.start({ onTilt, onShake, tilt: !reduce });
+  else { motion.stop(); onTilt(0, 0); }
+}
+feelBtn.addEventListener('click', () => {
+  tick();
+  if (feel.on) { setFeel(false); hideFeelTip(); track('feel_switch', { feel: 'off', lang: getLang() }); return; }
+  // an iPhone asks here, inside the tap
+  motion.ask().then((ok) => {
+    setFeel(ok);
+    showFeelTip(ok ? feelSays() : T('feelDenied'));
+    track('feel_switch', { feel: ok ? 'on' : 'denied', lang: getLang() });
+  });
+});
+// a visit after it was turned on: Android carries on at once. An iPhone has to ask again inside a
+// tap, so the first one anywhere does (it doesn't show the question again if the answer was yes).
+let feelSaved = false;
+try { feelSaved = localStorage.getItem(FEEL) === '1'; } catch {}
+if (!feelBtn.hidden && feelSaved) {
+  setFeel(true);
+  if (motion.needsAsk) {
+    const reask = (e) => {
+      document.removeEventListener('click', reask, true);
+      if (feel.on && !e.target.closest('#feel')) motion.ask().then((ok) => { if (!ok) setFeel(false); });
+    };
+    document.addEventListener('click', reask, true);
+  }
+}
+
+// ---------- share: the card as a picture for Stories or a chat, with its link ----------
+// The picture (from scripts/render-cards.mjs) is fetched when the popover opens: a phone only
+// opens its share sheet inside the tap, with no waiting on the network.
+const pictures = new Map();
+function prepShare() {
+  const t = state.i !== null ? TRACKS[state.i] : null;
+  if (!t || !navigator.canShare || pictures.has(t.id)) return;
+  pictures.set(t.id, null);
+  fetch(`assets/cards/${t.id}-story.jpg`)
+    .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+    .then((b) => pictures.set(t.id, new File([b], `${t.id}.jpg`, { type: 'image/jpeg' })))
+    .catch(() => pictures.delete(t.id));
+}
+async function shareCard(btn) {
+  const t = state.i !== null ? TRACKS[state.i] : null;
+  if (!t) return;
+  const url = `${location.origin}${location.pathname}?carta=${t.id}${getLang() === 'en' ? '&lang=en' : ''}`;
+  const text = T('shareText')(cap(t.card));
+  const file = pictures.get(t.id);
+  const shared = (method) => track('card_share', { card: t.id, method, lang: getLang() });
+  try {
+    if (file && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], text, url });
+    else if (navigator.share) await navigator.share({ title: `${cap(t.card)} · llü`, text, url });
+    else {
+      // no share sheet here (most desktops): the link goes on the clipboard instead
+      await navigator.clipboard.writeText(url);
+      shared('link');
+      btn.firstElementChild.textContent = T('copied');
+      setTimeout(() => setFollow(false), 1400);
+      return;
+    }
+    shared('sheet');
+    setFollow(false);
+  } catch {
+    // closing the share sheet without picking anything isn't an error
+  }
+}
+
 // ---------- arrival ----------
 const arrival = { running: false, timers: [], start: 0 };
 const STEPS = ['s-frame', 's-brand', 's-line', 's-deck', 's-line-out', 's-card', 's-ui'];
-const firstCard = () => Math.floor(Math.random() * 3);
+// a shared link opens on its card (?carta=el-cotorro); otherwise one of the three that are out
+const linked = (() => { try { return TRACKS.findIndex((t) => t.id === new URLSearchParams(location.search).get('carta')); } catch { return -1; } })();
+const firstCard = () => (linked >= 0 ? linked : Math.floor(Math.random() * 3));
+const firstVia = linked >= 0 ? 'link' : 'first';
 function finishArrival() {
   arrival.timers.forEach(clearTimeout);
   arrival.timers = [];
-  if (state.i === null) deal(firstCard(), { instant: true });
+  if (state.i === null) deal(firstCard(), { instant: true, via: firstVia });
   table.classList.remove('arriving', ...STEPS);
   arrival.running = false;
   session.set('bs-arrived', '1');
 }
 function runArrival() {
-  if (reduce) { table.classList.remove('arriving'); deal(firstCard(), { instant: true }); return; }
+  if (reduce) { table.classList.remove('arriving'); deal(firstCard(), { instant: true, via: firstVia }); return; }
   arrival.running = true;
   arrival.start = performance.now();
   // the table is already dark (a script in index.html hid it before it could paint)
@@ -776,11 +1004,11 @@ function runArrival() {
   at(1100, () => table.classList.add('s-brand'));
   at(1700, () => table.classList.add('s-deck'));
   at(2700, () => table.classList.add('s-line-out'));
-  at(2900, () => { table.classList.add('s-card'); deal(firstCard()); });
+  at(2900, () => { table.classList.add('s-card'); deal(firstCard(), { via: firstVia }); });
   at(3700, () => table.classList.add('s-ui'));
   at(4800, finishArrival);
 }
 
 // the arrival plays once a visit
 applyLang();
-if (session.get('bs-arrived')) { table.classList.remove('arriving'); deal(firstCard(), { instant: true }); } else runArrival();
+if (session.get('bs-arrived')) { table.classList.remove('arriving'); deal(firstCard(), { instant: true, via: firstVia }); } else runArrival();

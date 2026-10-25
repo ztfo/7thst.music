@@ -120,6 +120,33 @@
 .table.is-playing .card:hover .playmark, .table.is-playing .card:focus-visible .playmark { opacity: 1; }
 .table.is-dealing .playmark { opacity: 0 !important; }
 
+/* ---------- sentir: light moves across the gold and the card as the phone tilts ----------
+   The metal is drawn twice as tall, its own three stops in the middle half, so at rest it looks
+   exactly as it does without sentir, and only the tilt slides its highlight. */
+.table.is-feel { --lx: 0; --ly: 0; }
+.table.is-feel .metal, .table.is-feel .play {
+  background-image: linear-gradient(180deg, #d7bd7f 0%, #f1e3b6 25%, #d7bd7f 51%, #b39752 75%, #d7bd7f 100%);
+  background-size: 100% 200%;
+  background-position: 50% calc(50% + var(--ly) * 18%);
+}
+/* one wide, soft light, larger than the card, that travels less than its own size so it stays on it */
+.table.is-feel #card-front::before {
+  content: ''; position: absolute; inset: 0; z-index: 1; border-radius: 3px; pointer-events: none;
+  background: radial-gradient(160% 100% at calc(50% - var(--lx) * 45%) calc(38% - var(--ly) * 45%), rgba(255, 246, 222, 0.16), rgba(255, 246, 222, 0.06) 38%, rgba(255, 246, 222, 0) 72%);
+}
+/* the card's own switch sits in front of the card's turning faces */
+.card > .tick { transform: translateZ(3px); }
+
+/* what sentir does, said once when it's turned on, under the switch */
+.nav { position: relative; }
+.feel-tip {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 6; width: min(250px, calc(100vw - 64px)); margin: 0; padding: 12px 14px;
+  font: 400 13px/1.45 var(--sans); color: var(--paper-2); text-align: left;
+  background: rgba(10, 9, 7, 0.97); border: 1px solid var(--rule-soft); border-radius: 4px; box-shadow: 0 20px 40px -20px #000;
+  opacity: 0; transform: translateY(-4px); transition: opacity 360ms var(--ease), transform 360ms var(--ease);
+}
+.feel-tip.is-on { opacity: 1; transform: none; }
+
 /* ---------- name ---------- */
 .meta { grid-column: 1 / -1; display: grid; justify-items: center; text-align: center; }
 .meta__swap { display: grid; justify-items: center; gap: 12px; transition: opacity 420ms var(--ease), transform 420ms var(--ease); }
@@ -158,6 +185,8 @@
 .play:hover { filter: brightness(1.07); }
 .play:active { transform: scale(0.96); }
 .play svg { width: 17px; height: 17px; }
+/* an invisible switch over a tap target: on iPhones, a finger toggling it is what ticks (js/haptics.js) */
+.tick { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; padding: 0; opacity: 0; cursor: inherit; }
 
 .scrub { width: 100%; display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px; align-items: center; gap: 12px; font: 400 12px/1 var(--sans); color: var(--paper-3); }
 .scrub .time:first-child { text-align: right; }
@@ -178,9 +207,10 @@
 .follow-pop { position: absolute; bottom: calc(100% - 46px); left: calc(50% + 70px); z-index: 6; width: 236px; padding: 14px; display: grid; gap: 4px; background: rgba(10, 9, 7, 0.97); border: 1px solid var(--rule-soft); border-radius: 4px; box-shadow: 0 20px 40px -20px #000; }
 .follow-pop[hidden] { display: none; }
 .follow-pop p { margin: 0 0 6px; font-size: 13px; color: var(--paper-2); }
-.follow-pop a { display: flex; justify-content: space-between; align-items: center; padding: 9px 2px; border-top: 1px solid var(--rule-soft); font-size: 14px; color: var(--paper); text-decoration: none; }
-.follow-pop a:hover { color: var(--gold); }
-.follow-pop a svg { width: 12px; height: 12px; color: var(--gold); }
+.follow-pop a, .follow-pop .share { display: flex; justify-content: space-between; align-items: center; padding: 9px 2px; border-top: 1px solid var(--rule-soft); font-size: 14px; color: var(--paper); text-decoration: none; }
+.follow-pop .share { appearance: none; border-inline: 0; border-bottom: 0; background: none; width: 100%; cursor: pointer; font-family: inherit; text-align: left; }
+.follow-pop a:hover, .follow-pop .share:hover { color: var(--gold); }
+.follow-pop a svg, .follow-pop .share svg { width: 12px; height: 12px; color: var(--gold); }
 
 .status { margin: 0; text-align: center; font: 400 13px/1.5 var(--sans); color: var(--paper-2); max-width: 52ch; }
 .status[hidden] { display: none; }
