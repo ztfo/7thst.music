@@ -184,8 +184,6 @@
 
 .status { margin: 0; text-align: center; font: 400 13px/1.5 var(--sans); color: var(--paper-2); max-width: 52ch; }
 .status[hidden] { display: none; }
-.status a, .status button { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: var(--gold); text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 3px; }
-.status a:hover, .status button:hover { color: var(--paper); }
 
 /* ---------- the tracklist: every card, its state, one tap away ---------- */
 .tracks { grid-column: 1 / -1; justify-self: center; width: min(1200px, calc(100% - 180px)); display: grid; gap: 8px; }
