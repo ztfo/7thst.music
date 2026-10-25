@@ -16,7 +16,7 @@ const fromB64u = (s) => {
 };
 const through = async (bytes, stream) => new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer());
 
-export async function pack(code) {
+async function pack(code) {
   const bytes = new TextEncoder().encode(code);
   if (typeof CompressionStream === 'function') return 'z' + toB64u(await through(bytes, new CompressionStream('deflate-raw')));
   return 'u' + toB64u(bytes);

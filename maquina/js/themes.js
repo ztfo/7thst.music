@@ -5,7 +5,7 @@ export const THEMES = {
   cielo: '#7cc4ff',
   lavanda: '#a3b8ff',
 };
-export const DEFAULT_THEME = 'azul';
+const DEFAULT_THEME = 'azul';
 
 const KEY = 'maq-theme';
 export function savedTheme() {

@@ -4,7 +4,7 @@ import ENVELOPES from '../data/envelopes.js';
 import { T, getLang, setLang, paintLang } from './i18n.js';
 import { drawFrame, fit } from './microtext.js';
 import { buildBack } from './cardback.js';
-import { fmt, cap, first, esc, soundcloudLink, trackButtons, platformLinks, sketchRows } from './markup.js';
+import { fmt, cap, first, soundcloudLink, trackButtons, platformLinks, sketchRows } from './markup.js';
 import { tick, arm, canBuzz } from './haptics.js';
 import * as motion from './motion.js';
 import { drawTenth, showMachineCard, linkedToMachine, watchKeys, watchFrame, watchPerdido, lateNight, consoleHello } from './secrets.js';

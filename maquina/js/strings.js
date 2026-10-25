@@ -6,8 +6,7 @@ import { getLang, setLang } from '../../js/i18n.js';
 
 export const STR = {
   en: {
-    tabShell: '~', tabLive: 'live', tabScope: 'scope', vol: 'vol',
-    greet: 'La Máquina · llü · v0.1',
+    vol: 'vol',
     greetHint: 'type learn to build your first track, step by step, or help for everything else.',
     greetHintTouch: 'tap learn to build your first track, or another word below.',
     prompt: 'type a command', run: 'run', play: 'play', hush: 'hush', share: 'share',
@@ -87,8 +86,7 @@ export const STR = {
     learnApply: 'changed something? press ▶ update to hear it, or type auto on and it updates by itself.',
   },
   es: {
-    tabShell: '~', tabLive: 'live', tabScope: 'scope', vol: 'vol',
-    greet: 'La Máquina · llü · v0.1',
+    vol: 'vol',
     greetHint: 'escribe learn para armar tu primer track paso a paso, o help para todo lo demás.',
     greetHintTouch: 'toca learn para armar tu primer track, u otra palabra abajo.',
     prompt: 'escribe un comando', run: 'correr', play: 'dale', hush: 'para', share: 'comparte',

@@ -1,6 +1,6 @@
 # Working on 7thSt.music
 
-How the site is put together and how to update it. For what the site is, see the [README](README.md).
+How the site is put together and how to update it. For what the site is, see the [README](../README.md).
 
 - `index.html`: the table (the deck, the drawn card, the player, the tracklist), en proceso (works in progress from SoundCloud), and seguir (follow).
 - `art.html`: Mis dibujos / My art, the drawings by series with a viewer.
@@ -121,7 +121,7 @@ Motion and sharing need HTTPS, so on a phone test through a tunnel to the local 
 
 **Starting sound.** Chrome lets the visitor's tap or key on the page start sound in the frame. Where a browser doesn't (likely Safari), the engine answers `locked` and the page lays the frame over the play button. The visitor's next tap lands in the engine's own "turn on sound" button, once per visit. Check this on an iPhone whenever the engine changes.
 
-**Sounds** for now are Strudel's defaults: the drum machines and Dirt-Samples, loaded from GitHub by `engine.js`, plus Strudel's synths. llü's stems come later (see TERMINAL.md).
+**Sounds** for now are Strudel's defaults: the drum machines and Dirt-Samples, loaded from GitHub by `engine.js`, plus Strudel's synths. llü's stems come later (see [TERMINAL.md](TERMINAL.md)).
 
 **Changing what's playing:** edits go in when the visitor presses play (or Ctrl+Enter), and land on the next bar, as in every live-coding tool: half-typed code is usually broken. While the code on screen isn't what's playing, the button says "update" ("actualiza") and breathes softly, and the status says to press it. `auto on` applies changes by itself about a second after typing stops. Code that doesn't run is skipped: the last good version keeps playing, and the error shows only in the status line. The choice is remembered.
 
@@ -131,7 +131,7 @@ Motion and sharing need HTTPS, so on a phone test through a tunnel to the local 
 
 **Upgrading Strudel:** `npm pack @strudel/web@<version>`, copy its `dist/index.mjs`, `dist/assets/` and `LICENSE` into a new `maquina/vendor/strudel-<version>/`, point the import in `maquina/js/engine.js` at it, delete the old folder, and run every example.
 
-**Previewing it locally** needs a server that sends `Access-Control-Allow-Origin: *`, as GitHub Pages does, since the sandboxed frame loads its scripts cross-origin: `npx http-server -p 8000 --cors`, then open http://localhost:8000/maquina/. `python3 -m http.server` serves the page but not a working engine.
+**Previewing it locally** needs a server that sends `Access-Control-Allow-Origin: *`, as GitHub Pages does, since the sandboxed frame loads its scripts cross-origin. `pnpm run serve` does (see [Local preview](#local-preview)). `python3 -m http.server` serves the page, but not a working engine.
 
 ## Ways in
 
@@ -181,7 +181,7 @@ For the details to show in GA's reports, each one needs registering once: **Admi
 ## Local preview
 
 ```sh
-python3 -m http.server 8000
+pnpm run serve
 ```
 
-Then open http://localhost:8000.
+It opens http://localhost:8000. It sends the same cross-origin header GitHub Pages does, which La Máquina's sound engine needs; `python3 -m http.server 8000` works for everything else.

@@ -75,7 +75,7 @@ list-cloudinary-tags.js
 # Note: The following files ARE committed (needed for GitHub Pages):
 # - images-data.js (generated, but needed for gallery)
 # - scripts/fetch-cloudinary-images.js (utility script, part of workflow)
-# - package-lock.json (ensures consistent dependencies)
+# - pnpm-lock.yaml (ensures consistent dependencies)
 # - assets/ (all images, icons, and static assets)
 
 # Claude Code

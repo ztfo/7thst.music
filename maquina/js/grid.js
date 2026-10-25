@@ -9,7 +9,7 @@ export const STEPS = 16;
 const BANK = 'RolandTR909';
 const HEAD = '// grid · tap the steps, or edit the code';
 
-export const emptySteps = () => ROWS.map(() => Array(STEPS).fill(false));
+const emptySteps = () => ROWS.map(() => Array(STEPS).fill(false));
 export function starterSteps() {
   const on = (row, ...at) => at.forEach((i) => { steps[row][i] = true; });
   const steps = emptySteps();
