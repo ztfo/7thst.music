@@ -13,7 +13,7 @@
 // can go past a safe ceiling whatever its gain says, then the volume, then an analyser for
 // the terminal's scope.
 
-import { initStrudel, evaluate, hush, samples, getAudioContext, getCps } from '../vendor/strudel-1.3.0/index.mjs';
+import { initStrudel, initAudio, evaluate, hush, samples, getAudioContext, getCps } from '../vendor/strudel-1.3.0/index.mjs';
 
 const DOUGH = 'https://raw.githubusercontent.com/felixroos/dough-samples/main/';
 const CEILING = 0.89; // about -1 dBFS
@@ -82,12 +82,19 @@ async function unlocked() {
 const LOOP = /\b(?:for|while)\s*\(|\bdo\s*\{/;
 const withoutComments = (code) => code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
 
+// Strudel loads its effect worklets (shape, distort, crush and the rest) on the first mouse
+// press in its own page, and nobody ever clicks in here, so the engine loads them itself the
+// first time sound starts
+let effectsLoaded = null;
+const effects = () => (effectsLoaded ??= initAudio().catch(() => {}));
+
 async function run(code) {
   if (LOOP.test(withoutComments(code))) { fail('loops (for, while, do) aren’t allowed in a pattern'); return; }
   pending = code;
   if (!(await unlocked())) { send({ t: 'locked' }); return; }
   pending = null;
   await ready;
+  await effects();
   input.gain.cancelScheduledValues(ac.currentTime);
   input.gain.setValueAtTime(1, ac.currentTime);
   evaluating = true; evalFailed = false;
