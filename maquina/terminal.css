@@ -80,6 +80,22 @@ body.is-playing .tab__dot { display: inline-block; }
 
 /* the editor: a textarea over its own highlighted copy */
 .pane--live { display: flex; flex-direction: column; }
+.lesson {
+  margin: 14px 18px 0; padding: 14px 16px 12px; border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 8px; background: #10131b; color: var(--ink-2); font-size: 12px; line-height: 19px;
+}
+.lesson__head { display: flex; align-items: baseline; gap: 10px; }
+.lesson__n { color: var(--accent); }
+.lesson__title { flex: 1 1 auto; color: var(--ink); font-weight: 400; font-size: 13px; }
+.lesson__x { align-self: flex-start; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin: -6px -8px 0 0; background: none; border: 0; border-radius: 6px; color: var(--dim); }
+.lesson__x:hover { color: var(--ink); background: rgba(255, 255, 255, .05); }
+.lesson__text { margin: 8px 0 0; }
+.lesson__try { margin: 8px 0 0; color: var(--dim); }
+.lesson__try-k { color: var(--str); }
+.lesson__nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.lesson__nav button { min-height: 30px; padding: 0 12px; background: var(--raise); border: 1px solid var(--line-2); border-radius: 6px; color: var(--ink); font-size: 12px; }
+.lesson__nav button:disabled { opacity: .35; cursor: default; }
+.lesson__nav #lesson-next { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
 .notice {
   display: flex; gap: 12px; align-items: flex-start; margin: 14px 18px 0; padding: 12px 14px;
   border: 1px solid var(--line-2); border-radius: 8px; background: #121217; color: var(--ink-2); font-size: 12px; line-height: 18px;
@@ -205,7 +221,9 @@ body.is-grid .ed, body.is-grid .keys { display: none; }
     border: 0; border-radius: 8px; background: var(--accent); color: var(--bg);
   }
 
-  .notice { margin: 14px 16px 0; }
+  .notice, .lesson { margin: 12px 16px 0; }
+  .lesson { padding: 12px 14px 10px; }
+  .lesson__nav button { min-height: 40px; padding: 0 16px; font-size: 13px; }
   .ed { padding: 16px 0 24px; font-size: 13px; line-height: 22px; }
   .ed__nums { width: 38px; padding-right: 12px; }
   .ed__hl, .ed__ta { padding-right: 16px; }

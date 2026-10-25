@@ -4,6 +4,7 @@
 
 import { T, paint, getLang, setLang } from './strings.js';
 import { EXAMPLES, STARTER, DRUMS, SYNTHS, MORE } from '../data/examples.js';
+import { LESSONS, CHEAT } from '../data/lessons.js';
 import { PLATFORMS } from '../../data/tracks.js';
 import { THEMES, savedTheme, applyTheme } from './themes.js';
 import { linkFor, unpack, sharedInHash, MAX_CODE } from './share.js';
@@ -78,6 +79,7 @@ document.querySelectorAll('.keys [data-ins]').forEach((b) => {
 
 function loadExample(n) {
   const ex = EXAMPLES[n - 1];
+  $('#lesson').hidden = true;
   editor.value = ex.code;
   store.set('maq-draft', ex.code);
   setShared(false);
@@ -87,6 +89,49 @@ function setShared(on) {
   shared = on;
   $('#notice').hidden = !on;
 }
+
+// ---------- learn: eight steps from a kick to a whole track ----------
+let lessonAt = Math.min(LESSONS.length, Number(store.get('maq-learn')) || 0), lessonHinted = false;
+function paintLesson() {
+  if (!lessonAt) return;
+  const t = LESSONS[lessonAt - 1][getLang()];
+  $('#lesson-n').textContent = `${lessonAt}/${LESSONS.length}`;
+  $('#lesson-title').textContent = t.title;
+  $('#lesson-text').textContent = t.text;
+  $('#lesson-try').textContent = t.try;
+  $('#lesson-back').disabled = lessonAt === 1;
+  $('#lesson-next-word').textContent = T(lessonAt === LESSONS.length ? 'learnFinish' : 'learnNext');
+}
+function showLesson(n) {
+  lessonAt = n;
+  store.set('maq-learn', String(n));
+  paintLesson();
+  $('#lesson').hidden = false;
+  editor.value = LESSONS[n - 1].code;
+  store.set('maq-draft', editor.value);
+  setShared(false);
+  setGrid(false);
+  setTab('live');
+  line(['  ' + T('learnStep')(n, LESSONS.length, LESSONS[n - 1][getLang()].title, !lessonHinted), 'a']);
+  lessonHinted = true;
+  // already playing: the new step lands on the next bar
+  if (state === 'playing' || state === 'starting') runPattern('learn');
+  track('learn_step', { step: n });
+}
+function learn(arg) {
+  const n = arg ? Number(arg) : lessonAt || 1;
+  if (!Number.isInteger(n) || !LESSONS[n - 1]) return line([T('learnNo')(arg), 'e']);
+  showLesson(n);
+}
+function nextLesson() {
+  if (!lessonAt) return learn();
+  if (lessonAt < LESSONS.length) return showLesson(lessonAt + 1);
+  for (const l of T('learnEnd')) line([l, 'ok']);
+}
+function prevLesson() { if (lessonAt > 1) showLesson(lessonAt - 1); else learn('1'); }
+$('#lesson-next').addEventListener('click', nextLesson);
+$('#lesson-back').addEventListener('click', prevLesson);
+$('#lesson-close').addEventListener('click', () => { $('#lesson').hidden = true; line([T('learnHidden'), 'd']); });
 
 // ---------- the step grid ----------
 let gridOn = false;
@@ -260,6 +305,7 @@ function load(arg) {
   editor.value = x.code;
   store.set('maq-draft', x.code);
   setShared(false);
+  $('#lesson').hidden = true;
   line([T('loadedSaved')(x.name), 'ok']);
   setGrid(gridOn && !!readGrid(x.code));
   setTab('live');
@@ -278,7 +324,7 @@ function runPattern(via) {
   if (!code.trim()) { loadExample(STARTER); code = editor.value; }
   setStatus('starting', readyYet ? T('starting') : T('loading'));
   bpm = 0;
-  if (via !== 'grid') track('live_run', { via, shared: shared ? 'yes' : 'no' });
+  if (via !== 'grid' && via !== 'learn') track('live_run', { via, shared: shared ? 'yes' : 'no' });
   setShared(false);
   if (readyYet) engine.run(code); else wantRun = code;
 }
@@ -307,6 +353,7 @@ function paintLang() {
   document.querySelectorAll('#lang [data-l]').forEach((s) => s.classList.toggle('on', s.dataset.l === getLang()));
   if (state === 'stopped') setStatus('stopped', T('stopped'));
   setGrid(gridOn);
+  paintLesson();
 }
 $('#lang').addEventListener('click', () => { setLang(getLang() === 'es' ? 'en' : 'es'); paintLang(); line([T('lang'), 'd']); });
 
@@ -360,6 +407,7 @@ const COMMANDS = {
     setTab('live');
   },
   grid() {
+    $('#lesson').hidden = true;
     if (!editor.value.trim()) { editor.value = gridCode(starterSteps(), 132); store.set('maq-draft', editor.value); }
     setTab('live');
     setGrid(true);
@@ -368,6 +416,14 @@ const COMMANDS = {
   save,
   load,
   rm: forget,
+  learn,
+  next: nextLesson,
+  back: prevLesson,
+  cheat() {
+    line([T('cheatTitle'), 'd']);
+    for (const [k, v] of CHEAT[getLang()]) row(k, [v, 'd']);
+    line([T('cheatMore'), 'd'], ' ', { href: 'https://strudel.cc/workshop/getting-started/', text: 'strudel.cc/workshop' });
+  },
   examples() {
     EXAMPLES.forEach((ex, i) => line('  ', [String(i + 1), 'a'], ' ' + ex.name));
     line(['  ' + T('examplesHint'), 'd']);
@@ -408,6 +464,8 @@ const ALIASES = {
   limpia: 'clear', cls: 'clear', baraja: 'deck', exit: 'deck', salir: 'deck', cd: 'deck', idioma: 'lang',
   cuadricula: 'grid', steps: 'grid', graba: 'record', rec: 'record', guarda: 'save', carga: 'load', open: 'load',
   borra: 'rm', olvida: 'rm', delete: 'rm',
+  aprende: 'learn', tutorial: 'learn', curso: 'learn', siguiente: 'next', atras: 'back', anterior: 'back',
+  prev: 'back', chuleta: 'cheat', ref: 'cheat', acordeon: 'cheat',
 };
 
 const history = [];
