@@ -4,6 +4,7 @@ How the site is put together and how to update it. For what the site is, see the
 
 - `index.html`: the table (the deck, the drawn card, the player, the tracklist), en proceso (works in progress from SoundCloud), and seguir (follow).
 - `art.html`: Mis dibujos / My art, the drawings by series with a viewer.
+- `maquina/`: La Máquina, the terminal at `/maquina/` where visitors write techno in code (see [La Máquina](#la-máquina)). Its plan is [TERMINAL.md](TERMINAL.md).
 
 Plain HTML, CSS and ES modules on GitHub Pages. There is no build step: edit, commit, push to `main`, and Pages publishes it to 7thst.music.
 
@@ -91,6 +92,37 @@ On phones and in the browser the site reaches past the page. What works where:
 
 Motion and sharing need HTTPS, so on a phone test through a tunnel to the local server, not the LAN address. `js/motion.js` holds the shake's thresholds and the tilt's range. The light's strength is in `styles/home.css`, under "sentir".
 
+## La Máquina
+
+`/maquina/` is a terminal for live coding techno, built on [Strudel](https://strudel.cc). Everything in `maquina/` is AGPL-3.0 (`maquina/LICENSE`), because Strudel is; the rest of the site isn't. Code in `maquina/` may import the site's modules (it reads `js/i18n.js` and `data/tracks.js`), but nothing outside it imports from `maquina/`.
+
+| Path | What |
+| --- | --- |
+| `maquina/index.html` | the page: tabs, the editor, the shell, the scope |
+| `maquina/terminal.css` | the look: full screen, one blue accent, one pane at a time on phones |
+| `maquina/js/shell.js` | the commands, the tabs, and the wiring between the parts |
+| `maquina/js/editor.js` | the editor: a textarea over its own highlighted copy |
+| `maquina/js/scope.js` | the waveform and spectrum, and the kick the bar breathes with |
+| `maquina/js/bridge.js` | the page's side of the sound engine |
+| `maquina/sandbox.html`, `maquina/js/engine.js` | the sound engine, which runs the patterns |
+| `maquina/js/strings.js` | what the terminal says, in both languages |
+| `maquina/js/share.js` | share links, with the pattern in the address after `#p=` |
+| `maquina/js/themes.js` | the blues `theme` switches between |
+| `maquina/data/examples.js` | the seven example patterns and the list `samples` shows |
+| `maquina/vendor/strudel-1.3.0/` | a pinned copy of Strudel's browser bundle, served from this site |
+
+**Pattern code is JavaScript, and a share link carries a stranger's.** So it only ever runs in the engine: `sandbox.html` in an iframe sandboxed without `allow-same-origin`. There it has a blank origin of its own. It can't touch the page, its storage or its cookies, can't navigate or open windows, and its own Content Security Policy lets it fetch only samples. The page and the engine talk through `postMessage`, and the page takes only small, checked messages back. The page never evaluates anything: the shell matches a fixed list of commands. A shared link opens with its code showing and nothing runs until the visitor presses play.
+
+**Sound.** Everything goes through a limiter before the speakers, so nothing goes past about -1 dBFS whatever a pattern's gain says. Then comes the volume (60% to start). Esc, `hush` and the stop button always cut it. Loops (`for`, `while`, `do`) are refused, because an endless one would hang the tab: most browsers run the frame in the page's process.
+
+**Starting sound.** Chrome lets the visitor's tap or key on the page start sound in the frame. Where a browser doesn't (likely Safari), the engine answers `locked` and the page lays the frame over the play button. The visitor's next tap lands in the engine's own "turn on sound" button, once per visit. Check this on an iPhone whenever the engine changes.
+
+**Sounds** for now are Strudel's defaults: the drum machines and Dirt-Samples, loaded from GitHub by `engine.js`, plus Strudel's synths. llü's stems come later (see TERMINAL.md).
+
+**Upgrading Strudel:** `npm pack @strudel/web@<version>`, copy its `dist/index.mjs`, `dist/assets/` and `LICENSE` into a new `maquina/vendor/strudel-<version>/`, point the import in `maquina/js/engine.js` at it, delete the old folder, and run every example.
+
+**Previewing it locally** needs a server that sends `Access-Control-Allow-Origin: *`, as GitHub Pages does, since the sandboxed frame loads its scripts cross-origin: `npx http-server -p 8000 --cors`, then open http://localhost:8000/maquina/. `python3 -m http.server` serves the page but not a working engine.
+
 ## Analytics
 
 Google Analytics 4 (`G-G9DRK12SZE`) runs on both pages. On top of the page views GA tracks by itself, the site sends these events. Every one carries `lang`.
@@ -105,8 +137,12 @@ Google Analytics 4 (`G-G9DRK12SZE`) runs on both pages. On top of the page views
 | `lang_switch` | the EN/ES switch | `lang` |
 | `card_share` | a card shared from the follow popover | `card`, `method` (sheet or link) |
 | `feel_switch` | the sentir switch | `feel` (on, off, or denied when an iPhone's motion access is refused) |
+| `term_open` | La Máquina opens | `via` (a `?via=` from the link, `pattern` for a share link, or `direct`) |
+| `term_command` | a command in La Máquina | `command` (only its name, never what was typed after it) |
+| `live_run` | a pattern runs | `via` (keys, button, shell), `shared` (yes when it came from a share link) |
+| `pattern_share` / `pattern_open` | a pattern shared / a share link opened | `method` (sheet, link, shown) |
 
-For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `sketch`, `platform`, `series`, `piece`, `lang`, `method`, `feel`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
+For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `sketch`, `platform`, `series`, `piece`, `lang`, `method`, `feel`, `command`, `shared`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
 
 ## Local preview
 

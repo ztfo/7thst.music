@@ -1,6 +1,6 @@
 # La Máquina: the terminal side of 7thSt.music
 
-A plan, not built yet. The lotería deck is the front door; this is the back room. A
+The plan for La Máquina; phase 1 is built (see Phases). The lotería deck is the front door; this is the back room. A
 black terminal where llü's dark techno lives, and where a visitor can write their own
 techno in a few lines of code and hear it right away.
 
@@ -133,19 +133,21 @@ site's language.
 | --- | --- |
 | `maquina/index.html` | the page. Pages serves it at `/maquina` |
 | `maquina/LICENSE` | AGPL-3.0, for everything in `maquina/` |
-| `maquina/terminal.css` | the Hyper-style window, tabs, panes and palettes |
-| `maquina/js/shell.js` | the prompt, history, tab completion, commands |
-| `maquina/js/live.js` | the editor and Strudel, loaded only when `live` or `play` runs |
-| `maquina/js/scope.js` | the scope and spectrum, from a Web Audio analyser |
+| `maquina/terminal.css` | the full-screen terminal, tabs, panes and palettes |
+| `maquina/js/shell.js` | the prompt, history, tab completion, commands, and the wiring |
+| `maquina/js/editor.js` | the editor |
+| `maquina/js/scope.js` | the scope and spectrum, from the engine's analyser |
+| `maquina/js/bridge.js` | the page's side of the engine: messages, the unlock button, the watchdog |
 | `maquina/js/themes.js` | the palettes `theme` switches between |
-| `maquina/sandbox.html` | the sandboxed frame that runs pattern code and makes the sound |
-| `maquina/vendor/` | a pinned copy of Strudel, served from this site |
+| `maquina/sandbox.html`, `maquina/js/engine.js` | the sandboxed frame that runs pattern code and makes the sound |
+| `maquina/vendor/strudel-1.3.0/` | a pinned copy of Strudel, served from this site |
 | `maquina/js/strings.js` | the terminal's strings in both languages. It reads the language from `js/i18n.js`, so the switch is shared with the deck |
-| `maquina/data/techno.js` | the techno tracks, the samples and the track patterns |
+| `maquina/data/examples.js` | the example patterns and the sounds `samples` lists; the tracks join it later |
 
-- **Editor**: CodeMirror 6, a pinned copy in `maquina/vendor/` (Strudel's own REPL uses it). On a phone the
-  editor gets a row of keys for `~ * [ ] < > ( ) " .` and a big ▶, because a phone
-  keyboard hides those.
+- **Editor**: a plain textarea over a highlighted copy of its own text. It's light, needs
+  no build, and keeps the phone's own keyboard and selection working. CodeMirror (what
+  Strudel's REPL uses) can replace it if it ever needs more. On a phone the editor gets a
+  row of keys for `~ * [ ] < > ( ) " . ,` and a big ▶, because a phone keyboard hides those.
 - **Phones**: typing code on a phone is hard, so phones get a step grid under the editor.
   Tapping a step rewrites the pattern text, so the code and the grid stay the same thing.
   Tilt can drive the filter, reusing `js/motion.js`.
@@ -221,10 +223,11 @@ That's cross-site scripting, handed out by design. How we stop it:
   origin of its own: it can make sound, but it can't touch the terminal, the deck, the
   site's storage or its cookies, and it can't navigate the window. The terminal sends it
   code and gets back sound levels for the scope through `postMessage`, nothing else.
-  The frame gets `allow="autoplay"` so it can make sound after the visitor's tap. That
-  needs testing on iPhone Safari first thing in phase 1. If Safari won't play from the
-  frame, the fallback is serving the sandbox from a second address of its own (such as
-  a `maquina-sandbox` subdomain), which keeps it walled off the same way.
+  The frame gets `allow="autoplay"`. In Chrome, the visitor's tap or key on the page is
+  enough to start sound in it (tested). Where a browser won't allow that (likely
+  Safari), the engine says so and the page lays the frame over the play button, so the
+  next tap lands on the engine's own "turn on sound" button. That works anywhere, once
+  per visit (tested by forcing it in Chrome). It still needs checking on a real iPhone.
 - **Nothing runs until you press play.** A shared link opens with the code showing, under
   a line saying it's someone else's pattern. Strudel's own site works the same way.
 - **The shell never evaluates.** `help`, `ls`, `play` and the rest are a fixed list of
@@ -252,8 +255,11 @@ copy of one exact Strudel version is kept in `maquina/vendor/` and served from t
 so nothing outside can change it. Upgrading means copying a newer version in on purpose.
 
 **5. Freezing a phone.** An endless loop or a huge pattern can hang the tab and drain the
-battery. In the sandbox that's contained: if the frame stops answering, the terminal
-reloads it and says so.
+battery. The sandbox doesn't contain that on its own: most browsers run the frame in the
+page's own process, so an endless loop hangs the whole tab (tested). So the engine
+refuses `for`, `while` and `do` loops outright, which patterns never need. Where a
+browser does run the frame in its own process, a watchdog reloads the frame if it stops
+answering. Very heavy code can still slow a tab for a while; closing it always ends it.
 
 **6. What's given away.** Anything on Cloudinary can be downloaded by anyone, so:
 - the hidden track is effectively released the day it goes up, since anyone can save it
@@ -278,7 +284,7 @@ there.
 
 The machine can go up before the music, so it comes first.
 
-1. **The machine** (about two weeks). `/maquina` in the Hyper-style window, the shell
+1. **The machine** (built). `/maquina` in the Hyper-style window, the shell
    (`help`, `ls` with tracks as coming soon, `follow`, `deck`, `theme`), both languages,
    the phone layout. Strudel with its default sounds, the AGPL `LICENSE` and credit, the
    editor in a split pane, `examples`, `samples`, the scope on the live pattern, and
