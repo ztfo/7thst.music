@@ -33,3 +33,5 @@ It's built with plain HTML, CSS and JavaScript on GitHub Pages, with the audio a
 ## License
 
 © 2026 Luis Palomares · 7thSt.music. All rights reserved.
+
+Except `maquina/`, La Máquina, which is free software under the [AGPL-3.0](maquina/LICENSE), like [Strudel](https://codeberg.org/uzu/strudel), which it runs on.

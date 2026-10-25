@@ -44,6 +44,10 @@ Unfinished songs, newest first, from the SoundCloud set [works in progress.](htt
 
 [Mis dibujos / My art](https://7thst.music/art.html): covers (portadas, 11), dreams (sueños, 38), mandalas (34), voices (voces, 4), animals (animales, 2).
 
+## La Máquina
+
+A terminal behind the deck, at https://7thst.music/maquina/, where anyone can write techno in a few lines of code and hear it right away. It runs on [Strudel](https://strudel.cc), the browser version of TidalCycles, with classic drum machines and synths; llü's own sounds and dark techno are coming. Patterns can be shared as links.
+
 ## From the studio
 
 - [Arreglo](https://arreglo.ai): an AI-powered music arrangement generator for Figma, by 7thSt.music and llü.
@@ -52,3 +56,4 @@ Unfinished songs, newest first, from the SoundCloud set [works in progress.](htt
 
 - [Home: Buena Suerte, works in progress, follow](https://7thst.music/)
 - [Mis dibujos / My art](https://7thst.music/art.html)
+- [La Máquina: live coding techno](https://7thst.music/maquina/)

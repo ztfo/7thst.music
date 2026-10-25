@@ -81,6 +81,19 @@ a { color: inherit; }
 .foot__in a:hover { color: var(--gold); }
 
 
+/* the ways into La Máquina (js/secrets.js): the frame's one wrong character, and the glitch
+   on the way in, a jitter that only ever darkens, never flashes */
+.frame .secret { pointer-events: auto; cursor: pointer; fill: inherit; }
+.frame .secret:hover { fill: #5b9cff; }
+body.is-leaving { animation: leave 520ms steps(7, end) forwards; }
+@keyframes leave {
+  0% { transform: none; filter: none; }
+  25% { transform: translateX(-5px) skewX(3deg); filter: saturate(.4) hue-rotate(150deg); }
+  50% { transform: translateX(4px); filter: saturate(.2) hue-rotate(190deg) brightness(.6); }
+  75% { transform: translateX(-2px) skewX(-2deg); filter: grayscale(1) brightness(.3); }
+  100% { transform: none; filter: brightness(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: 1ms !important; }
   html { scroll-behavior: auto; }

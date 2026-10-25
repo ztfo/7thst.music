@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="google" content="notranslate">
+<!-- Scripts only from this site and Google's tag; the sound engine is a sandboxed frame from
+     this site; nothing here is ever evaluated as code. Pattern code only runs in that frame. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self'; img-src 'self' data: https://*.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>La Máquina · llü</title>
+<meta name="description" content="La Máquina: the back room of llü's Buena Suerte. A terminal where you write techno in code and hear it right away.">
+<link rel="canonical" href="https://7thst.music/maquina/">
+<link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#0b0b0e">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G9DRK12SZE"></script>
+<script src="js/gtag.js"></script>
+
+<link rel="stylesheet" href="terminal.css">
+</head>
+<body data-tab="shell">
+
+<header class="bar">
+  <span class="bar__name">la máquina</span>
+  <nav class="tabs" role="tablist" aria-label="Panes">
+    <button class="tab" type="button" role="tab" id="tab-shell" data-tab="shell" aria-controls="pane-shell" aria-selected="true">~</button>
+    <button class="tab" type="button" role="tab" id="tab-live" data-tab="live" aria-controls="pane-live" aria-selected="false"><i class="tab__dot" aria-hidden="true"></i>live</button>
+    <button class="tab" type="button" role="tab" id="tab-scope" data-tab="scope" aria-controls="pane-scope" aria-selected="false">scope</button>
+  </nav>
+  <div class="bar__end">
+    <label class="vol"><span data-t="vol">vol</span> <input id="vol" type="range" min="0" max="100" value="60"></label>
+    <button class="lang" id="lang" type="button" aria-label="English / Español"><span data-l="en">en</span> / <span data-l="es">es</span></button>
+  </div>
+</header>
+
+<main class="panes">
+  <section class="pane pane--live" id="pane-live" role="tabpanel" aria-labelledby="tab-live">
+    <div class="notice" id="notice" hidden>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+      <p><b data-t="sharedTitle"></b> <span data-t="sharedBody"></span></p>
+    </div>
+    <div class="grid" id="grid" hidden>
+      <div class="grid__not" id="grid-not" hidden>
+        <p data-t="gridNot"></p>
+        <button type="button" id="grid-new" data-t="gridNew"></button>
+      </div>
+      <div class="grid__on" id="grid-on">
+        <div class="grid__bpm">
+          <button type="button" id="bpm-down" data-t-label="slower">−</button>
+          <span><b id="bpm">132</b> bpm</span>
+          <button type="button" id="bpm-up" data-t-label="faster">+</button>
+        </div>
+        <div class="grid__rows" id="grid-rows"></div>
+      </div>
+    </div>
+    <div class="ed">
+      <div class="ed__nums" id="nums" aria-hidden="true"></div>
+      <div class="ed__body">
+        <pre class="ed__hl" id="hl" aria-hidden="true"></pre>
+        <textarea class="ed__ta" id="code" wrap="off" rows="1" cols="1" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="Pattern"></textarea>
+      </div>
+    </div>
+    <div class="keys" aria-label="Symbol keys">
+      <button type="button" data-ins="~">~</button>
+      <button type="button" data-ins="*">*</button>
+      <button type="button" data-ins="[]">[ ]</button>
+      <button type="button" data-ins="&lt;&gt;">&lt; &gt;</button>
+      <button type="button" data-ins="()">( )</button>
+      <button type="button" data-ins='""'>"</button>
+      <button type="button" data-ins=".">.</button>
+      <button type="button" data-ins=",">,</button>
+    </div>
+    <div class="ctl">
+      <p class="ctl__status" id="status" role="status"><i class="ctl__dot" aria-hidden="true"></i><span id="status-text"></span></p>
+      <button class="ctl__hush" id="hush" type="button" data-t-label="hush"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg><span class="ctl__word" data-t="hush">hush</span><kbd>esc</kbd></button>
+      <button class="ctl__run" id="run" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg><span data-t="play">play</span><kbd>ctrl ↵</kbd></button>
+      <button class="ctl__view" id="view" type="button" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span class="ctl__word" data-t="gridView">grid</span></button>
+      <button class="ctl__share" id="share" type="button" data-t-label="share"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg><span class="ctl__word" data-t="share">share</span></button>
+    </div>
+  </section>
+
+  <div class="side">
+    <section class="pane pane--shell" id="pane-shell" role="tabpanel" aria-labelledby="tab-shell">
+      <div class="out" id="out" role="log" aria-live="polite"></div>
+      <div class="chips">
+        <button type="button" data-cmd="live">live</button>
+        <button type="button" data-cmd="grid">grid</button>
+        <button type="button" data-cmd="examples">examples</button>
+        <button type="button" data-cmd="samples">samples</button>
+        <button type="button" data-cmd="record">record</button>
+        <button type="button" data-cmd="follow">follow</button>
+        <button type="button" data-cmd="help">help</button>
+      </div>
+      <form class="prompt" id="prompt" autocomplete="off">
+        <label for="cmd" class="prompt__ps"><span class="ps__user">llü@7thst</span><span class="ps__path">:~$</span></label>
+        <input id="cmd" type="text" enterkeyhint="go" autocapitalize="off" autocorrect="off" spellcheck="false" data-t-ph="prompt">
+        <button class="prompt__go" type="submit" aria-label="Run"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button>
+      </form>
+    </section>
+
+    <section class="pane pane--scope" id="pane-scope" role="tabpanel" aria-labelledby="tab-scope">
+      <div class="scope__head"><span>scope</span><span>kick · low · high</span></div>
+      <canvas class="scope__cv" id="scope" aria-hidden="true"></canvas>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <span>7thst.music/maquina</span>
+  <span><a href="https://strudel.cc" rel="noopener">made with Strudel</a> · <a href="https://github.com/ztfo/7thst.music/tree/main/maquina" rel="noopener">AGPL-3.0</a></span>
+</footer>
+
+<!-- the sound engine: sandboxed with no origin of its own, so pattern code can't reach this page -->
+<iframe class="engine" id="engine" src="sandbox.html" sandbox="allow-scripts" allow="autoplay" title="Sound engine" tabindex="-1"></iframe>
+
+<script type="module" src="js/shell.js"></script>
+</body>
+</html>
