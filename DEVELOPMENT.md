@@ -13,7 +13,7 @@ Plain HTML, CSS and ES modules on GitHub Pages. There is no build step: edit, co
 | --- | --- |
 | `styles/site.css` | tokens, base, the microtext frame, language switch, footer (both pages) |
 | `styles/home.css`, `styles/art.css` | each page's own styles |
-| `js/i18n.js` | every string, in English and Mexican Spanish, and the remembered language. Spanish is written the way an artist talks ("probadita", "dale play"), and labels capitalize only their first word |
+| `js/i18n.js` | every string, in English and Mexican Spanish, the remembered language, and a first visit following the browser's language (Spanish when it's neither). Spanish is written the way an artist talks ("probadita", "dale play"), and labels capitalize only their first word |
 | `js/home.js`, `js/art.js` | each page's behavior |
 | `js/microtext.js` | the "BUENA SUERTE · LLÜ · 7TH ST" line used for frames and rules |
 | `data/tracks.js` | the nine cards, the SoundCloud sketches, follow links |
