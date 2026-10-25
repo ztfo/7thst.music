@@ -62,7 +62,7 @@ const miniBar = $('#mini [data-bar]');
 $('#card-reverse').innerHTML = backHTML();
 
 // src: what the mini player and the space bar follow, the card or a sketch
-const state = { i: null, drawn: new Set(), sung: [], playing: false, breath: 0, kick: 0, lastFrame: -1, previewEnded: false, ready: false, src: 'card', via: 'first' };
+const state = { i: null, drawn: new Set(), sung: [], playing: false, breath: 0, kick: 0, lastFrame: -1, ready: false, src: 'card', via: 'first' };
 
 // ---------- worlds ----------
 const worldEl = $('#world');
@@ -296,7 +296,6 @@ function load(t, autoplay) {
   state.ready = false;
   audio.src = t.src;
   state.lastFrame = -1;
-  state.previewEnded = false;
   if (resume) play(); else setPlaying(false);
 }
 audio.addEventListener('loadedmetadata', () => {
@@ -307,22 +306,15 @@ audio.addEventListener('loadedmetadata', () => {
 });
 function play() {
   const t = TRACKS[state.i];
-  if (sk.playing || sk.want) pauseSketch();
+  // the card and a sketch never sound together, whatever the sketch player last reported
+  if (sk.frame) pauseSketch();
   setSource('card');
-  const start = state.ready && audio.currentTime > 1 && !(t.sealed && state.previewEnded) ? 'resume' : 'beginning';
-  if (t.sealed && state.previewEnded) { audio.currentTime = 0; state.previewEnded = false; status.hidden = true; }
+  const start = state.ready && audio.currentTime > 1 ? 'resume' : 'beginning';
   const p = audio.play();
   if (p && p.catch) p.catch(() => setPlaying(false));
   setPlaying(true);
   session.set('bs-arrived', '1');
   track('card_play', { card: t.id, kind: t.sealed ? 'preview' : 'full', via: state.via, start, lang: getLang() });
-}
-// a preview stops on its card and says when the rest comes, instead of dealing the next
-function previewOver(t) {
-  setPlaying(false);
-  state.previewEnded = true;
-  status.innerHTML = `${T('previewOver')(cap(t.card))} <button type="button" data-act="follow">${T('followToHear')}</button>, <button type="button" data-act="next">${T('orNext')}</button>.`;
-  status.hidden = false;
 }
 function pause() { audio.pause(); setPlaying(false); }
 function toggle() { if (state.playing) pause(); else play(); }
@@ -340,8 +332,8 @@ function setPlaying(on) {
 audio.addEventListener('ended', () => {
   const t = TRACKS[state.i];
   track('card_complete', { card: t.id, kind: t.sealed ? 'preview' : 'full', lang: getLang() });
-  if (t.sealed) previewOver(t);
-  else deal((state.i + 1) % TRACKS.length, { autoplay: true, via: 'auto' });
+  // a preview runs on into the next card, the same as a full song
+  deal((state.i + 1) % TRACKS.length, { autoplay: true, via: 'auto' });
 });
 audio.addEventListener('error', () => {
   status.textContent = T('failed')(cap(TRACKS[state.i].card));
@@ -354,7 +346,6 @@ function seekTo(fraction) {
   const f = Math.max(0, Math.min(0.999, fraction));
   audio.currentTime = f * lenOf(t);
   state.lastFrame = -1;
-  if (t.sealed) state.previewEnded = false;
 }
 
 // ---------- frame loop ----------
@@ -412,11 +403,14 @@ requestAnimationFrame(loop);
 
 // ---------- en proceso: SoundCloud's own player, hidden, under these controls ----------
 // Plays still count on SoundCloud. If its player can't load here, each row opens SoundCloud instead.
+// The player holds the whole set and changes sketches without reloading: Safari only lets it
+// start sound inside the press that asked, and the next sketch only follows on in the same player.
 // iPhones can refuse to start a hidden player from the page's own button: when a tap
 // plays nothing, SoundCloud's own player opens in that row, and every row after it.
 const SC = 'https://w.soundcloud.com';
 const SHOWN = 12;
-const sk = { frame: null, i: null, loaded: null, ready: false, failed: false, playing: false, want: false, pos: 0, at: 0, timer: 0, embed: false, nudge: 0 };
+// ids: the set's sounds in the set's own order, which isn't the list's newest-first
+const sk = { frame: null, ids: null, i: null, ready: false, failed: false, playing: false, want: false, pos: 0, at: 0, timer: 0, embed: false, nudge: 0 };
 const skEl = $('#sketches');
 function scSend(method, value) {
   if (sk.frame && sk.frame.contentWindow) sk.frame.contentWindow.postMessage(JSON.stringify(value === undefined ? { method } : { method, value }), SC);
@@ -444,30 +438,29 @@ function armNudge() {
   }, 2500);
 }
 const widgetSrc = (api) => `${SC}/player/?url=${encodeURIComponent(api)}&color=%23d2b97c&auto_play=false&visual=false&show_artwork=false&sharing=false&buying=false&download=false&show_comments=false&show_teaser=false`;
-function scFrame() {
-  if (sk.frame) return;
-  sk.frame = document.createElement('iframe');
-  sk.frame.allow = 'autoplay; encrypted-media';
-  sk.frame.title = 'SoundCloud';
-  $('#sc-host').appendChild(sk.frame);
-}
-// sk.loaded is a sketch's index, or 'set' while the player reads the whole set
-function scLoad(i) {
-  scFrame();
-  if (sk.embed) placeFrame(i);
-  sk.loaded = i;
-  sk.ready = false;
-  sk.frame.src = widgetSrc(`https://api.soundcloud.com/tracks/${SKETCHES[i].id}`);
-  scTimeout();
-}
 // The list on the page is a snapshot. Reading the set when it comes into view adds
 // whatever was uploaded since, so a new sketch shows up without touching the site.
-function scLoadSet() {
-  scFrame();
-  sk.loaded = 'set';
+function scLoad() {
+  if (!sk.frame) {
+    sk.frame = document.createElement('iframe');
+    sk.frame.allow = 'autoplay; encrypted-media';
+    sk.frame.title = 'SoundCloud';
+    $('#sc-host').appendChild(sk.frame);
+  }
   sk.ready = false;
   sk.frame.src = widgetSrc(`https://api.soundcloud.com/playlists/${SKETCH_SET.playlist}`);
   scTimeout();
+}
+// picks the sketch that's on out of the set, from its start, and plays it if it's wanted
+function cue(pick) {
+  if (pick) {
+    const n = sk.ids.indexOf(SKETCHES[sk.i].id);
+    // one the set no longer has can only be heard on SoundCloud
+    if (n < 0) return scFailed();
+    scSend('skip', n);
+    scSend('seekTo', 0);
+  }
+  if (sk.want) { scSend('play'); armNudge(); }
 }
 // sketches read from SoundCloud only get in with a real SoundCloud link, a date and a length
 function mergeSketches(sounds) {
@@ -488,13 +481,27 @@ function mergeSketches(sounds) {
 }
 function scTimeout() {
   clearTimeout(sk.timer);
-  sk.timer = setTimeout(() => {
-    if (sk.ready) return;
-    sk.failed = true;
-    sk.want = false;
-    renderSketches();
-    syncMini();
-  }, 6000);
+  sk.timer = setTimeout(() => { if (!sk.ready) scFailed(); }, 6000);
+}
+function scFailed() {
+  sk.failed = true;
+  sk.want = false;
+  renderSketches();
+  syncMini();
+}
+// the player says a sketch is sounding
+function heard(other) {
+  // the card took over before the hidden player got going: the card stays on
+  if (state.playing && !sk.embed) return scSend('pause');
+  // a sound the page didn't ask for, like the set's own next one after the last row
+  if (other) { if (!sk.want && !sk.embed) scSend('pause'); return; }
+  sk.playing = true;
+  sk.want = true;
+  sk.at = performance.now();
+  clearTimeout(sk.nudge);
+  setSource('sketch');
+  if (state.playing) pause();
+  syncSketch();
 }
 addEventListener('message', (e) => {
   if (e.origin !== SC || !sk.frame || e.source !== sk.frame.contentWindow) return;
@@ -505,11 +512,22 @@ addEventListener('message', (e) => {
     clearTimeout(sk.timer);
     if (sk.failed) { sk.failed = false; renderSketches(); }
     ['play', 'pause', 'finish', 'playProgress'].forEach((ev) => scSend('addEventListener', ev));
-    if (sk.loaded === 'set') scSend('getSounds');
-    if (sk.want && sk.loaded === sk.i) { scSend('play'); armNudge(); }
+    // the set is read once; a player that reloaded where it was moved starts back on the set's first sound
+    if (!sk.ids) scSend('getSounds');
+    else if (sk.i !== null) cue(true);
   }
-  if (d.method === 'getSounds' && sk.loaded === 'set') mergeSketches(d.value);
-  if (d.method === 'play') { sk.playing = true; sk.want = true; sk.at = performance.now(); clearTimeout(sk.nudge); setSource('sketch'); if (state.playing) pause(); syncSketch(); }
+  if (d.method === 'getSounds' && !sk.ids) {
+    sk.ids = Array.isArray(d.value) ? d.value.map((s) => s.id) : [];
+    mergeSketches(d.value);
+    // a press that came before the player was ready
+    if (sk.i !== null) cue(true);
+  }
+  // when a sketch ends the set moves on by itself, in its own order: only the sketch that's on counts
+  const id = d.value?.soundId;
+  const other = id != null && (sk.i === null || id !== SKETCHES[sk.i].id);
+  // SoundCloud doesn't always send its play event, so progress nobody asked for counts the same
+  if (d.method === 'play' || (d.method === 'playProgress' && !sk.playing && (sk.want || (state.playing && !sk.embed)))) heard(other);
+  if (other) return;
   // SoundCloud also pauses its widgets on its own, when another of its players starts
   if (d.method === 'pause') { sk.playing = false; sk.want = false; syncSketch(); }
   if (d.method === 'finish') {
@@ -517,12 +535,14 @@ addEventListener('message', (e) => {
     track('sketch_complete', { sketch: SKETCHES[sk.i].title, lang: getLang() });
     sk.playing = false;
     sk.want = false;
-    if (sk.i < SKETCHES.length - 1) playSketch(sk.i + 1);
-    else syncSketch();
+    // on down the list; after the last row the set would play on into sketches the page doesn't show
+    if (sk.i < SKETCHES.length - 1) playSketch(sk.i + 1, true);
+    else { scSend('pause'); syncSketch(); }
   }
   if (d.method === 'playProgress' && d.value) { sk.pos = d.value.currentPosition / 1000; sk.at = performance.now(); }
 });
-function playSketch(i) {
+// auto: the sketch before it just ended, so an opened player stays where it is (moving it reloads it)
+function playSketch(i, auto = false) {
   if (state.playing) pause();
   const changed = sk.i !== i;
   if (changed) sk.pos = 0;
@@ -531,10 +551,10 @@ function playSketch(i) {
   setSource('sketch');
   // setSource skips the redraw when a sketch was already on, so the next one redraws here
   if (changed) syncMini();
-  // a player still loading this sketch plays it as soon as it's ready
-  if (sk.loaded !== i || sk.failed) scLoad(i);
-  else if (sk.ready) { scSend('play'); armNudge(); }
-  if (sk.embed && sk.frame) placeFrame(i);
+  if (sk.embed && !auto) placeFrame(i);
+  // sent inside the press itself; a player still loading, or reloading after a move, cues it once it's ready
+  if (!sk.frame || sk.failed) scLoad();
+  else if (sk.ready && sk.ids) cue(changed);
   syncSketch();
   track('sketch_play', { sketch: SKETCHES[i].title, lang: getLang() });
 }
@@ -593,8 +613,7 @@ skEl.addEventListener('click', (e) => {
   if (b) toggleSketch(+b.dataset.sketch);
 });
 // warm SoundCloud's player as the list comes near, so the first press plays at once
-// warm SoundCloud's player as the list comes near: it reads the set first, then plays on the first press
-new IntersectionObserver(([e]) => { if (e.isIntersecting && !sk.frame) scLoadSet(); }, { rootMargin: '1200px 0px' }).observe($('#bocetos'));
+new IntersectionObserver(([e]) => { if (e.isIntersecting && !sk.frame) scLoad(); }, { rootMargin: '1200px 0px' }).observe($('#bocetos'));
 const toggleActive = () => (miniSketch() ? toggleSketch() : toggle());
 
 // ---------- input ----------
@@ -652,7 +671,6 @@ document.addEventListener('click', (e) => {
     return deal(k, { autoplay: true, via: 'tracklist' });
   }
   const act = b.dataset.act;
-  if (b.closest('#status') && state.i !== null) track('preview_prompt', { choice: act, card: TRACKS[state.i].id, lang: getLang() });
   if (b.closest('#mini') && miniSketch()) {
     if (act === 'toggle') toggleSketch();
     if (act === 'next') playSketch((sk.i + 1) % SKETCHES.length);
