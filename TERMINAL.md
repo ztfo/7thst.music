@@ -28,26 +28,27 @@ only the domain, the language switch and the follow links.
 
 ## The look
 
-Close to [Hyper](https://hyper.is): a modern terminal window, not a retro CRT. Clean,
-dark and quiet, with the music as the only thing that moves much.
+Close to [Hyper](https://hyper.is): a modern terminal, not a retro CRT. Clean, dark and
+quiet, with the music as the only thing that moves much.
 
-- **One window.** On a laptop it floats in the middle of a dark backdrop, with rounded
-  corners, a hairline border, a soft shadow, and three window dots top left. On a phone
-  it fills the screen and the dots go.
+- **Full screen, everywhere.** No window floating on a backdrop and no window dots: on a
+  laptop and on a phone alike, the terminal is the whole page, as if you'd peeked behind
+  the deck into the machine itself.
 - **Tabs in the title bar.** Thin tabs sit where the title would be: `~` for the shell,
   `live` for the editor, `scope` for the sound. The active tab is a shade lighter, and
   the others are dim text.
 - **Split panes.** `live` splits the window: the editor on the left, the shell and scope
   on the right, divided by a 1px line. On a phone the panes stack, and the tabs switch
   between them.
-- **Colour.** Near-black ground (`#000` to `#0b0b0f`), soft white text, a muted ANSI
-  palette for names, numbers and errors, and one accent: a magenta block cursor, as in
-  Hyper. Selection is the same magenta, faint. `theme` switches palettes for fun.
+- **Colour.** Near-black ground (`#0b0b0e`), soft white text, a muted palette for
+  names, numbers and errors, and one accent in blue (`#5b9cff`): the block cursor, the
+  prompt, the sounds playing in the code, the kick in the scope and the play button.
+  Selection is the same blue, faint. `theme` switches between blues (and maybe more).
 - **Type.** The system's own monospace (`ui-monospace, SFMono-Regular, Menlo, Consolas,
   monospace`), so it looks native on each machine and loads nothing. 13 to 14px, with
   generous line height.
 - **Motion.** No scanlines, no glow, no flicker. The cursor blinks; the scope and the
-  window's border pulse lightly with the kick. All of it stops with reduced motion.
+  line under the tabs pulse lightly with the kick. All of it stops with reduced motion.
 
 It borrows Hyper's feel, never its name or logo.
 
@@ -164,7 +165,7 @@ The terminal should feel found, not linked. A few ways in, from obvious to burie
 - **Type on the deck.** Anywhere on the home page, typing `llu`, `sudo`, `máquina` or
   just `/` on a keyboard glitches the page into the terminal. Nothing on screen says so.
 - **The tenth card.** One draw in fifty, the deck deals a card that isn't in the
-  Buena Suerte nine: **La Máquina**, black with a magenta cursor engraved on it. Playing it opens the
+  Buena Suerte nine: **La Máquina**, black with a blue cursor engraved on it. Playing it opens the
   terminal. Sharing it shares the way in.
 - **El Perdido.** The lost one. Tapping its sealed card face seven times, or holding it
   for three seconds, opens a prompt instead of the preview.
@@ -302,7 +303,7 @@ Each phase can ship on its own. Phase 1 is worth having even if the rest never h
 | Engine and license | Strudel, a pinned copy served from this site. The terminal's code is AGPL-3.0 in `maquina/`; the rest of the site stays MIT |
 | Address | `/maquina` |
 | Name and artist | La Máquina, by llü |
-| Look | Close to Hyper: a clean, modern terminal window with tabs and split panes, not a retro CRT |
+| Look | Close to Hyper: a clean, modern terminal, full screen on every device, with tabs, split panes and a blue accent. Not a retro CRT |
 | Shared patterns | Links only, with the pattern in the address. A gallery maybe later |
 | Tracks | Coming soon. When ready: released techno in full, unreleased as 30-second previews |
 | Sounds | Strudel's defaults for now; llü's stems on Cloudinary once the machine is up |
