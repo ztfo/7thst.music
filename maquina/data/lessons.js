@@ -27,12 +27,12 @@ s("bd*4").bank("RolandTR909")`,
     en: {
       title: 'the kick',
       text: 'Every techno track starts here. s() plays a sound: "bd" is a kick drum, and *4 plays it four times a bar. .bank() picks the drum machine, a Roland 909. setcps() sets the tempo, 130 beats a minute. Press play to hear it. Each step replaces the code with the next one.',
-      try: 'change *4 to *2 or *8, then press play again: changes land on the next bar.',
+      try: 'change *4 to *2 or *8, then press ▶ update: it lands on the next bar.',
     },
     es: {
       title: 'el bombo',
       text: 'Todo track de techno empieza aquí. s() toca un sonido: "bd" es el bombo, y *4 lo toca cuatro veces por compás. .bank() escoge la caja de ritmos, una Roland 909. setcps() pone el tempo, 130 golpes por minuto. Dale play para oírlo. Cada paso reemplaza el código con el siguiente.',
-      try: 'cambia *4 por *2 o *8 y dale play otra vez: los cambios entran en el siguiente compás.',
+      try: 'cambia *4 por *2 o *8 y dale ▶ actualiza: entra en el siguiente compás.',
     },
   },
   {

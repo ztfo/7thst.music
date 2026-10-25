@@ -50,7 +50,8 @@ export function makeEditor({ ta, hl, nums, onRun, onChange }) {
 
   return {
     get value() { return ta.value; },
-    set value(v) { ta.value = v; paint(); },
+    // set from outside (an example, a lesson, the grid): it counts as a change too
+    set value(v) { ta.value = v; paint(); onChange?.(ta.value); },
     insert,
     focus: () => ta.focus({ preventScroll: true }),
     paint,

@@ -70,7 +70,7 @@ let shared = false, saveTimer = 0;
 const editor = makeEditor({
   ta: $('#code'), hl: $('#hl'), nums: $('#nums'),
   onRun: () => runPattern('keys'),
-  onChange: (v) => { clearTimeout(saveTimer); saveTimer = setTimeout(() => store.set('maq-draft', v), 300); },
+  onChange: (v) => { clearTimeout(saveTimer); saveTimer = setTimeout(() => store.set('maq-draft', v), 300); edited(); },
 });
 document.querySelectorAll('.keys [data-ins]').forEach((b) => {
   b.addEventListener('pointerdown', (e) => e.preventDefault()); // keep the keyboard up
@@ -206,6 +206,32 @@ viewBtn.addEventListener('click', () => setGrid(!gridOn));
 // ---------- the engine ----------
 const scope = makeScope($('#scope'));
 let state = 'stopped', bpm = 0, readyYet = false, wantRun = null;
+// applied: the code that's actually playing; sending: the code on its way to the engine;
+// failed: code that didn't run, so auto doesn't keep resending it
+let sounding = false, applied = null, sending = null, failed = null, lastVia = '';
+let autoOn = store.get('maq-auto') === 'on', autoTimer = 0;
+const isDirty = () => sounding && editor.value !== applied;
+// the run button says update, and the status says why, while the code on screen isn't what's playing
+function markDirty() {
+  const dirty = isDirty();
+  const run = $('#run');
+  run.classList.toggle('is-dirty', dirty);
+  $('#run-word').textContent = T(dirty ? 'update' : 'play');
+  // an error stays up only while the code it came from is still on screen
+  if (dirty && (statusEl.dataset.state !== 'err' || editor.value !== failed)) {
+    statusEl.dataset.state = 'edited';
+    statusText.textContent = T(autoOn ? 'editedAuto' : 'edited');
+  } else if (!dirty && sounding && statusEl.dataset.state === 'edited') setStatus('playing', bpm ? T('playing')(bpm) : T('ran'));
+}
+function edited() {
+  markDirty();
+  if (!autoOn || !sounding) return;
+  clearTimeout(autoTimer);
+  autoTimer = setTimeout(() => {
+    const code = editor.value;
+    if (code.trim() && code !== applied && code !== failed && code !== sending) runPattern('auto');
+  }, 900);
+}
 function setStatus(s, text) {
   state = s;
   statusEl.dataset.state = s;
@@ -214,8 +240,22 @@ function setStatus(s, text) {
 }
 const engine = makeBridge($('#engine'), {
   ready() { readyYet = true; engine.volume(volume()); if (wantRun !== null) { const c = wantRun; wantRun = null; engine.run(c); } },
-  ok() { setStatus('playing', bpm ? T('playing')(bpm) : T('ran')); },
-  err(msg) { setStatus('err', T('err')(msg)); line([T('err')(msg), 'e']); },
+  ok() {
+    sounding = true;
+    applied = sending ?? applied;
+    sending = null;
+    failed = null;
+    setStatus('playing', bpm ? T('playing')(bpm) : T('ran'));
+    markDirty();
+  },
+  err(msg) {
+    if (sending !== null) { failed = sending; sending = null; }
+    // what was playing keeps playing; the error only shows
+    if (sounding) { statusEl.dataset.state = 'err'; statusText.textContent = T('err')(msg); }
+    else setStatus('err', T('err')(msg));
+    // auto doesn't fill the shell with an error for every pause in typing
+    if (lastVia !== 'auto') line([T('err')(msg), 'e']);
+  },
   locked() {
     const btn = $('#run');
     if (!btn.offsetParent) setTab('live');
@@ -226,9 +266,9 @@ const engine = makeBridge($('#engine'), {
   levels(m) {
     scope.feed(m);
     const b = Math.round(m.cps * 240);
-    if (state === 'playing' && b && b !== bpm) { bpm = b; setStatus('playing', T('playing')(bpm)); }
+    if (state === 'playing' && b && b !== bpm) { bpm = b; if (!isDirty() && statusEl.dataset.state === 'playing') setStatus('playing', T('playing')(bpm)); }
   },
-  restarted() { readyYet = false; clearInterval(recTimer); setStatus('stopped', T('stopped')); line([T('restarted'), 'e']); },
+  restarted() { readyYet = false; sounding = false; applied = sending = null; markDirty(); clearInterval(recTimer); setStatus('stopped', T('stopped')); line([T('restarted'), 'e']); },
   wav(blob) {
     clearInterval(recTimer);
     const d = new Date(), p2 = (n) => String(n).padStart(2, '0');
@@ -322,9 +362,13 @@ function forget(arg) {
 function runPattern(via) {
   let code = editor.value;
   if (!code.trim()) { loadExample(STARTER); code = editor.value; }
-  setStatus('starting', readyYet ? T('starting') : T('loading'));
-  bpm = 0;
-  if (via !== 'grid' && via !== 'learn') track('live_run', { via, shared: shared ? 'yes' : 'no' });
+  lastVia = via;
+  sending = code;
+  clearTimeout(autoTimer);
+  // already playing: the change lands on the next bar, and the music doesn't stop meanwhile
+  if (sounding) { statusEl.dataset.state = 'playing'; statusText.textContent = T('applying'); }
+  else { setStatus('starting', readyYet ? T('starting') : T('loading')); bpm = 0; }
+  if (!['grid', 'learn', 'auto'].includes(via)) track('live_run', { via, shared: shared ? 'yes' : 'no' });
   setShared(false);
   if (readyYet) engine.run(code); else wantRun = code;
 }
@@ -333,7 +377,11 @@ function hush() {
   if (engine.recording) engine.stopRecording();
   engine.hush();
   bpm = 0;
+  sounding = false;
+  applied = sending = null;
+  clearTimeout(autoTimer);
   setStatus('stopped', T('stopped'));
+  markDirty();
 }
 $('#run').addEventListener('click', () => runPattern('button'));
 $('#hush').addEventListener('click', hush);
@@ -354,6 +402,7 @@ function paintLang() {
   if (state === 'stopped') setStatus('stopped', T('stopped'));
   setGrid(gridOn);
   paintLesson();
+  markDirty();
 }
 $('#lang').addEventListener('click', () => { setLang(getLang() === 'es' ? 'en' : 'es'); paintLang(); line([T('lang'), 'd']); });
 
@@ -436,6 +485,14 @@ const COMMANDS = {
     line(['  ' + T('samplesSoon'), 'd']);
   },
   hush() { hush(); line(['  ' + T('hushed'), 'd']); },
+  auto(arg) {
+    if (arg === 'on' || arg === 'off') autoOn = arg === 'on';
+    else autoOn = !autoOn;
+    store.set('maq-auto', autoOn ? 'on' : 'off');
+    line([T(autoOn ? 'autoOn' : 'autoOff'), 'a']);
+    markDirty();
+    track('auto_switch', { auto: autoOn ? 'on' : 'off' });
+  },
   share,
   theme(arg) {
     if (arg && THEMES[arg]) { applyTheme(arg); scope.recolor(); return line([T('themeNow')(arg), 'a']); }

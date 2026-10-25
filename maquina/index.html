@@ -44,6 +44,7 @@
       </div>
       <p class="lesson__text" id="lesson-text"></p>
       <p class="lesson__try"><span class="lesson__try-k" data-t="learnTry"></span> <span id="lesson-try"></span></p>
+      <p class="lesson__apply" data-t="learnApply"></p>
       <div class="lesson__nav">
         <button type="button" id="lesson-back">← <span data-t="learnBack"></span></button>
         <button type="button" id="lesson-next"><span id="lesson-next-word"></span> →</button>
@@ -87,7 +88,7 @@
     <div class="ctl">
       <p class="ctl__status" id="status" role="status"><i class="ctl__dot" aria-hidden="true"></i><span id="status-text"></span></p>
       <button class="ctl__hush" id="hush" type="button" data-t-label="hush"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg><span class="ctl__word" data-t="hush">hush</span><kbd>esc</kbd></button>
-      <button class="ctl__run" id="run" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg><span data-t="play">play</span><kbd>ctrl ↵</kbd></button>
+      <button class="ctl__run" id="run" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg><span id="run-word">play</span><kbd>ctrl ↵</kbd></button>
       <button class="ctl__view" id="view" type="button" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span class="ctl__word" data-t="gridView">grid</span></button>
       <button class="ctl__share" id="share" type="button" data-t-label="share"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg><span class="ctl__word" data-t="share">share</span></button>
     </div>
@@ -123,7 +124,6 @@
 
 <footer class="foot">
   <span>7thst.music/maquina</span>
-  <span><a href="https://strudel.cc" rel="noopener">made with Strudel</a> · <a href="https://github.com/ztfo/7thst.music/tree/main/maquina" rel="noopener">AGPL-3.0</a></span>
 </footer>
 
 <!-- the sound engine: sandboxed with no origin of its own, so pattern code can't reach this page -->
