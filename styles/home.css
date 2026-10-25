@@ -342,10 +342,8 @@
   .nav { grid-column: 2; gap: 14px; }
   .nav a { display: none; }
   .nav a[href="art.html"] { display: inline; }
-  .tracks { width: 100%; }
-  .tracks__legend { display: none; }
-  .tracks__list { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 140px; overflow-x: auto; scrollbar-width: none; }
-  .tracks__list::-webkit-scrollbar { display: none; }
+  /* the strip of nine is a laptop thing; on a phone the card, its arrows and a swipe deal */
+  .tracks { display: none; }
   .tbtn::after, .play::after { display: none; }
   .follow-pop { left: auto; right: 0; }
   .band__in { grid-template-columns: minmax(0, 1fr); }
