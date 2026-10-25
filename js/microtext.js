@@ -7,14 +7,22 @@ export function micro(len, size = 6.4) {
   return phrase.repeat(count).trim();
 }
 
-const run = (x, y, len, rot) => `<text transform="translate(${x} ${y}) rotate(${rot})" textLength="${len}" lengthAdjust="spacing">${micro(len, 7)}</text>`;
+const run = (x, y, len, rot, secret = false) => `<text transform="translate(${x} ${y}) rotate(${rot})" textLength="${len}" lengthAdjust="spacing">${secret ? withSecret(micro(len, 7)) : micro(len, 7)}</text>`;
 
-// four runs around an element, with corner marks
-export function drawFrame(el) {
+// one character in the frame is wrong: the Ü of the last LLÜ along the top is a cursor,
+// and it's the way into La Máquina (js/secrets.js)
+function withSecret(text) {
+  const at = text.lastIndexOf('LLÜ');
+  if (at < 0) return text;
+  return `${text.slice(0, at)}LL<a class="secret" href="/maquina/?via=frame" tabindex="-1">_</a>${text.slice(at + 3)}`;
+}
+
+// four runs around an element, with corner marks; secret: true puts the wrong character in
+export function drawFrame(el, { secret = false } = {}) {
   const r = el.getBoundingClientRect();
   if (!r.width) return;
   const w = r.width + 12, h = r.height + 12, o = 6, c = 7;
-  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}">${run(o + 16, o + 2.5, w - 2 * o - 32, 0)}${run(w - o - 16, h - o - 2.5, w - 2 * o - 32, 180)}${run(o + 2.5, h - o - 16, h - 2 * o - 32, -90)}${run(w - o - 2.5, o + 16, h - 2 * o - 32, 90)}<path class="corner" d="M${o} ${o + c}V${o}H${o + c}M${w - o - c} ${o}H${w - o}V${o + c}M${w - o} ${h - o - c}V${h - o}H${w - o - c}M${o + c} ${h - o}H${o}V${h - o - c}"/></svg>`;
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}">${run(o + 16, o + 2.5, w - 2 * o - 32, 0, secret)}${run(w - o - 16, h - o - 2.5, w - 2 * o - 32, 180)}${run(o + 2.5, h - o - 16, h - 2 * o - 32, -90)}${run(w - o - 2.5, o + 16, h - 2 * o - 32, 90)}<path class="corner" d="M${o} ${o + c}V${o}H${o + c}M${w - o - c} ${o}H${w - o}V${o + c}M${w - o} ${h - o - c}V${h - o}H${w - o - c}M${o + c} ${h - o}H${o}V${h - o - c}"/></svg>`;
 }
 
 // one run along an element's width, as a rule

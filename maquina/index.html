@@ -40,6 +40,20 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
       <p><b data-t="sharedTitle"></b> <span data-t="sharedBody"></span></p>
     </div>
+    <div class="grid" id="grid" hidden>
+      <div class="grid__not" id="grid-not" hidden>
+        <p data-t="gridNot"></p>
+        <button type="button" id="grid-new" data-t="gridNew"></button>
+      </div>
+      <div class="grid__on" id="grid-on">
+        <div class="grid__bpm">
+          <button type="button" id="bpm-down" data-t-label="slower">−</button>
+          <span><b id="bpm">132</b> bpm</span>
+          <button type="button" id="bpm-up" data-t-label="faster">+</button>
+        </div>
+        <div class="grid__rows" id="grid-rows"></div>
+      </div>
+    </div>
     <div class="ed">
       <div class="ed__nums" id="nums" aria-hidden="true"></div>
       <div class="ed__body">
@@ -61,6 +75,7 @@
       <p class="ctl__status" id="status" role="status"><i class="ctl__dot" aria-hidden="true"></i><span id="status-text"></span></p>
       <button class="ctl__hush" id="hush" type="button" data-t-label="hush"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg><span class="ctl__word" data-t="hush">hush</span><kbd>esc</kbd></button>
       <button class="ctl__run" id="run" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg><span data-t="play">play</span><kbd>ctrl ↵</kbd></button>
+      <button class="ctl__view" id="view" type="button" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span class="ctl__word" data-t="gridView">grid</span></button>
       <button class="ctl__share" id="share" type="button" data-t-label="share"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg><span class="ctl__word" data-t="share">share</span></button>
     </div>
   </section>
@@ -70,8 +85,10 @@
       <div class="out" id="out" role="log" aria-live="polite"></div>
       <div class="chips">
         <button type="button" data-cmd="live">live</button>
+        <button type="button" data-cmd="grid">grid</button>
         <button type="button" data-cmd="examples">examples</button>
         <button type="button" data-cmd="samples">samples</button>
+        <button type="button" data-cmd="record">record</button>
         <button type="button" data-cmd="follow">follow</button>
         <button type="button" data-cmd="help">help</button>
       </div>

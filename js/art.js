@@ -3,6 +3,7 @@
 // to Cloudinary shows up here without touching this file.
 import { T, getLang, setLang, paintLang } from './i18n.js';
 import { drawFrame, drawRule, fit } from './microtext.js';
+import { consoleHello } from './secrets.js';
 import { pad2 } from './markup.js';
 import { SERIES, PER_PAGE, piecesFrom, large, seriesButtons, workTiles, inSeries as piecesIn, titleOf as nameOf } from './art-markup.js';
 
@@ -13,6 +14,7 @@ const track = (name, params) => { try { window.gtag?.('event', name, params); } 
 $('#year').textContent = String(new Date().getFullYear());
 
 const ART = piecesFrom(window.images || {});
+consoleHello();
 
 fit($('#rule'), drawRule);
 const frameEl = $('#viewer-frame');

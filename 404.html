@@ -6,32 +6,45 @@
 <title>Esta carta no está · llü</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-<meta name="theme-color" content="#000000">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&display=swap">
-<!-- absolute paths: GitHub Pages serves this page at whatever address was missing -->
-<link rel="stylesheet" href="/styles/site.css">
+<meta name="theme-color" content="#0b0b0e">
+<!-- absolute paths: GitHub Pages serves this page at whatever address was missing.
+     A lost visitor lands in a terminal; its prompt knows a few commands and runs nothing typed. -->
 <style>
-  .lost { min-height: 100svh; display: grid; place-content: center; justify-items: center; gap: 22px; padding-block: 48px; text-align: center; }
-  .lost svg { width: 40px; height: 40px; }
-  .lost h1 { margin: 0; font: 400 clamp(32px, 6vw, 56px)/1.05 var(--serif); text-wrap: balance; }
-  .lost p { margin: 0; color: var(--paper-3); }
-  .lost a { margin-top: 10px; font: 500 10.5px/1 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); text-decoration: none; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
-  .lost a:hover { color: var(--paper); border-color: var(--paper); }
+  :root { --bg: #0b0b0e; --ink: #e8e8ea; --ink-2: #c9c9cf; --dim: #8a8a94; --faint: #6c6c76; --accent: #5b9cff; --err: #ff8a80; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink-2); font: 13px/22px var(--mono); -webkit-font-smoothing: antialiased; }
+  main { max-width: 760px; padding: 28px 24px 40px; }
+  p { margin: 0; min-height: 22px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .ps { color: var(--accent); }
+  .ps i { color: var(--dim); font-style: normal; }
+  .e { color: var(--err); }
+  .d { color: var(--dim); }
+  .i { color: var(--ink); }
+  .gap { height: 22px; }
+  form { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+  input { flex: 1; min-width: 0; height: 28px; padding: 0; background: none; border: 0; outline: none; color: var(--ink); font: inherit; caret-color: var(--accent); }
+  input::placeholder { color: var(--faint); }
+  a { color: var(--accent); }
+  a:hover { color: var(--ink); }
+  .home { display: inline-block; margin-top: 28px; color: var(--dim); }
+  @media (max-width: 760px) { main { padding: 20px 16px 32px; } input { font-size: 16px; } }
 </style>
 </head>
 <body>
-<main class="wrap lost">
-  <svg viewBox="0 0 44 44" aria-hidden="true">
-    <defs>
-      <radialGradient id="llu-gold" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(44 0) rotate(135) scale(62.2254 235.242)"><stop stop-color="#E7D494"/><stop offset="0.5" stop-color="#C7AB48"/><stop offset="1" stop-color="#EDD78B"/></radialGradient>
-    </defs>
-    <path fill="url(#llu-gold)" fill-rule="evenodd" d="M40 4L40 40L4 40L4 4L40 4ZM0 0H44V44H0ZM12 8H8V36H12V8ZM16 8H20V36H16V8ZM28 16H24V36H36V16H32V32H28V16ZM24 8H28V12H24V8ZM36 8H32V12H36V8Z"/>
-  </svg>
-  <h1>Esta carta no está en la baraja.</h1>
-  <p lang="en">This card isn't in the deck.</p>
-  <a href="/">regresar a la música · back to the music</a>
+<main>
+  <p><span class="ps">llü@7thst<i>:~$</i></span> cd <span id="path">/</span></p>
+  <p class="e">bash: cd: <span id="path-2">/</span>: esta carta no está en la baraja</p>
+  <p class="d" lang="en">this card isn't in the deck.</p>
+  <div class="gap"></div>
+  <p class="d">escribe <span class="i">baraja</span> para regresar, o <span class="i">help</span> · <span lang="en">type <span class="i">deck</span> to go back, or <span class="i">help</span></span></p>
+  <div id="out" role="log" aria-live="polite"></div>
+  <form id="prompt" autocomplete="off">
+    <label for="cmd" class="ps">llü@7thst<i>:~$</i></label>
+    <input id="cmd" type="text" enterkeyhint="go" autocapitalize="off" autocorrect="off" spellcheck="false" autofocus>
+  </form>
+  <a class="home" href="/">regresar a la música · <span lang="en">back to the music</span></a>
 </main>
+<script src="/js/lost.js"></script>
 </body>
 </html>

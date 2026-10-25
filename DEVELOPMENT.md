@@ -22,6 +22,8 @@ Plain HTML, CSS and ES modules on GitHub Pages. There is no build step: edit, co
 | `js/markup.js`, `js/art-markup.js` | the lists both pages draw, shared with the prerender |
 | `js/cardback.js` | the engraved card back |
 | `js/haptics.js`, `js/motion.js` | the phone's ticks, tilt and shake (see [The phone](#the-phone)) |
+| `js/secrets.js` | the hidden ways into La Máquina (see [Ways in](#ways-in)) |
+| `js/lost.js` | the 404 page's little terminal |
 | `scripts/prerender.mjs` | writes the pages' content, head tags, structured data and `llms.txt` into the HTML |
 | `assets/cards/` | generated: each card's share picture and lock screen artwork (`pnpm run cards`) |
 | `images-data.js` | generated: the art, from Cloudinary (`pnpm run fetch-images`) |
@@ -108,6 +110,7 @@ Motion and sharing need HTTPS, so on a phone test through a tunnel to the local 
 | `maquina/js/strings.js` | what the terminal says, in both languages |
 | `maquina/js/share.js` | share links, with the pattern in the address after `#p=` |
 | `maquina/js/themes.js` | the blues `theme` switches between |
+| `maquina/js/grid.js` | the step grid: five drums by sixteen steps, read from and written to the code |
 | `maquina/data/examples.js` | the seven example patterns and the list `samples` shows |
 | `maquina/vendor/strudel-1.3.0/` | a pinned copy of Strudel's browser bundle, served from this site |
 
@@ -119,9 +122,30 @@ Motion and sharing need HTTPS, so on a phone test through a tunnel to the local 
 
 **Sounds** for now are Strudel's defaults: the drum machines and Dirt-Samples, loaded from GitHub by `engine.js`, plus Strudel's synths. llü's stems come later (see TERMINAL.md).
 
+**Beyond patterns:** `grid` swaps the editor for a step grid. A grid pattern is code in one exact shape, so tapping a step rewrites the code, and code edited out of that shape stops being a grid. `record [seconds]` saves up to 30 seconds of what's playing as a WAV. The engine encodes it and the page downloads it, taking the file only while a recording it asked for is running. `save`, `load` and `rm` keep patterns in the visitor's own browser, and nothing goes anywhere else.
+
 **Upgrading Strudel:** `npm pack @strudel/web@<version>`, copy its `dist/index.mjs`, `dist/assets/` and `LICENSE` into a new `maquina/vendor/strudel-<version>/`, point the import in `maquina/js/engine.js` at it, delete the old folder, and run every example.
 
 **Previewing it locally** needs a server that sends `Access-Control-Allow-Origin: *`, as GitHub Pages does, since the sandboxed frame loads its scripts cross-origin: `npx http-server -p 8000 --cors`, then open http://localhost:8000/maquina/. `python3 -m http.server` serves the page but not a working engine.
+
+## Ways in
+
+Nothing on the site links to La Máquina; it's found. Each way in lands on `/maquina/?via=<way>`, and `term_open` reports the `via`. Most of them live in `js/secrets.js`.
+
+| Way (`via`) | Where | What |
+| --- | --- | --- |
+| `card` | home | One draw in fifty (the deck, `d`, or a shake) deals the tenth card, La Máquina, instead of a song. Its "pásale / step in" goes in. `?carta=la-maquina` opens on it. |
+| `keys` | home | Typing `llu`, `llü`, `sudo` or `máquina` anywhere (not in a field), or just `/` |
+| `perdido` | home | Seven quick taps on El Perdido's card, or holding it for three seconds |
+| `frame` | home | The microtext frame's one wrong character: the Ü of the last LLÜ along the top is a `_` (`js/microtext.js`) |
+| `3am` | home | From 3 to 4 a.m. local time the room sinks into a dark blue, and a blinking cursor in the bottom corner goes in |
+| `console` | home, art | The console says `try llu.maquina()` |
+| `source` | home, art | A comment in the page source names `/maquina/?via=source` |
+| `404` | any missing page | `404.html` is a small terminal; `ls -a` shows `.maquina/`, and `cd .maquina` goes in |
+
+`llms.txt` also describes it, for AI assistants. On the way in the page jitters and darkens for half a second (`.is-leaving` in `styles/site.css`). It never flashes, and with reduced motion it just goes.
+
+To try the tenth card without drawing fifty times, open `/?carta=la-maquina`. To see 3 a.m. at another hour, set the computer's clock to 3 a.m. and reload.
 
 ## Analytics
 
@@ -141,8 +165,11 @@ Google Analytics 4 (`G-G9DRK12SZE`) runs on both pages. On top of the page views
 | `term_command` | a command in La Máquina | `command` (only its name, never what was typed after it) |
 | `live_run` | a pattern runs | `via` (keys, button, shell), `shared` (yes when it came from a share link) |
 | `pattern_share` / `pattern_open` | a pattern shared / a share link opened | `method` (sheet, link, shown) |
+| `pattern_record` | a recording is saved | `seconds` |
+| `secret_found` | a way into La Máquina is used, on the deck | `way` (card, keys, perdido, frame, 3am, console) |
+| `machine_card` | the tenth card shows | `via` (draw, keys, shake, link) |
 
-For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `sketch`, `platform`, `series`, `piece`, `lang`, `method`, `feel`, `command`, `shared`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
+For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `sketch`, `platform`, `series`, `piece`, `lang`, `method`, `feel`, `command`, `shared`, `seconds`, `way`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
 
 ## Local preview
 

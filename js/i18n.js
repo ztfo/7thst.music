@@ -24,6 +24,7 @@ export const STR = {
     obraH: 'Mis dibujos.', obraP: 'Portadas, sueños, mandalas y lo que va saliendo entre rola y rola.',
     seeAll: (n) => `ver todos · ${n}`, seeLess: 'ver menos', close: 'cerrar', prevWork: 'anterior', nextWork: 'siguiente',
     months: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
+    machineSub: 'La carta que no está en la baraja. Detrás hay una máquina para hacer techno.', machineGo: 'pásale', machineBack: 'regresar a la baraja',
   },
   en: {
     music: 'music', art: 'art', wipNav: 'in progress', follow: 'follow', prev: 'prev', play: 'play', pause: 'pause', next: 'next',
@@ -42,6 +43,7 @@ export const STR = {
     obraH: 'My art.', obraP: 'Covers, dreams, mandalas, and whatever turns up between songs.',
     seeAll: (n) => `see all · ${n}`, seeLess: 'see less', close: 'close', prevWork: 'previous', nextWork: 'next',
     months: ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
+    machineSub: 'The card that isn’t in the deck. Behind it, a machine for making techno.', machineGo: 'step in', machineBack: 'back to the deck',
   },
 };
 

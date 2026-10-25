@@ -1,8 +1,8 @@
 // La Máquina's sound engine. It runs inside sandbox.html, in a frame with no origin of its
 // own, so the code people type (or open from a stranger's link) can only make sound.
-// The terminal sends it { t: 'run', code }, { t: 'hush' }, { t: 'vol', v } and
-// { t: 'unlock', label }; it answers with { t: 'ready' | 'ok' | 'err' | 'locked' |
-// 'unlocked' | 'levels' | 'beat' }.
+// The terminal sends it { t: 'run', code }, { t: 'hush' }, { t: 'vol', v },
+// { t: 'unlock', label }, { t: 'rec', s } and { t: 'recstop' }; it answers with
+// { t: 'ready' | 'ok' | 'err' | 'locked' | 'unlocked' | 'levels' | 'beat' | 'wav' }.
 //
 // Chrome lets a tap or a key on the terminal start sound in here. Browsers that don't
 // (Safari, maybe Firefox) get 'locked' back: the terminal then lays this frame over its
@@ -134,8 +134,53 @@ addEventListener('message', (e) => {
   if (m.t === 'run' && typeof m.code === 'string') run(m.code.slice(0, 20000));
   else if (m.t === 'hush') stop();
   else if (m.t === 'unlock') showUnlock(m.label);
+  else if (m.t === 'rec' && Number.isFinite(m.s)) record(Math.min(30, Math.max(1, m.s)));
+  else if (m.t === 'recstop') finishRecording();
   else if (m.t === 'vol' && Number.isFinite(m.v)) vol.gain.setTargetAtTime(Math.min(1, Math.max(0, m.v)), ac.currentTime, 0.02);
 });
+
+// ---------- recording: what comes out of the limiter (before the volume), as a WAV ----------
+let rec = null;
+function record(seconds) {
+  if (rec) return;
+  const tap = ac.createScriptProcessor(4096, 2, 2);
+  const mute = new GainNode(ac, { gain: 0 });
+  rec = { tap, mute, left: [], right: [], frames: 0, max: Math.round(seconds * ac.sampleRate) };
+  tap.onaudioprocess = (e) => {
+    if (!rec) return;
+    const n = Math.min(e.inputBuffer.length, rec.max - rec.frames);
+    rec.left.push(e.inputBuffer.getChannelData(0).slice(0, n));
+    rec.right.push(e.inputBuffer.getChannelData(e.inputBuffer.numberOfChannels > 1 ? 1 : 0).slice(0, n));
+    rec.frames += n;
+    if (rec.frames >= rec.max) finishRecording();
+  };
+  connect.call(clip, tap);
+  connect.call(tap, mute);
+  connect.call(mute, ac.destination);
+}
+function finishRecording() {
+  if (!rec) return;
+  const { tap, mute, left, right, frames } = rec;
+  rec = null;
+  try { clip.disconnect(tap); } catch {}
+  tap.disconnect(); mute.disconnect();
+  // 16-bit stereo PCM
+  const buf = new ArrayBuffer(44 + frames * 4), v = new DataView(buf);
+  const str = (at, t) => { for (let i = 0; i < t.length; i++) v.setUint8(at + i, t.charCodeAt(i)); };
+  str(0, 'RIFF'); v.setUint32(4, 36 + frames * 4, true); str(8, 'WAVE');
+  str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 2, true);
+  v.setUint32(24, ac.sampleRate, true); v.setUint32(28, ac.sampleRate * 4, true); v.setUint16(32, 4, true); v.setUint16(34, 16, true);
+  str(36, 'data'); v.setUint32(40, frames * 4, true);
+  let at = 44;
+  for (let c = 0; c < left.length; c++) {
+    for (let i = 0; i < left[c].length; i++) {
+      v.setInt16(at, Math.max(-1, Math.min(1, left[c][i])) * 0x7fff, true);
+      v.setInt16(at + 2, Math.max(-1, Math.min(1, right[c][i])) * 0x7fff, true);
+      at += 4;
+    }
+  }
+  parent.postMessage({ t: 'wav', buf }, '*', [buf]);
+}
 
 // the scope: 256 points of waveform and 48 bands of spectrum, about 30 times a second
 const wave = new Float32Array(scope.fftSize);

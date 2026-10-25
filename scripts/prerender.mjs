@@ -212,6 +212,10 @@ const lines = [
   '',
   `[Mis dibujos / My art](${SITE}/art.html): ${SERIES.filter((s) => s.count).map((s) => `${s.en.toLowerCase()} (${s.es !== s.en ? `${s.es.toLowerCase()}, ` : ''}${s.count})`).join(', ')}.`,
   '',
+  '## La Máquina',
+  '',
+  `A terminal behind the deck, at ${SITE}/maquina/, where anyone can write techno in a few lines of code and hear it right away. It runs on [Strudel](https://strudel.cc), the browser version of TidalCycles, with classic drum machines and synths; llü's own sounds and dark techno are coming. Patterns can be shared as links.`,
+  '',
   '## From the studio',
   '',
   '- [Arreglo](https://arreglo.ai): an AI-powered music arrangement generator for Figma, by 7thSt.music and llü.',
@@ -220,6 +224,7 @@ const lines = [
   '',
   `- [Home: Buena Suerte, works in progress, follow](${SITE}/)`,
   `- [Mis dibujos / My art](${SITE}/art.html)`,
+  `- [La Máquina: live coding techno](${SITE}/maquina/)`,
   '',
 ];
 write('llms.txt', lines.join('\n'));

@@ -7,6 +7,7 @@ import { buildBack } from './cardback.js';
 import { fmt, cap, first, esc, soundcloudLink, trackButtons, platformLinks, sketchRows } from './markup.js';
 import { tick, arm, canBuzz } from './haptics.js';
 import * as motion from './motion.js';
+import { drawTenth, showMachineCard, linkedToMachine, watchKeys, watchFrame, watchPerdido, lateNight, consoleHello } from './secrets.js';
 
 const PREVIEW = 30;
 // worlds load at the size the screen needs
@@ -84,7 +85,7 @@ const layers = TRACKS.map((t) => {
 });
 
 // the frame: four runs of microtext, fitted to the table
-fit($('#frame'), drawFrame);
+fit($('#frame'), (el) => drawFrame(el, { secret: true }));
 
 // ---------- the tracklist, follow links ----------
 const tracksEl = $('#tracks');
@@ -302,6 +303,8 @@ function deal(i, { instant = false, autoplay = false, dir = 0, via = 'first' } =
   load(t, autoplay);
 }
 function drawRandom(autoplay, via = 'draw') {
+  // one draw in fifty is the tenth card, which isn't in the deck (js/secrets.js)
+  if (drawTenth(via)) return;
   const left = TRACKS.map((_, k) => k).filter((k) => k !== state.i && !state.drawn.has(k));
   const pool = left.length ? left : TRACKS.map((_, k) => k).filter((k) => k !== state.i);
   deal(pool[Math.floor(Math.random() * pool.length)], { autoplay, via });
@@ -685,6 +688,8 @@ stageEl.addEventListener('pointercancel', endSwipe);
 // On iPhones the card gets its own invisible switch, so a tap on it ticks. Safari's switch also
 // follows a drag, which is the only way a swipe there can tick at all.
 arm(cardBtn);
+// El Perdido, tapped seven times or held, opens the machine (js/secrets.js)
+watchPerdido(cardBtn, () => state.i !== null && TRACKS[state.i].id === 'el-perdido');
 // a swipe that ends on the card isn't also a tap on it
 cardBtn.addEventListener('click', () => {
   if (swipe.used) { swipe.used = false; return; }
@@ -1012,3 +1017,10 @@ function runArrival() {
 // the arrival plays once a visit
 applyLang();
 if (session.get('bs-arrived')) { table.classList.remove('arriving'); deal(firstCard(), { instant: true, via: firstVia }); } else runArrival();
+
+// the ways into La Máquina
+watchKeys();
+watchFrame();
+lateNight();
+consoleHello();
+if (linkedToMachine()) setTimeout(() => showMachineCard('link'), session.get('bs-arrived') || reduce ? 300 : 5000);

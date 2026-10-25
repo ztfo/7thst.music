@@ -1,6 +1,6 @@
 # La Máquina: the terminal side of 7thSt.music
 
-The plan for La Máquina; phase 1 is built (see Phases). The lotería deck is the front door; this is the back room. A
+The plan for La Máquina. Everything that doesn't need llü's music is built (see Phases). The lotería deck is the front door; this is the back room. A
 black terminal where llü's dark techno lives, and where a visitor can write their own
 techno in a few lines of code and hear it right away.
 
@@ -289,14 +289,15 @@ The machine can go up before the music, so it comes first.
    the phone layout. Strudel with its default sounds, the AGPL `LICENSE` and credit, the
    editor in a split pane, `examples`, `samples`, the scope on the live pattern, and
    share links with the pattern in the address. The phone key row.
-2. **The secrets** (about a week). The tenth card, typing on the deck, El Perdido, the
+2. **The secrets** (built). The tenth card, typing on the deck, El Perdido, the
    microtext glitch, the 3 a.m. fade, the console, view source and the 404. Analytics on
    each way in.
 3. **llü's sounds** (when the stems are ready). The `samples` script, the stems on
    Cloudinary, the starter patterns switched to them, `remix` per track.
 4. **The music** (when the tracks are ready). `ls` and `play` with the real tracks and
    their envelopes, `cat` notes, the hidden track, the spectrogram picture.
-5. **The loop** (ongoing). `record`, the phone step grid, pattern of the week, the remix
+5. **The loop** (ongoing). Built: `record`, `save` / `load` / `rm`, and the step grid (on
+   every screen, not just phones). Still to run, not build: pattern of the week, the remix
    contest. Later, maybe a public gallery of shared patterns, which would need a small
    backend (Supabase) and moderation.
 
