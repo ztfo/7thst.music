@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Card picture</title>
+<!-- One card's picture, drawn by scripts/render-cards.mjs (pnpm run cards):
+     ?id=el-cotorro&shape=story   1080x1920, shared to Stories and chats
+     ?id=el-cotorro&shape=square  600x600, the artwork on the phone's lock screen
+     Sealed cards show their sealed back, never the unreleased art. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../styles/site.css">
+<link rel="stylesheet" href="../../styles/home.css">
+<style>
+  :root { padding: 0; }
+  html, body { margin: 0; overflow: hidden; }
+  .pic { position: relative; overflow: hidden; isolation: isolate; background: var(--ink); }
+  .pic--story { width: 1080px; height: 1920px; --f: 40px; }
+  .pic--square { width: 600px; height: 600px; --f: 16px; }
+  /* the card's room, darkened as the table darkens it */
+  .pic__world { position: absolute; inset: -4%; z-index: -3; isolation: isolate; filter: brightness(0.46); }
+  .pic__world i { position: absolute; inset: 0; background: var(--img) center / cover no-repeat; transform: scale(var(--fx, 1), var(--fy, 1)); }
+  .pic__world[data-tint]::after { content: ''; position: absolute; inset: 0; background: var(--tint); mix-blend-mode: color; }
+  .pic__card { position: absolute; left: 50%; aspect-ratio: var(--ar); translate: -50% 0; border-radius: 4px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 50px 90px -30px rgba(0, 0, 0, 0.95); }
+  .pic__card .face { border-radius: 4px; }
+  .pic--story .pic__card { top: 440px; height: 960px; }
+  .pic--square .pic__card { top: 40px; height: 520px; }
+
+  /* Stories cover the top and bottom 250px or so with their own bar and reply box,
+     so the words sit inside that */
+  .pic__brand { position: absolute; left: 0; right: 0; top: 268px; display: grid; justify-items: center; gap: 20px; }
+  .pic__brand svg { width: 64px; height: 64px; display: block; }
+  .pic__brand .label { font-size: 19px; }
+  .pic__name { position: absolute; left: 0; right: 0; top: 1462px; display: grid; justify-items: center; gap: 18px; text-align: center; }
+  .pic__name small { font: 500 17px/1 var(--sans); letter-spacing: 0.2em; color: var(--paper-3); }
+  .pic__name p { margin: 0; font: 500 66px/1 var(--serif); letter-spacing: 0.12em; text-transform: uppercase; padding-left: 0.12em; }
+  .pic__name .label { font-size: 18px; color: var(--gold); }
+  .pic__site { position: absolute; left: 0; right: 0; top: 1690px; text-align: center; font: 500 18px/1 var(--sans); letter-spacing: 0.24em; text-transform: uppercase; color: var(--paper-3); }
+  .pic--square .pic__brand, .pic--square .pic__name, .pic--square .pic__site, .pic--square .frame { display: none; }
+</style>
+</head>
+<body>
+<svg class="svgdefs" aria-hidden="true" focusable="false">
+  <defs id="defs">
+    <radialGradient id="llu-gold" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(44 0) rotate(135) scale(62.2254 235.242)">
+      <stop stop-color="#E7D494"/><stop offset="0.5" stop-color="#C7AB48"/><stop offset="1" stop-color="#EDD78B"/>
+    </radialGradient>
+    <path id="llu-path" fill-rule="evenodd" d="M40 4L40 40L4 40L4 4L40 4ZM0 0H44V44H0ZM12 8H8V36H12V8ZM16 8H20V36H16V8ZM28 16H24V36H36V16H32V32H28V16ZM24 8H28V12H24V8ZM36 8H32V12H36V8Z"/>
+    <symbol id="llu" viewBox="0 0 44 44"><use href="#llu-path" fill="url(#llu-gold)"/></symbol>
+    <symbol id="llu-mono" viewBox="0 0 44 44"><use href="#llu-path" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<div class="pic" id="pic">
+  <div class="pic__world" id="world" aria-hidden="true"><i></i></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="frame" id="frame" aria-hidden="true"></div>
+  <div class="pic__brand"><svg viewBox="0 0 44 44"><use href="#llu"/></svg><span class="label">llü · buena suerte</span></div>
+  <div class="pic__card" id="card"></div>
+  <div class="pic__name"><small>Nº <span id="n"></span></small><p class="metal" id="name"></p><span class="label" id="when"></span></div>
+  <span class="pic__site">7thst.music</span>
+</div>
+
+<script type="module">
+  import { TRACKS, groundUrl } from '../../data/tracks.js';
+  import { STR } from '../../js/i18n.js';
+  import { drawFrame } from '../../js/microtext.js';
+  import { buildBack } from '../../js/cardback.js';
+
+  const q = new URLSearchParams(location.search);
+  const t = TRACKS.find((k) => k.id === q.get('id')) || TRACKS[0];
+  const shape = q.get('shape') === 'square' ? 'square' : 'story';
+  const T = (k) => STR.es[k];
+  const $ = (id) => document.getElementById(id);
+
+  buildBack($('defs'));
+  $('pic').classList.add(`pic--${shape}`);
+  drawFrame($('frame'));
+
+  const world = $('world');
+  world.firstElementChild.style.setProperty('--img', `url(${groundUrl(t.ground, 1600)})`);
+  if (t.fx) world.firstElementChild.style.setProperty('--fx', t.fx);
+  if (t.fy) world.firstElementChild.style.setProperty('--fy', t.fy);
+  if (t.tint) { world.dataset.tint = ''; world.style.setProperty('--tint', t.tint); }
+
+  $('card').innerHTML = t.sealed
+    ? `<span class="face face--back face--sealed" style="--field:${t.field}"><svg viewBox="0 0 516 884"><use href="#card-back"/></svg><span class="seal"><span class="seal__n">${t.n}</span><span class="seal__mid"><span class="seal__name">${t.card}</span><span class="seal__date">${T('preview')} · ${T('when')}</span></span><span class="seal__stamp"><svg viewBox="0 0 44 44"><use href="#llu-mono"/></svg></span></span></span>`
+    : `<span class="face face--art"><img src="${t.img}" alt=""></span>`;
+  $('n').textContent = t.n;
+  $('name').textContent = t.card;
+  $('when').textContent = t.sealed ? T('outWhen') : '';
+</script>
+</body>
+</html>

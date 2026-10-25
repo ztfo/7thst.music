@@ -20,11 +20,13 @@ Plain HTML, CSS and ES modules on GitHub Pages. There is no build step: edit, co
 | `data/envelopes.js` | generated: each song's low-end energy, which makes the room breathe |
 | `js/markup.js`, `js/art-markup.js` | the lists both pages draw, shared with the prerender |
 | `js/cardback.js` | the engraved card back |
+| `js/haptics.js`, `js/motion.js` | the phone's ticks, tilt and shake (see [The phone](#the-phone)) |
 | `scripts/prerender.mjs` | writes the pages' content, head tags, structured data and `llms.txt` into the HTML |
+| `assets/cards/` | generated: each card's share picture and lock screen artwork (`pnpm run cards`) |
 | `images-data.js` | generated: the art, from Cloudinary (`pnpm run fetch-images`) |
 | `fonts/` | Gambetta (Fontshare), self-hosted; Archivo loads from Google Fonts |
 
-Audio and art are on Cloudinary, never in this repo. The repo is public.
+Audio and art are on Cloudinary, never in this repo. The repo is public. The card pictures in `assets/cards/` show sealed cards face down, never their art.
 
 ## Audio
 
@@ -41,6 +43,7 @@ This needs ffmpeg and the Cloudinary credentials in `.env`. Each run uploads to 
 1. Upload it in full with `--kind full`.
 2. In `data/tracks.js`, remove `sealed: true` and the field and tint colors, then add its card art (`img`) and its own `ground`.
 3. Point `src` at the full file.
+4. Run `pnpm run cards <id>` for its share picture and lock screen artwork, then `pnpm run prerender`, and commit both.
 
 ## Works in progress
 
@@ -63,6 +66,8 @@ It also writes the head tags (description, canonical, `es`/`en` alternates, Open
 
 English has its own address for search engines: `?lang=en` (for example `https://7thst.music/?lang=en`).
 
+**Card pictures** are in `assets/cards/`: `<id>-story.jpg` (1080 by 1920, what the share button sends) and `<id>.jpg` (600 by 600, the lock screen artwork). `pnpm run cards` draws them all from `scripts/og/carta.html` with headless Chrome, and `pnpm run cards el-fuego` draws one.
+
 **Share images** are `assets/og/buena-suerte.jpg` and `assets/og/mis-dibujos.jpg`, at 1200 by 630. To redo one:
 1. Serve the repo.
 2. Open `scripts/og/buena-suerte.html` or `scripts/og/mis-dibujos.html` in a 1200 by 630 window.
@@ -70,20 +75,38 @@ English has its own address for search engines: `?lang=en` (for example `https:/
 
 Also in the root: `robots.txt` (everything allowed), `sitemap.xml`, `site.webmanifest` (home screen name and icons), and `404.html`.
 
+## The phone
+
+On phones and in the browser the site reaches past the page. What works where:
+
+| What | Where | How |
+| --- | --- | --- |
+| Lock screen, Control Center, headphones, the car | iPhone, Android, desktop | The Media Session API shows the card's name and artwork. Prev and next deal cards, and the scrubber seeks. Works in progress show too, as best they can: they play inside SoundCloud's player, so the phone may show SoundCloud's details instead. |
+| Tab title | everywhere | `▶ El Cotorro · llü` while something plays |
+| Browser bar colour | Android | `theme-color` takes the dark top edge of the card's room, read from Cloudinary's one-pixel average of the ground. iOS Safari picks its own colour from the page. |
+| Card links | everywhere | `?carta=el-cotorro` opens on that card (with `&lang=en` for English). The address bar isn't rewritten as cards change, so page views aren't counted twice. |
+| Share a card | everywhere | The top row of the follow popover. Phones and Safari open the share sheet with the card's picture (`assets/cards/<id>-story.jpg`) and its link. Elsewhere, the link is copied. |
+| Ticks | iPhone: taps. Android: taps, swipes and landings | Android uses `navigator.vibrate`. iPhones have no vibration API, but Safari ticks when a finger toggles a switch input, so `arm()` in `js/haptics.js` lays an invisible one over draw, prev, next, the deck, the tracklist and the two switches. Since iOS 26.5 only a real tap does it, never code, so an iPhone can't tick on a swipe or a kick. Link buttons are never armed, since the switch would take their click. |
+| Sentir | phones only, off until turned on, remembered | Tilting moves the light across the gold and the card. A hard shake draws a card. On Android each kick pulses the phone. iPhones ask for motion access when it's switched on. |
+
+Motion and sharing need HTTPS, so on a phone test through a tunnel to the local server, not the LAN address. `js/motion.js` holds the shake's thresholds and the tilt's range. The light's strength is in `styles/home.css`, under "sentir".
+
 ## Analytics
 
 Google Analytics 4 (`G-G9DRK12SZE`) runs on both pages. On top of the page views GA tracks by itself, the site sends these events. Every one carries `lang`.
 
 | Event | When | Details |
 | --- | --- | --- |
-| `card_play` | a card starts playing | `card`, `kind` (full or preview), `via` (first, draw, tracklist, swipe, next, prev, keys, auto), `start` (beginning or resume) |
+| `card_play` | a card starts playing | `card`, `kind` (full or preview), `via` (first, link, draw, tracklist, swipe, next, prev, keys, shake, lockscreen, auto), `start` (beginning or resume) |
 | `card_complete` | a song or probadita plays to the end | `card`, `kind` |
 | `sketch_play` / `sketch_complete` | a work in progress starts / plays to the end | `sketch` |
 | `follow_click` | Spotify, Apple Music, SoundCloud or Instagram tapped | `platform` |
 | `art_open` | a drawing opened in the viewer | `series`, `piece` |
 | `lang_switch` | the EN/ES switch | `lang` |
+| `card_share` | a card shared from the follow popover | `card`, `method` (sheet or link) |
+| `feel_switch` | the sentir switch | `feel` (on, off, or denied when an iPhone's motion access is refused) |
 
-For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `sketch`, `platform`, `series`, `piece`, `lang`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
+For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `sketch`, `platform`, `series`, `piece`, `lang`, `method`, `feel`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
 
 ## Local preview
 

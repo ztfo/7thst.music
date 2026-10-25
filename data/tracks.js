@@ -8,6 +8,8 @@ const card = (pid) => `${CLOUD}/image/upload/c_crop,x_619,y_365,w_516,h_884/f_au
 
 // a card's painted ground, turned on its side to fill the room
 export const groundUrl = (pid, w) => `${CLOUD}/image/upload/c_crop,x_20,y_30,w_520,h_1654/a_90/c_fill,w_${w},h_${Math.round(w * 0.625)},g_center/f_auto,q_76/${pid}`;
+// the same ground as one pixel, its average colour
+export const groundAvgUrl = (pid) => `${CLOUD}/image/upload/c_crop,x_20,y_30,w_520,h_1654/c_scale,w_1,h_1/f_png/${pid}`;
 
 const LUNA = 'La_Luna_zpuyld';
 const COTORRO = 'El_Cotorro_az7mbb';
