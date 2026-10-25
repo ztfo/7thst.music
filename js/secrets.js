@@ -11,7 +11,7 @@ const track = (name, params) => { try { window.gtag?.('event', name, params); } 
 
 // the page gives out like an old screen on the way into the terminal (styles/site.css,
 // "the ways into La Máquina"): it never flashes, and with reduced motion it just goes
-export function goToMachine(via) {
+function goToMachine(via) {
   if (document.body.classList.contains('is-leaving')) return;
   track('secret_found', { way: via, lang: getLang() });
   const url = `${MACHINE}?via=${encodeURIComponent(via)}`;

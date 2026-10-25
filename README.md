@@ -28,7 +28,7 @@ Find llü's music on these platforms:
 
 The site is a deck on a black table. Draw a card and its painted world fills the room, breathing with the low end of the song. The cards that are out play in full. The ones still to come wait face down, sealed in their color, and play a short preview. It's in English and Spanish, and it remembers which one you picked.
 
-It's built with plain HTML, CSS and JavaScript on GitHub Pages, with the audio and art on Cloudinary. How it's put together and how to update it: [DEVELOPMENT.md](DEVELOPMENT.md).
+It's built with plain HTML, CSS and JavaScript on GitHub Pages, with the audio and art on Cloudinary. How it's put together and how to update it: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## License
 

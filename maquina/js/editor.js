@@ -6,7 +6,7 @@ const TOKENS = /(\/\/[^\n]*)|("(?:[^"\\\n]|\\.)*"?|'(?:[^'\\\n]|\\.)*'?|`(?:[^`\
 const KIND = ['', 'k-c', 'k-s', 'k-n', 'k-f'];
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-export function highlight(code) {
+function highlight(code) {
   let html = '', at = 0;
   for (const m of code.matchAll(TOKENS)) {
     html += esc(code.slice(at, m.index));
