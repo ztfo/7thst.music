@@ -81,18 +81,65 @@ a { color: inherit; }
 .foot__in a:hover { color: var(--gold); }
 
 
-/* the ways into La Máquina (js/secrets.js): the frame's one wrong character, and the glitch
-   on the way in, a jitter that only ever darkens, never flashes */
+/* the ways into La Máquina (js/secrets.js): the frame's one wrong character, and the way in,
+   like an old screen giving out: it shakes, splits into red and blue and tears, the scanlines
+   roll, then it collapses to a line and goes dark. It only ever darkens, never flashes. */
 .frame .secret { pointer-events: auto; cursor: pointer; fill: inherit; }
 .frame .secret:hover { fill: #5b9cff; }
-body.is-leaving { animation: leave 520ms steps(7, end) forwards; }
-@keyframes leave {
-  0% { transform: none; filter: none; }
-  25% { transform: translateX(-5px) skewX(3deg); filter: saturate(.4) hue-rotate(150deg); }
-  50% { transform: translateX(4px); filter: saturate(.2) hue-rotate(190deg) brightness(.6); }
-  75% { transform: translateX(-2px) skewX(-2deg); filter: grayscale(1) brightness(.3); }
-  100% { transform: none; filter: brightness(0); }
+html.is-leaving { background: #000; overflow: hidden; }
+body.is-leaving {
+  transform-origin: 50% calc(var(--leave-y, 0px) + 50vh);
+  animation: leave 1150ms forwards;
 }
+@keyframes leave {
+  0% { transform: none; filter: none; text-shadow: none; animation-timing-function: steps(1, end); }
+  6% { transform: translateX(-6px); filter: drop-shadow(4px 0 rgba(255, 40, 90, .55)) drop-shadow(-4px 0 rgba(60, 150, 255, .55)); text-shadow: 3px 0 rgba(255, 40, 90, 0.75), -3px 0 rgba(60, 150, 255, 0.75); animation-timing-function: steps(1, end); }
+  12% { transform: translateX(5px) skewX(-4deg); filter: drop-shadow(6px 0 rgba(255, 40, 90, .5)) drop-shadow(-6px 0 rgba(60, 150, 255, .5)); text-shadow: 5px 0 rgba(255, 40, 90, 0.7), -5px 0 rgba(60, 150, 255, 0.7); animation-timing-function: steps(1, end); }
+  18% { transform: translateX(-2px); filter: drop-shadow(9px 0 rgba(255, 40, 90, .5)) drop-shadow(-9px 0 rgba(60, 150, 255, .5)) saturate(.7); text-shadow: 7px 0 rgba(255, 40, 90, 0.7), -7px 0 rgba(60, 150, 255, 0.7); animation-timing-function: steps(1, end); }
+  26% { transform: translate(11px, 2px) skewX(6deg); filter: drop-shadow(12px 0 rgba(255, 40, 90, .45)) drop-shadow(-12px 0 rgba(60, 150, 255, .45)) saturate(.5); text-shadow: 10px 0 rgba(255, 40, 90, 0.65), -10px 0 rgba(60, 150, 255, 0.65); animation-timing-function: steps(1, end); }
+  33% { transform: translateX(-13px) skewX(-2deg); filter: drop-shadow(16px 0 rgba(255, 40, 90, .4)) drop-shadow(-16px 0 rgba(60, 150, 255, .4)) saturate(.4) hue-rotate(170deg); text-shadow: 14px 0 rgba(255, 40, 90, 0.6), -14px 0 rgba(60, 150, 255, 0.6); animation-timing-function: steps(1, end); }
+  41% { transform: translateY(-4px) skewX(-9deg); filter: drop-shadow(10px 0 rgba(255, 40, 90, .4)) drop-shadow(-10px 0 rgba(60, 150, 255, .4)) saturate(.3) hue-rotate(200deg) brightness(.85); text-shadow: 9px 0 rgba(255, 40, 90, 0.6), -9px 0 rgba(60, 150, 255, 0.6); animation-timing-function: steps(1, end); }
+  49% { transform: translate(7px, 5px) skewX(3deg); filter: drop-shadow(18px 0 rgba(255, 40, 90, .35)) drop-shadow(-18px 0 rgba(60, 150, 255, .35)) saturate(.2) brightness(.8); text-shadow: 16px 0 rgba(255, 40, 90, 0.55), -16px 0 rgba(60, 150, 255, 0.55); animation-timing-function: steps(1, end); }
+  57% { transform: translateX(-5px) skewX(4deg); filter: drop-shadow(8px 0 rgba(255, 40, 90, .35)) drop-shadow(-8px 0 rgba(60, 150, 255, .35)) grayscale(.6) brightness(.75); text-shadow: 7px 0 rgba(255, 40, 90, 0.5), -7px 0 rgba(60, 150, 255, 0.5); animation-timing-function: steps(1, end); }
+  64% { transform: none; filter: drop-shadow(5px 0 rgba(255, 40, 90, .3)) drop-shadow(-5px 0 rgba(60, 150, 255, .3)) grayscale(.8) brightness(.7); text-shadow: 4px 0 rgba(255, 40, 90, 0.45), -4px 0 rgba(60, 150, 255, 0.45); animation-timing-function: cubic-bezier(.7, 0, .9, .4); }
+  /* the collapse: down to a line, the line to nothing */
+  80% { transform: scale(1, .006); filter: grayscale(1) brightness(.8); text-shadow: none; animation-timing-function: cubic-bezier(.6, 0, .9, .5); }
+  93% { transform: scale(.1, .006); filter: grayscale(1) brightness(.5); }
+  100% { transform: scale(0, .006); filter: brightness(0); }
+}
+/* over it all: scanlines that roll, two bands that jump, then black */
+.crt { position: fixed; inset: 0; z-index: 2147483647; pointer-events: none; background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .38) 0 1px, transparent 1px 3px); animation: crt-roll 1150ms linear forwards; }
+.crt::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 0 22%, rgba(91, 156, 255, .07) 22% 25%, transparent 25% 58%, rgba(0, 0, 0, .55) 58% 64%, transparent 64%);
+  animation: crt-bands 1150ms forwards;
+}
+.crt::after { content: ''; position: absolute; inset: 0; z-index: 1; background: #000; opacity: 0; animation: crt-dark 1150ms forwards; }
+/* the screen's last line, pale blue, shrinking to a point: one short glow, not a flash */
+.crt__line {
+  position: absolute; left: 0; right: 0; top: 50%; z-index: 2; height: 2px; margin-top: -1px;
+  background: rgba(205, 222, 255, .85); box-shadow: 0 0 14px 2px rgba(91, 156, 255, .55);
+  opacity: 0; animation: crt-line 1150ms forwards;
+}
+@keyframes crt-line {
+  0%, 76% { opacity: 0; transform: scaleX(1); }
+  80% { opacity: .85; transform: scaleX(1); animation-timing-function: cubic-bezier(.6, 0, .9, .5); }
+  94% { opacity: .75; transform: scaleX(.06); }
+  99% { opacity: .5; transform: scaleX(.004); }
+  100% { opacity: 0; transform: scaleX(0); }
+}
+@keyframes crt-roll { from { background-position: 0 0; } to { background-position: 0 66px; } }
+@keyframes crt-bands {
+  0% { transform: translateY(0); opacity: 0; animation-timing-function: steps(1, end); }
+  10% { transform: translateY(18%); opacity: 1; animation-timing-function: steps(1, end); }
+  24% { transform: translateY(-30%); animation-timing-function: steps(1, end); }
+  38% { transform: translateY(8%); animation-timing-function: steps(1, end); }
+  50% { transform: translateY(-12%); animation-timing-function: steps(1, end); }
+  64% { transform: translateY(26%); opacity: 1; }
+  80% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes crt-dark { 0%, 78% { opacity: 0; } 100% { opacity: .9; } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: 1ms !important; }

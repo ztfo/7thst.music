@@ -9,14 +9,31 @@ const MACHINE = '/maquina/';
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const track = (name, params) => { try { window.gtag?.('event', name, params); } catch {} };
 
-// the page glitches into the terminal: a short jitter that only ever darkens, never flashes
+// the page gives out like an old screen on the way into the terminal (styles/site.css,
+// "the ways into La Máquina"): it never flashes, and with reduced motion it just goes
 export function goToMachine(via) {
+  if (document.body.classList.contains('is-leaving')) return;
   track('secret_found', { way: via, lang: getLang() });
   const url = `${MACHINE}?via=${encodeURIComponent(via)}`;
-  if (document.body.classList.contains('is-leaving')) return;
+  if (reduce) { setTimeout(() => { location.href = url; }, 150); return; }
+  // the screen collapses to a line across the middle of the view, wherever the page is scrolled
+  document.body.style.setProperty('--leave-y', `${scrollY}px`);
+  document.documentElement.classList.add('is-leaving');
   document.body.classList.add('is-leaving');
-  setTimeout(() => { location.href = url; }, reduce ? 150 : 520);
+  const crt = document.createElement('div');
+  crt.className = 'crt';
+  crt.innerHTML = '<i class="crt__line"></i>';
+  document.documentElement.append(crt);
+  setTimeout(() => { location.href = url; }, 1150);
 }
+
+// coming back with the browser's back button can restore the page mid-collapse; put it back
+addEventListener('pageshow', (e) => {
+  if (!e.persisted) return;
+  document.documentElement.classList.remove('is-leaving');
+  document.body.classList.remove('is-leaving');
+  document.querySelector('.crt')?.remove();
+});
 
 // ---------- the tenth card ----------
 // One draw in fifty deals a card that isn't in the nine: La Máquina. ?carta=la-maquina opens on it.
