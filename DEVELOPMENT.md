@@ -112,6 +112,7 @@ Motion and sharing need HTTPS, so on a phone test through a tunnel to the local 
 | `maquina/js/themes.js` | the blues `theme` switches between |
 | `maquina/js/grid.js` | the step grid: five drums by sixteen steps, read from and written to the code |
 | `maquina/data/examples.js` | the seven example patterns and the list `samples` shows |
+| `maquina/data/lessons.js` | `learn`, eight steps from a kick to an arranged track, and the `cheat` sheet, in both languages |
 | `maquina/vendor/strudel-1.3.0/` | a pinned copy of Strudel's browser bundle, served from this site |
 
 **Pattern code is JavaScript, and a share link carries a stranger's.** So it only ever runs in the engine: `sandbox.html` in an iframe sandboxed without `allow-same-origin`. There it has a blank origin of its own. It can't touch the page, its storage or its cookies, can't navigate or open windows, and its own Content Security Policy lets it fetch only samples. The page and the engine talk through `postMessage`, and the page takes only small, checked messages back. The page never evaluates anything: the shell matches a fixed list of commands. A shared link opens with its code showing and nothing runs until the visitor presses play.
@@ -121,6 +122,8 @@ Motion and sharing need HTTPS, so on a phone test through a tunnel to the local 
 **Starting sound.** Chrome lets the visitor's tap or key on the page start sound in the frame. Where a browser doesn't (likely Safari), the engine answers `locked` and the page lays the frame over the play button. The visitor's next tap lands in the engine's own "turn on sound" button, once per visit. Check this on an iPhone whenever the engine changes.
 
 **Sounds** for now are Strudel's defaults: the drum machines and Dirt-Samples, loaded from GitHub by `engine.js`, plus Strudel's synths. llü's stems come later (see TERMINAL.md).
+
+**Learning:** `learn` walks a newcomer from one kick drum to a whole arranged track in eight steps. Each step shows a panel above the code (what's new, and something to try) and loads the whole pattern so far, so `next` and `back` can always replace the code. Each step's code must run on its own. Change one, and run all eight. `cheat` prints the notation on one screen. The step someone reached is remembered.
 
 **Beyond patterns:** `grid` swaps the editor for a step grid. A grid pattern is code in one exact shape, so tapping a step rewrites the code, and code edited out of that shape stops being a grid. `record [seconds]` saves up to 30 seconds of what's playing as a WAV. The engine encodes it and the page downloads it, taking the file only while a recording it asked for is running. `save`, `load` and `rm` keep patterns in the visitor's own browser, and nothing goes anywhere else.
 
@@ -166,10 +169,11 @@ Google Analytics 4 (`G-G9DRK12SZE`) runs on both pages. On top of the page views
 | `live_run` | a pattern runs | `via` (keys, button, shell), `shared` (yes when it came from a share link) |
 | `pattern_share` / `pattern_open` | a pattern shared / a share link opened | `method` (sheet, link, shown) |
 | `pattern_record` | a recording is saved | `seconds` |
+| `learn_step` | a step of `learn` opens | `step` (1 to 8) |
 | `secret_found` | a way into La Máquina is used, on the deck | `way` (card, keys, perdido, frame, 3am, console) |
 | `machine_card` | the tenth card shows | `via` (draw, keys, shake, link) |
 
-For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `sketch`, `platform`, `series`, `piece`, `lang`, `method`, `feel`, `command`, `shared`, `seconds`, `way`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
+For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `sketch`, `platform`, `series`, `piece`, `lang`, `method`, `feel`, `command`, `shared`, `seconds`, `way`, `step`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
 
 ## Local preview
 
