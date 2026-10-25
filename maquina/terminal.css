@@ -92,6 +92,7 @@ body.is-playing .tab__dot { display: inline-block; }
 .lesson__text { margin: 8px 0 0; }
 .lesson__try { margin: 8px 0 0; color: var(--dim); }
 .lesson__try-k { color: var(--str); }
+.lesson__apply { margin: 6px 0 0; color: var(--faint); }
 .lesson__nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; }
 .lesson__nav button { min-height: 30px; padding: 0 12px; background: var(--raise); border: 1px solid var(--line-2); border-radius: 6px; color: var(--ink); font-size: 12px; }
 .lesson__nav button:disabled { opacity: .35; cursor: default; }
@@ -160,6 +161,11 @@ body.is-grid .ed, body.is-grid .keys { display: none; }
 .ctl button:hover { color: var(--ink); background: rgba(255, 255, 255, .05); }
 .ctl .ctl__run { color: var(--accent); }
 .ctl .ctl__view[aria-pressed="true"] { color: var(--accent); }
+/* the code on screen isn't what's playing: the run button says update and breathes, softly */
+.ctl .ctl__run.is-dirty { border-color: color-mix(in srgb, var(--accent) 60%, transparent); animation: nudge 1.8s ease-in-out infinite; }
+@keyframes nudge { 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); } }
+.ctl__status[data-state="edited"] { color: var(--ink-2); }
+.ctl__status[data-state="edited"] .ctl__dot { background: var(--num); }
 .ctl kbd { font: inherit; font-size: 11px; color: var(--faint); }
 
 /* the scope */
@@ -171,8 +177,6 @@ body.is-grid .ed, body.is-grid .keys { display: none; }
   display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 16px;
   background: var(--bar); border-top: 1px solid var(--line); font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden;
 }
-.foot a { color: var(--dim); }
-.foot a:hover { color: var(--ink); }
 
 /* the sound engine's frame: 1px and invisible, but in view, so its clock isn't throttled.
    It only shows when a browser needs a tap inside it to turn sound on. */
@@ -248,4 +252,5 @@ body.is-grid .ed, body.is-grid .keys { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .bar { border-bottom-color: var(--line); }
+  .ctl .ctl__run.is-dirty { animation: none; }
 }

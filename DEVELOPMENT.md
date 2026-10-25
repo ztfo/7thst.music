@@ -96,7 +96,7 @@ Motion and sharing need HTTPS, so on a phone test through a tunnel to the local 
 
 ## La Máquina
 
-`/maquina/` is a terminal for live coding techno, built on [Strudel](https://strudel.cc). Everything in `maquina/` is AGPL-3.0 (`maquina/LICENSE`), because Strudel is; the rest of the site isn't. Code in `maquina/` may import the site's modules (it reads `js/i18n.js` and `data/tracks.js`), but nothing outside it imports from `maquina/`.
+`/maquina/` is a terminal for live coding techno, built on [Strudel](https://strudel.cc). Everything in `maquina/` is AGPL-3.0 (`maquina/LICENSE`), because Strudel is; the rest of the site isn't. The `credits` command (listed in `help`) credits Strudel and links to both sources, which is what the AGPL asks of a site; keep it there. Code in `maquina/` may import the site's modules (it reads `js/i18n.js` and `data/tracks.js`), but nothing outside it imports from `maquina/`.
 
 | Path | What |
 | --- | --- |
@@ -122,6 +122,8 @@ Motion and sharing need HTTPS, so on a phone test through a tunnel to the local 
 **Starting sound.** Chrome lets the visitor's tap or key on the page start sound in the frame. Where a browser doesn't (likely Safari), the engine answers `locked` and the page lays the frame over the play button. The visitor's next tap lands in the engine's own "turn on sound" button, once per visit. Check this on an iPhone whenever the engine changes.
 
 **Sounds** for now are Strudel's defaults: the drum machines and Dirt-Samples, loaded from GitHub by `engine.js`, plus Strudel's synths. llü's stems come later (see TERMINAL.md).
+
+**Changing what's playing:** edits go in when the visitor presses play (or Ctrl+Enter), and land on the next bar, as in every live-coding tool: half-typed code is usually broken. While the code on screen isn't what's playing, the button says "update" ("actualiza") and breathes softly, and the status says to press it. `auto on` applies changes by itself about a second after typing stops. Code that doesn't run is skipped: the last good version keeps playing, and the error shows only in the status line. The choice is remembered.
 
 **Learning:** `learn` walks a newcomer from one kick drum to a whole arranged track in eight steps. Each step shows a panel above the code (what's new, and something to try) and loads the whole pattern so far, so `next` and `back` can always replace the code. Each step's code must run on its own. Change one, and run all eight. `cheat` prints the notation on one screen. The step someone reached is remembered.
 
@@ -170,10 +172,11 @@ Google Analytics 4 (`G-G9DRK12SZE`) runs on both pages. On top of the page views
 | `pattern_share` / `pattern_open` | a pattern shared / a share link opened | `method` (sheet, link, shown) |
 | `pattern_record` | a recording is saved | `seconds` |
 | `learn_step` | a step of `learn` opens | `step` (1 to 8) |
+| `auto_switch` | `auto` turned on or off | `auto` (on, off) |
 | `secret_found` | a way into La Máquina is used, on the deck | `way` (card, keys, perdido, frame, 3am, console) |
 | `machine_card` | the tenth card shows | `via` (draw, keys, shake, link) |
 
-For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `sketch`, `platform`, `series`, `piece`, `lang`, `method`, `feel`, `command`, `shared`, `seconds`, `way`, `step`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
+For the details to show in GA's reports, each one needs registering once: **Admin → Custom definitions → Create custom dimension**, scope **Event**, with the same name as the detail (`card`, `kind`, `via`, `start`, `sketch`, `platform`, `series`, `piece`, `lang`, `method`, `feel`, `command`, `shared`, `seconds`, `way`, `step`, `auto`). The `track()` helper in `js/home.js` and `js/art.js` sends them, and does nothing where the tag is blocked.
 
 ## Local preview
 
