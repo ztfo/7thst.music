@@ -13,6 +13,31 @@ const first = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const track = (name, params) => { try { window.gtag?.('event', name, params); } catch {} };
 $('#year').textContent = String(new Date().getFullYear());
 
+// Over the home page (js/art-layer.js) this page runs in a frame laid on the table. There the
+// ways home close the frame instead of loading the table again, so the music never stops.
+const layer = (() => { try { return window.parent !== window && new URLSearchParams(location.search).has('layer'); } catch { return false; } })();
+const toTable = (msg) => parent.postMessage({ llu: 'art', ...msg }, location.origin);
+if (layer) {
+  document.documentElement.classList.add('is-layer');
+  const base = new URL('./', location.href).pathname;
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (a.target && a.target !== '_self') return;
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin) return;
+    e.preventDefault();
+    if (url.pathname === base || url.pathname === `${base}index.html`) toTable({ act: 'home', hash: url.hash });
+    // this page's own link stays put; anything else on the site leaves the table for real
+    else if (url.pathname !== location.pathname) top.location.href = url.href;
+  });
+  // the table says which language it's in each time the frame opens
+  addEventListener('message', (e) => {
+    if (e.source !== parent || e.origin !== location.origin || e.data?.llu !== 'art' || e.data.act !== 'lang') return;
+    if ((e.data.lang === 'es' || e.data.lang === 'en') && e.data.lang !== getLang()) { setLang(e.data.lang); applyLang(); }
+  });
+}
+
 const ART = piecesFrom(window.images || {});
 consoleHello();
 
@@ -110,5 +135,6 @@ $('#lang').addEventListener('click', () => {
   setLang(getLang() === 'es' ? 'en' : 'es');
   applyLang();
   track('lang_switch', { lang: getLang() });
+  if (layer) toTable({ act: 'lang', lang: getLang() });
 });
 applyLang();

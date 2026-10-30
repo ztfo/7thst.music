@@ -8,6 +8,7 @@ import { fmt, cap, first, soundcloudLink, trackButtons, platformLinks, sketchRow
 import { tick, arm, canBuzz } from './haptics.js';
 import * as motion from './motion.js';
 import { drawTenth, showMachineCard, linkedToMachine, watchKeys, watchFrame, watchPerdido, lateNight, consoleHello } from './secrets.js';
+import { artLayer } from './art-layer.js';
 
 const PREVIEW = 30;
 // worlds load at the size the screen needs
@@ -756,11 +757,21 @@ $$('[data-bar]').forEach((bar) => {
     if (e.key === 'End') { seekTo(0.98); e.preventDefault(); }
   });
 });
+// Mis dibujos opens over the table, so what's playing keeps playing (js/art-layer.js)
+const art = artLayer({
+  lang: getLang,
+  onOpen: showMini,
+  onClose: showMini,
+  onLang: (next) => { setLang(next); applyLang(); },
+});
+
 document.addEventListener('keydown', (e) => {
   if (arrival.running) return finishArrival();
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const onControl = e.target.closest('button, a, input, [role="slider"], [role="switch"]');
   if (e.key === ' ' && !onControl) { e.preventDefault(); toggleActive(); }
+  // over the art the space bar still plays and pauses, but the table's keys wait
+  if (art.open) return;
   if (e.key === 'ArrowRight' && !onControl) deal((state.i + 1) % TRACKS.length, { autoplay: state.playing, via: 'keys' });
   if (e.key === 'ArrowLeft' && !onControl) deal((state.i + TRACKS.length - 1) % TRACKS.length, { autoplay: state.playing, via: 'keys' });
   if (e.key === 'd' || e.key === 'D') drawRandom(true, 'keys');
@@ -784,12 +795,18 @@ if (fine && !reduce) {
   });
 }
 
-new IntersectionObserver(([e]) => {
-  feel.inView = e.intersectionRatio >= 0.35;
-  const on = !feel.inView && state.i !== null;
+// the mini player shows once the table scrolls away, and all the time over the art
+function showMini() {
+  const on = (art.open || !feel.inView) && state.i !== null;
   $('#mini').classList.toggle('is-on', on);
   document.body.classList.toggle('mini-on', on);
+}
+new IntersectionObserver(([e]) => {
+  feel.inView = e.intersectionRatio >= 0.35;
+  showMini();
 }, { threshold: [0, 0.35, 0.6, 1] }).observe(table);
+// the art layer stops above it
+new ResizeObserver(() => document.documentElement.style.setProperty('--mini-h', `${$('#mini').offsetHeight}px`)).observe($('#mini'));
 
 // ---------- the phone: lock screen, tab, browser bar ----------
 // The phone's own player (lock screen, Control Center, headphones, the car) shows what's on and
@@ -906,7 +923,7 @@ document.addEventListener('pointerdown', (e) => { if (!feelTip.hidden && !e.targ
 const feelSays = () => [!reduce && T('feelTilt'), T('feelShake'), canBuzz && T('feelKick')].filter(Boolean).join(' ');
 // a shake draws a card, while the table is in view and a card is on it
 function onShake() {
-  if (!feel.inView || arrival.running || state.i === null) return;
+  if (!feel.inView || art.open || arrival.running || state.i === null) return;
   drawRandom(state.playing, 'shake');
 }
 function setFeel(on) {

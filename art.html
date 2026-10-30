@@ -18,7 +18,8 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-G9DRK12SZE');
+  // over the home page this page is a layer (js/art-layer.js), and the home page counts the view
+  gtag('config', 'G-G9DRK12SZE', /[?&]layer=/.test(location.search) ? { send_page_view: false, page_location: location.origin + location.pathname } : {});
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">

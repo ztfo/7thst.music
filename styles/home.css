@@ -317,6 +317,16 @@
 /* the mini player sits over the footer's end */
 .foot__in { padding-bottom: calc(28px + 72px); }
 
+/* ================= mis dibujos, over the table (js/art-layer.js) ================= */
+/* the art page in a frame above the table, so the song keeps going; it stops at the mini player */
+html.art-open { overflow: hidden; }
+.art-layer { position: fixed; inset: env(safe-area-inset-top, 0px) 0 0; z-index: 40; background: var(--ink); }
+.art-layer[hidden] { display: none; }
+body.mini-on .art-layer { bottom: var(--mini-h, 0px); }
+.art-layer iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--ink); opacity: 0; transition: opacity 320ms var(--ease); }
+.art-layer.is-ready iframe { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .art-layer iframe { transition: none; } }
+
 /* ================= narrow ================= */
 /* nine names fit the strip down to laptop widths; below that it scrolls, as on phones */
 @media (max-width: 1360px) and (min-width: 761px) {

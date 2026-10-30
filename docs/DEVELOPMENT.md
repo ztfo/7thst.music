@@ -16,6 +16,7 @@ Plain HTML, CSS and ES modules on GitHub Pages. There is no build step: edit, co
 | `styles/home.css`, `styles/art.css` | each page's own styles |
 | `js/i18n.js` | every string, in English and Mexican Spanish, the remembered language, and a first visit following the browser's language (Spanish when it's neither). Spanish is written the way an artist talks ("probadita", "dale play"), and labels capitalize only their first word |
 | `js/home.js`, `js/art.js` | each page's behavior |
+| `js/art-layer.js` | on the home page, opens the art page over the table so the music keeps playing (see [The art over the table](#the-art-over-the-table)) |
 | `js/microtext.js` | the "BUENA SUERTE · LLÜ · 7TH ST" line used for frames and rules |
 | `data/tracks.js` | the nine cards, the SoundCloud sketches, follow links |
 | `data/envelopes.js` | generated: each song's low-end energy, which makes the room breathe |
@@ -55,6 +56,16 @@ The list shows the newest 12 from the SoundCloud set "works in progress." and pl
 ## Art
 
 Upload through the existing tool (`upload.html` with `pnpm run upload-server`, kept out of git), then run `pnpm run fetch-images` and commit `images-data.js`. Titles come from the Cloudinary display names, and untitled pieces are numbered.
+
+## The art over the table
+
+Leaving a page stops its audio, so on the home page "arte" doesn't load `art.html`. It opens it in a frame laid over the table (`js/art-layer.js`), and the song or sketch that's on keeps playing. The mini player stays along the bottom the whole time, so it can be paused, skipped and scrubbed from over the art. The address changes to `art.html`, and the browser's back button closes the frame. Inside the frame (`?layer=1`), the back link, the mark, música, en proceso and seguir close it instead of loading the table again, landing on their section, and the language switch reaches the table too.
+
+`art.html` is still a page of its own. A link to it, a new tab, a reload or a crawler gets the real page, with nothing playing. Plain clicks are the only ones caught, so a cmd-click or a middle click still opens a new tab.
+
+The frame doesn't count a page view of its own (its `gtag('config')` sends none when `?layer=` is set). The view is counted from the address change instead, by GA's enhanced measurement ("page changes based on browser history events", on by default). If that's ever turned off, art views opened from the table stop counting.
+
+While the frame is open, the table's keys wait (the space bar still plays and pauses), and a shake doesn't draw.
 
 ## Search and sharing
 
