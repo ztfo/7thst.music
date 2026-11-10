@@ -18,11 +18,15 @@ export const trackButtons = (tracks, T) => tracks.map((t, i) => `<button class="
 
 export const platformLinks = (platforms) => platforms.map((p) => `<a href="${p.href}" target="_blank" rel="noopener" data-platform="${p.name}"><span>${p.name}</span><svg><use href="#i-out"/></svg></a>`).join('');
 
+// how many sketches show before "more"; the rest wait folded under it, in the same list
+export const SKETCHES_SHOWN = 12;
+
 // buttons play the sketch on the page; links open it on SoundCloud (written into the HTML,
-// and used when SoundCloud's player can't load)
+// and used when SoundCloud's player can't load). Rows past the first few are marked to fold.
 export const sketchRows = (sketches, T, { links = false, fallback = '', icon = 'play' } = {}) => sketches.map((s, i) => {
   const inner = `<span class="sk__n">${pad2(i + 1)}</span><span class="sk__t">${esc(s.title)}</span><span class="sk__d">${monthYear(s.date, T)}</span><span class="sk__l tnum">${fmt(s.dur)}</span><span class="sk__i"><svg><use href="#i-${icon}"/></svg></span>`;
+  const li = i < SKETCHES_SHOWN ? '<li>' : '<li class="sk-more">';
   return links
-    ? `<li><a class="sk" href="${esc(soundcloudLink(s.url) ? s.url : fallback)}" target="_blank" rel="noopener">${inner}</a></li>`
-    : `<li><button class="sk" type="button" data-sketch="${i}" aria-label="${esc(s.title)}, ${fmt(s.dur)}">${inner}</button></li>`;
+    ? `${li}<a class="sk" href="${esc(soundcloudLink(s.url) ? s.url : fallback)}" target="_blank" rel="noopener">${inner}</a></li>`
+    : `${li}<button class="sk" type="button" data-sketch="${i}" aria-label="${esc(s.title)}, ${fmt(s.dur)}">${inner}</button></li>`;
 }).join('');

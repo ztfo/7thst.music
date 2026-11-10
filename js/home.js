@@ -4,7 +4,7 @@ import ENVELOPES from '../data/envelopes.js';
 import { T, getLang, setLang, paintLang } from './i18n.js';
 import { drawFrame, fit } from './microtext.js';
 import { buildBack } from './cardback.js';
-import { fmt, cap, first, soundcloudLink, trackButtons, platformLinks, sketchRows } from './markup.js';
+import { fmt, cap, first, soundcloudLink, trackButtons, platformLinks, sketchRows, SKETCHES_SHOWN } from './markup.js';
 import { tick, arm, canBuzz } from './haptics.js';
 import * as motion from './motion.js';
 import { drawTenth, showMachineCard, linkedToMachine, watchKeys, watchFrame, watchPerdido, lateNight, consoleHello } from './secrets.js';
@@ -438,10 +438,11 @@ requestAnimationFrame(loop);
 // iPhones can refuse to start a hidden player from the page's own button: when a tap
 // plays nothing, SoundCloud's own player opens in that row, and every row after it.
 const SC = 'https://w.soundcloud.com';
-const SHOWN = 12;
-// ids: the set's sounds in the set's own order, which isn't the list's newest-first
-const sk = { frame: null, ids: null, i: null, ready: false, failed: false, playing: false, want: false, pos: 0, at: 0, timer: 0, embed: false, nudge: 0 };
+// ids: the set's sounds in the set's own order, which the list follows too
+// open: the rows past the first few are unfolded
+const sk = { frame: null, ids: null, i: null, ready: false, failed: false, playing: false, want: false, pos: 0, at: 0, timer: 0, embed: false, nudge: 0, open: false };
 const skEl = $('#sketches');
+const moreEl = $('#sketches-more');
 function scSend(method, value) {
   if (sk.frame && sk.frame.contentWindow) sk.frame.contentWindow.postMessage(JSON.stringify(value === undefined ? { method } : { method, value }), SC);
 }
@@ -492,17 +493,19 @@ function cue(pick) {
   }
   if (sk.want) { scSend('play'); armNudge(); }
 }
-// sketches read from SoundCloud only get in with a real SoundCloud link, a date and a length
+// The list follows the set's own order, the one on SoundCloud. Only the set's first few sounds
+// come with details, which is where new uploads land; the rest are known from data/tracks.js.
+// A sketch read from SoundCloud only gets in with a real SoundCloud link, a date and a length.
 function mergeSketches(sounds) {
   if (!Array.isArray(sounds) || !sounds.length) return;
-  const inSet = new Set(sounds.map((s) => s.id));
-  // only the set's first few come with details, which is where new uploads land
-  const fresh = sounds
-    .filter((s) => typeof s.title === 'string' && Number(s.duration) > 0 && /^\d{4}-\d{2}-\d{2}/.test(String(s.display_date || s.created_at)) && soundcloudLink(s.permalink_url) && !SKETCHES.some((k) => k.id === s.id))
-    .map((s) => ({ id: s.id, title: s.title, dur: Math.round(s.duration / 1000), date: String(s.display_date || s.created_at).slice(0, 10), url: s.permalink_url }));
-  const keep = (k) => inSet.has(k.id);
+  const known = new Map(SKETCHES.map((k) => [k.id, k]));
+  const fresh = new Map(sounds
+    .filter((s) => typeof s.title === 'string' && Number(s.duration) > 0 && /^\d{4}-\d{2}-\d{2}/.test(String(s.display_date || s.created_at)) && soundcloudLink(s.permalink_url))
+    .map((s) => [s.id, { id: s.id, title: s.title, dur: Math.round(s.duration / 1000), date: String(s.display_date || s.created_at).slice(0, 10), url: s.permalink_url }]));
+  // a sound with no details here and none on file can't be listed: SoundCloud still plays it in the set
+  const next = sounds.map((s) => fresh.get(s.id) || known.get(s.id)).filter(Boolean);
+  if (!next.length) return;
   const current = sk.i !== null ? SKETCHES[sk.i].id : null;
-  const next = [...fresh, ...SKETCHES.filter(keep)].sort((a, b) => b.date.localeCompare(a.date)).slice(0, SHOWN);
   if (current !== null && !next.some((k) => k.id === current)) return;
   SKETCHES.splice(0, SKETCHES.length, ...next);
   SKETCH_SET.count = sounds.length;
@@ -574,6 +577,8 @@ addEventListener('message', (e) => {
 // auto: the sketch before it just ended, so an opened player stays where it is (moving it reloads it)
 function playSketch(i, auto = false) {
   if (state.playing) pause();
+  // a folded sketch that comes on (down the list, next, the lock screen) unfolds the rest
+  if (i >= SKETCHES_SHOWN && !sk.open) setMore(true);
   const changed = sk.i !== i;
   if (changed) sk.pos = 0;
   sk.i = i;
@@ -614,6 +619,7 @@ function setSource(src) {
 // rows are built once per language; play state only toggles classes, so focus stays put
 function renderSketches() {
   skEl.innerHTML = sketchRows(SKETCHES, T, { links: sk.failed, fallback: SKETCH_SET.url, icon: sk.failed ? 'out' : 'play' });
+  syncMore();
   const all = $('#sketches-all');
   all.href = SKETCH_SET.url;
   all.firstElementChild.textContent = T('allOnSC')(SKETCH_SET.count);
@@ -630,6 +636,8 @@ function syncSketch() {
   [...skEl.children].forEach((li, i) => {
     const row = li.firstElementChild;
     const on = i === sk.i;
+    // the sketch that's on stays in sight when the rest fold away
+    li.classList.toggle('is-kept', on);
     row.classList.toggle('is-on', on);
     row.classList.toggle('is-playing', on && sk.want);
     row.classList.toggle('is-loading', on && sk.want && !sk.playing && !sk.failed);
@@ -641,6 +649,29 @@ function syncSketch() {
 skEl.addEventListener('click', (e) => {
   const b = e.target.closest('[data-sketch]');
   if (b) toggleSketch(+b.dataset.sketch);
+});
+// ---------- more: the rest of the set, folded under the first few ----------
+function syncMore() {
+  const rest = Math.max(0, SKETCHES.length - SKETCHES_SHOWN);
+  moreEl.hidden = !rest;
+  skEl.classList.toggle('is-open', sk.open);
+  moreEl.setAttribute('aria-expanded', String(sk.open));
+  moreEl.firstElementChild.textContent = sk.open ? T('wipLess') : T('wipMore')(rest);
+}
+function setMore(open) {
+  sk.open = open;
+  syncMore();
+}
+moreEl.addEventListener('click', () => {
+  setMore(!sk.open);
+  if (sk.open) {
+    // focus moves to the first unfolded row, so a keyboard carries on down the list
+    skEl.children[SKETCHES_SHOWN]?.firstElementChild?.focus({ preventScroll: true });
+  } else if (moreEl.getBoundingClientRect().top < 0) {
+    // folding from far down leaves the button where the list ended
+    moreEl.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+  }
+  track('sketches_more', { open: sk.open, lang: getLang() });
 });
 // warm SoundCloud's player as the list comes near, so the first press plays at once
 new IntersectionObserver(([e]) => { if (e.isIntersecting && !sk.frame) scLoad(); }, { rootMargin: '1200px 0px' }).observe($('#bocetos'));

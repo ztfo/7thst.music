@@ -51,7 +51,12 @@ This needs ffmpeg and the Cloudinary credentials in `.env`. Each run uploads to 
 
 ## Works in progress
 
-The list shows the newest 12 from the SoundCloud set "works in progress." and plays them through SoundCloud's own player, so plays count there. On each visit the page reads the set again and adds anything newer, so a new upload shows up without touching the site. The list in `data/tracks.js` is only what shows when SoundCloud can't be reached. Refresh it now and then.
+The list is the whole SoundCloud set "works in progress.", in the set's own order (the order on SoundCloud, so reordering the set there reorders the site), and plays through SoundCloud's own player, so plays count there. The first 12 show, and the rest fold under a "more" row (`SKETCHES_SHOWN` in `js/markup.js`). A sketch that comes on from the folded part, by playing on down the list or from the lock screen, unfolds it, and the one that's on stays in sight when the list folds.
+
+On each visit the page reads the set again and follows its order, so a reorder or a new upload shows up without touching the site. SoundCloud's player only gives details (title, length, date) for the set's first few sounds, so a sound further down the set that isn't in `data/tracks.js` stays off the list until the list there is refreshed. To refresh it:
+1. Serve the repo and open `/scripts/sketch-set.html`. It reads the set through SoundCloud's player without playing anything.
+2. When it says done, paste the list it wrote over `SKETCHES` in `data/tracks.js`, and set `SKETCH_SET.count`.
+3. Run `pnpm run prerender` and commit both.
 
 ## Art
 

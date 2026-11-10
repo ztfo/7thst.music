@@ -303,6 +303,15 @@
 .sk.is-playing .sk__i { color: var(--ink); background: var(--gold); box-shadow: none; }
 .sk.is-loading .sk__i { animation: wait 900ms ease-in-out infinite alternate; }
 @keyframes wait { from { box-shadow: inset 0 0 0 1px var(--rule-soft); } to { box-shadow: inset 0 0 0 1px var(--gold); } }
+/* the rest of the set folds under the first few; the one that's on stays in sight */
+.sketches:not(.is-open) > .sk-more:not(.is-kept) { display: none; }
+.sketches.is-open > .sk-more { animation: unfold 420ms var(--ease, ease) both; }
+@keyframes unfold { from { opacity: 0; transform: translateY(-6px); } }
+.sketches__more { appearance: none; width: 100%; margin: 0; padding-inline: 0; background: none; border: 0; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; padding-block: 20px; border-bottom: 1px solid var(--rule-soft); text-align: left; font: 400 15px/1 var(--sans); color: var(--paper-2); transition: color var(--t-ui); }
+.sketches__more:hover { color: var(--gold); }
+.sketches__more svg { width: 13px; height: 13px; color: var(--gold); transition: transform var(--t-ui); }
+.sketches__more[aria-expanded="true"] svg { transform: rotate(180deg); }
+.sketches__more[hidden] { display: none; }
 .sketches__all { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; padding-block: 20px; border-bottom: 1px solid var(--rule-soft); text-decoration: none; font: 400 15px/1 var(--sans); color: var(--paper-2); transition: color var(--t-ui); }
 .sketches__all:hover { color: var(--gold); }
 .sketches__all svg { width: 13px; height: 13px; color: var(--gold); }

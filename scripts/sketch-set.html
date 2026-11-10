@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<title>works in progress: read the set</title>
+<style>
+  body { margin: 24px; font: 13px/1.5 ui-monospace, Menlo, monospace; background: #111; color: #ddd; }
+  textarea { width: 100%; height: 70vh; background: #000; color: #ddd; border: 1px solid #333; font: inherit; }
+  #h { position: absolute; left: -9999px; }
+</style>
+<!--
+  Reads the SoundCloud set "works in progress." through SoundCloud's own player (no key needed)
+  and writes the SKETCHES list for data/tracks.js, in the set's own order. Serve the repo and open
+  /scripts/sketch-set.html, wait for "done", then paste the list over SKETCHES and set SKETCH_SET.count.
+  Nothing plays: each sound is only loaded, so no plays are counted.
+-->
+<p id="s">reading the set…</p>
+<textarea id="o" spellcheck="false" readonly></textarea>
+<div id="h"></div>
+<script type="module">
+  import { SKETCH_SET } from '../data/tracks.js';
+  const SC = 'https://w.soundcloud.com';
+  const src = (u) => `${SC}/player/?url=${encodeURIComponent(u)}&auto_play=false&visual=false`;
+  const $s = document.getElementById('s');
+  const frames = new Map(); // window -> handler
+  function widget(url, onMsg) {
+    const f = document.createElement('iframe');
+    f.src = src(url);
+    document.getElementById('h').appendChild(f);
+    frames.set(f, onMsg);
+    return f;
+  }
+  const send = (f, method) => f.contentWindow.postMessage(JSON.stringify({ method }), SC);
+  addEventListener('message', (e) => {
+    if (e.origin !== SC) return;
+    let d; try { d = JSON.parse(e.data); } catch { return; }
+    for (const [f, fn] of frames) if (f.contentWindow === e.source) fn(f, d);
+  });
+  const row = (v) => ({ id: v.id, title: v.title, dur: Math.round(v.duration / 1000), date: String(v.display_date || v.created_at).slice(0, 10), url: v.permalink_url });
+  let ids = [];
+  const got = new Map();
+  function finish() {
+    const list = ids.map((id) => got.get(id)).filter(Boolean);
+    const q = (s) => `'${String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+    const lines = list.map((s) => `  { id: ${s.id}, title: ${q(s.title)}, dur: ${s.dur}, date: '${s.date}', url: ${q(s.url)} },`);
+    document.getElementById('o').value = `// count: ${ids.length}\nexport const SKETCHES = [\n${lines.join('\n')}\n];\n\n${JSON.stringify(list)}`;
+    $s.textContent = `done: ${list.length} of ${ids.length} sounds`;
+    document.title = `done ${list.length}/${ids.length}`;
+  }
+  function more() {
+    const missing = ids.filter((id) => !got.has(id));
+    if (!missing.length) return finish();
+    $s.textContent = `reading ${missing.length} more…`;
+    let left = missing.length;
+    const timer = setTimeout(finish, 30000);
+    missing.forEach((id) => widget(`https://api.soundcloud.com/tracks/${id}`, (f, d) => {
+      if (d.method === 'ready') send(f, 'getCurrentSound');
+      if (d.method === 'getCurrentSound' && d.value && !got.has(id)) {
+        got.set(id, row(d.value));
+        if (--left === 0) { clearTimeout(timer); finish(); }
+      }
+    }));
+  }
+  widget(`https://api.soundcloud.com/playlists/${SKETCH_SET.playlist}`, (f, d) => {
+    if (d.method === 'ready') send(f, 'getSounds');
+    if (d.method === 'getSounds' && !ids.length && Array.isArray(d.value)) {
+      ids = d.value.map((s) => s.id);
+      d.value.forEach((s) => { if (typeof s.title === 'string' && s.duration > 0) got.set(s.id, row(s)); });
+      more();
+    }
+  });
+</script>
+</html>
