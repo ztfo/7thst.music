@@ -14,7 +14,7 @@ Find llü's music on these platforms:
 ### Music
 
 - **Buena Suerte**: the new record, nine songs dealt like a Lotería deck, one card each. La Luna, El Cotorro and El Diablito are out. El Sueño, Los Amigos, El Corazón, El Fuego, El Perdido and La Dama arrive in early 2027, and each plays a 30-second preview on the site until then.
-- **[works in progress](https://soundcloud.com/llu-official/sets/experiments)**: unfinished songs as they come out of the studio. The newest play right on the site.
+- **[works in progress](https://soundcloud.com/llu-official/sets/experiments)**: unfinished songs as they come out of the studio, in the same order as on SoundCloud. They all play right on the site.
 
 ### Music Plug-ins
 

@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { TRACKS, SKETCHES, SKETCH_SET, PLATFORMS } from '../data/tracks.js';
 import ENVELOPES from '../data/envelopes.js';
 import { STR } from '../js/i18n.js';
-import { cap, esc, trackButtons, platformLinks, sketchRows } from '../js/markup.js';
+import { cap, esc, trackButtons, platformLinks, sketchRows, SKETCHES_SHOWN } from '../js/markup.js';
 import { SERIES as ART_SERIES, PER_PAGE, piecesFrom, inSeries, seriesButtons, workTiles } from '../js/art-markup.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -162,6 +162,7 @@ home = block(home, 'ld', ldBlock(homeLd));
 home = fillText(home);
 home = between(home, '<nav class="tracks__list" id="tracks" aria-label="Cards in the deck"', '</nav>', ` style="--n:${tracks.length}">${trackButtons(tracks, T)}`);
 home = between(home, '<ol class="sketches" id="sketches">', '</ol>', sketchRows(SKETCHES, T, { links: true, fallback: SKETCH_SET.url }));
+home = between(home, '<button class="sketches__more" id="sketches-more" type="button" aria-controls="sketches" aria-expanded="false"', '<svg', `${SKETCHES.length > SKETCHES_SHOWN ? '' : ' hidden'}><span>${esc(T('wipMore')(SKETCHES.length - SKETCHES_SHOWN))}</span>`);
 home = between(home, '<a class="sketches__all" id="sketches-all"', '<svg>', ` href="${SKETCH_SET.url}" target="_blank" rel="noopener"><span>${esc(T('allOnSC')(SKETCH_SET.count))}</span>`);
 home = between(home, '<nav class="platforms" id="platforms" aria-label="Follow llü">', '</nav>', platformLinks(PLATFORMS));
 write('index.html', home);
@@ -204,7 +205,7 @@ const lines = [
   '',
   '## Works in progress',
   '',
-  `Unfinished songs, newest first, from the SoundCloud set [works in progress.](${SKETCH_SET.url}) (${SKETCH_SET.count} in all). The newest play right on the site:`,
+  `Unfinished songs from the SoundCloud set [works in progress.](${SKETCH_SET.url}) (${SKETCH_SET.count} in all), in the set's own order. They all play right on the site, the first ${SKETCHES_SHOWN} shown and the rest under "more":`,
   '',
   ...SKETCHES.map((s) => `- [${s.title}](${s.url})`),
   '',
